@@ -1,7 +1,13 @@
 # develop
 
-1. `npm run dev`
+npm i
+安裝依賴
+
+
+1. `npm run dev` 
+    會開啟目前的介面到 http://localhost:3000
 2. `npm run electron`
+    會將 http://localhost:3000 的頁面包裝成 app 然後啟動
 
 `src/main.ts` 是 vue 前端的進入點
 `main.js` 是 electron 桌面的進入點
