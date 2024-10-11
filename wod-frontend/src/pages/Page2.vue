@@ -32,13 +32,13 @@
 </template>
 <script setup lang="ts">
   // import { createWindow, getVersion, setSize, setTitle } from '@/utils/electronAPI'
-  import { createWindow, setSize, setTitle } from '@/utils/electronAPI'
+  import { createWindow, setSize } from '@/utils/electronAPI'
 
-  const titleValue = ref('test')
+  // const titleValue = ref('test')
   function clickSetSize () {
     setSize(200, 400)
   }
-  function clickSetTitle () {
-    setTitle(titleValue.value)
-  }
+  // function clickSetTitle () {
+  //   setTitle(titleValue.value)
+  // }
 </script>
