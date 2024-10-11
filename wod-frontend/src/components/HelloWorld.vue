@@ -20,13 +20,15 @@
           <v-btn @click="clickSetTitle">set</v-btn>
         </v-card-text>
       </v-card>
-      <v-card>
+      <!-- <v-card>
         <v-card-title>set size</v-card-title>
         <v-btn @click="clickSetSize">set size</v-btn>
+      </v-card> -->
+      <v-card>
+        <!-- <v-btn @click="()=>{createWindow('/')}">create another home page</v-btn> -->
+        <v-btn to="/Page2">to page2</v-btn>
       </v-card>
-      <v-card title="create new window">
-        <v-btn @click="()=>{createWindow('/')}">create another home page</v-btn>
-      </v-card>
+      
     </v-responsive>
   </v-container>
 </template>
