@@ -1,7 +1,20 @@
-const { app, BrowserWindow } = require('electron/main')
+const { app, BrowserWindow, ipcMain } = require('electron/main')
 const path = require('node:path')
+ipcMain.on('window:set-title', (event, title) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+  win.setTitle(title)
+})
+ipcMain.on('window:create', (event, url) => {
+  createWindow(url)
+})
+ipcMain.on('window:set-size', (event, width, height) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+  win.setBounds({ width, height })
+})
 
-const createWindow = () => {
+const createWindow = url => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -9,8 +22,12 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   })
+  let baseUrl = 'http://localhost:3000'
+  if (url) {
+    baseUrl = baseUrl + url
+  }
 
-  win.loadURL('http://localhost:3000')// 使用 Vue 的開發伺服器地址
+  win.loadURL(baseUrl, { frame: false })// 使用 Vue 的開發伺服器地址
 }
 
 app.whenReady().then(() => {

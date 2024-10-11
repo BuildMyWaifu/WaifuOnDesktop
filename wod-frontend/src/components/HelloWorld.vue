@@ -10,28 +10,34 @@
       </div>
 
       <div class="py-4" />
-      <v-btn @click="resizeWindow">test resize 1</v-btn>
+      {{ getVersion() }}
       <v-btn @click="console.log(2)">asdf</v-btn>
->
-      test
-
-      test
-      fasdf;asdifj;asdf
+      > test test fasdf;asdifj;asdf
+      <v-card>
+        <v-card-title>set title example</v-card-title>
+        <v-card-text>
+          <v-text-field v-model="titleValue" />
+          <v-btn @click="clickSetTitle">set</v-btn>
+        </v-card-text>
+      </v-card>
+      <v-card>
+        <v-card-title>set size</v-card-title>
+        <v-btn @click="clickSetSize">set size</v-btn>
+      </v-card>
+      <v-card title="create new window">
+        <v-btn @click="()=>{createWindow('/')}">create another home page</v-btn>
+      </v-card>
     </v-responsive>
   </v-container>
 </template>
-
 <script setup lang="ts">
-  function resizeWindow () {
-    // 獲取 Electron 的窗口對象
-    alert(`本应用正在使用 Chrome (v${window.versions.chrome()}), Node.js (v${window.versions.node()}), 和 Electron (v${window.versions.electron()})`)
-    // const { remote } = require('electron')
-    // console.log(remote)
-    // const currentWindow = remote.getCurrentWindow()
+  import { createWindow, getVersion, setSize, setTitle } from '@/utils/electronAPI'
 
-    // // 設置新的窗口大小
-    // currentWindow.setSize(1024, 1024, true) // 修改為您想要的大小
-    // currentWindow.center()
+  const titleValue = ref('test')
+  function clickSetSize () {
+    setSize(200, 400)
   }
-
+  function clickSetTitle () {
+    setTitle(titleValue.value)
+  }
 </script>
