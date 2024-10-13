@@ -6,14 +6,17 @@
         <template #prepend>
           <v-avatar />
         </template>
-        <v-list-item>
-          <v-list-item-title>老婆一號</v-list-item-title>
-          <v-list-item-subtitle>老婆一號：你好呀！呀！呀！呀！呀！</v-list-item-subtitle>
+
+        <v-list-item v-for="companion in store.companionList" :key="companion._id">
+          <v-list-item-title>{{ companion._id }}</v-list-item-title>
+          <v-list-item-subtitle>
+            <div v-if="store.messageMap.get(companion._id)">
+              {{ lastMessage(companion._id)?.content || 'No messages yet' }}
+            </div>
+          </v-list-item-subtitle>
         </v-list-item>
-        <v-list-item>
-          <v-list-item-title>老婆一號</v-list-item-title>
-          <v-list-item-subtitle>老婆一號：你好呀！呀！呀！呀！呀！</v-list-item-subtitle>
-        </v-list-item>
+
+
       </v-list>
       <template #append>
         <div class="d-flex justify-center">
@@ -39,14 +42,34 @@
     <v-main>
       <v-container style="max-height: 80vh; overflow: auto">
         chat interface
-        <pre><code>{{ store.messageMap }}</code></pre>
+        <!-- <pre><code>{{ store.messageMap }}</code></pre> -->
+        
+        <div v-if="store.messageMap.get('test 1')">
+
+          <div v-if="lastMessage('test 1')">
+            Last message from waifu: {{ lastMessage('test 1')?.content || 'No messages yet' }}
+          </div>
+
+          <v-list-item v-for="(message, index) in store.messageMap.get('test 1')" :key="index">
+            <v-list-item-title>{{ message.role }}:</v-list-item-title>
+            <v-list-item-subtitle>{{ message.content }}</v-list-item-subtitle>
+          </v-list-item>
+          
+        </div>
+        
+
       </v-container>
     </v-main>
   </v-app>
 </template>
 <script setup lang="ts">
-  import { useAppStore } from '@/stores/app'
+import { useAppStore } from '@/stores/app'
 
-  const store = useAppStore()
+const store = useAppStore()
+
+const lastMessage = (Id: string) => {
+  const messages = store.messageMap.get(Id);
+  return messages ? messages[messages.length - 1] : null;
+}
 
 </script>
