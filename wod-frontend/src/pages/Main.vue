@@ -22,6 +22,11 @@
           <v-btn stacked>設定</v-btn>
           <v-btn stacked>登出</v-btn>
         </div>
+        <v-list-item v-if="store.user" lines="three">
+          <v-list-item-title>
+            {{ store.user?.profile.name }}
+          </v-list-item-title>
+        </v-list-item>
       </template>
     </v-navigation-drawer>
     <v-app-bar>
@@ -33,4 +38,8 @@
   </v-app>
 </template>
 <script setup lang="ts">
+  import { useAppStore } from '@/stores/app'
+
+  const store = useAppStore()
+
 </script>

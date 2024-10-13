@@ -4,7 +4,7 @@
       <div class="text-center">
         <div class="text-h3 font-weight-light mb-n1">Build My</div>
 
-        <h1 class="text-h2 font-weight-bold">Waifu</h1>
+        <h1 class="text-h2 font-weight-bold text-primary">Waifu</h1>
       </div>
 
       <div class="py-4" />
@@ -21,15 +21,24 @@
         </v-alert>
 
       </div>
-      <v-card style="position: fixed; right: 8px; bottom: 8px">
+      <!-- <v-card style="position: fixed; right: 8px; bottom: 8px">
         <v-card-text>
           <v-switch v-model="auth" hide-details label="切換登入狀態" />
         </v-card-text>
-      </v-card>
+      </v-card> -->
     </v-responsive>
   </v-container>
 </template>
 
 <script lang="ts" setup>
-  const auth = ref(false)
+  import { useAppStore } from '@/stores/app'
+
+  const store = useAppStore()
+  const auth = computed(() => {
+    if (store.user !== undefined) {
+      return true
+    }
+    return false
+  })
+
 </script>
