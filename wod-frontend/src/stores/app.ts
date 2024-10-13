@@ -12,5 +12,8 @@ export const useAppStore = defineStore('app', {
       // 當你登入後，將登入取得的使用者資訊傳入此函式
       this.user = user
     },
+    logout () {
+      this.user = undefined
+    },
   },
 })

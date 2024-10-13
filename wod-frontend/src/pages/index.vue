@@ -21,11 +21,12 @@
         </v-alert>
 
       </div>
-      <!-- <v-card style="position: fixed; right: 8px; bottom: 8px">
+      <v-card style="position: fixed; right: 8px; bottom: 8px">
         <v-card-text>
-          <v-switch v-model="auth" hide-details label="切換登入狀態" />
+          <v-btn variant="text" @click="toggleAuthStat">切換登入狀態</v-btn>
+
         </v-card-text>
-      </v-card> -->
+      </v-card>
     </v-responsive>
   </v-container>
 </template>
@@ -40,5 +41,11 @@
     }
     return false
   })
-
+  function toggleAuthStat () {
+    if (store.user !== undefined) {
+      store.logout()
+    } else {
+      store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
+    }
+  }
 </script>
