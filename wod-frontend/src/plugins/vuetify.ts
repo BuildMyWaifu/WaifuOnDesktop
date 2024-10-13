@@ -19,10 +19,9 @@ export default createVuetify({
     themes: {
       dark: {
         colors: {
-          primary: colors.red.darken1, // #E53935
-          secondary: colors.red.lighten4, // #FFCDD2
-          background: colors.pink.accent1,
-        }
+          primary: colors.pink.accent1, // #E53935
+          secondary: colors.pink.accent2, // #FFCDD2
+        },
       },
     },
   },

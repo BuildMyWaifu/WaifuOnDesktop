@@ -14,7 +14,7 @@ ipcMain.on('window:set-size', (event, width, height) => {
   win.setBounds({ width, height })
 })
 
-const createWindow = (url) => {
+const createWindow = url => {
   const win = new BrowserWindow({
     width: 600,
     height: 450,
