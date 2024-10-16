@@ -1,14 +1,5 @@
 <template>
   <v-app>
-    <v-app-bar>
-      <template v-slot:prepend>
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      </template>
-      <v-app-bar-title>
-        {{ currentWife === null ? (currentWife || '老婆名稱') : currentWife }}
-      </v-app-bar-title>
-    </v-app-bar>
-
     <v-navigation-drawer location="left" v-model="drawer" app>
       <v-list lines="three" select-strategy="single-independent">
         <template #prepend>
@@ -55,6 +46,15 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
+
+    <v-app-bar>
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      </template>
+      <v-app-bar-title>
+        {{ currentWife === null ? (currentWife || '老婆名稱') : currentWife }}
+      </v-app-bar-title>
+    </v-app-bar>
 
     <v-main>
       <v-container style="max-height: 80vh; overflow: auto">
@@ -111,6 +111,6 @@ import { useAppStore } from '@/stores/app'
   };
 
   const logout = () => {
-    console.log('Logging out...');
+    router.push('/');
   };
 </script>
