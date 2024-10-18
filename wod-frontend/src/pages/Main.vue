@@ -110,6 +110,7 @@
   }
 
   const logout = () => {
+    store.logout()
     router.push('/')
   }
 </script>
