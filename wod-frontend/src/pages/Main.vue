@@ -3,7 +3,7 @@
     <v-navigation-drawer v-model="drawer" app location="left">
       <v-list lines="three" select-strategy="single-independent">
         <template #prepend>
-          <v-avatar />
+          <v-avatar /> <!-- avatar for waifu -->
         </template>
         <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id" @click="updateCurrentWife(companion._id)">
           <v-list-item-title>{{ companion._id }}</v-list-item-title>
@@ -25,9 +25,7 @@
           <template #append>
             <v-menu offset-y>
               <template #activator="{ props }">
-                <v-btn v-bind="props" position="sticky">
-                  ...
-                </v-btn>
+                <v-btn v-bind="props" icon="mdi-cog" variant="text" />
               </template>
               <!-- 彈出選單內容 -->
               <v-list>
@@ -86,7 +84,7 @@
   const router = useRouter()
 
   // 控制 navigation drawer 的開關
-  const drawer = ref(false) // 初始為 false，即隱藏
+  const drawer = ref(true) // 初始改為 undefined，即自動
 
   // currentWife 定義為一個 ref，這樣它可以是響應式的
   const currentWife = ref<string | null>(null)
