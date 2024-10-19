@@ -6,24 +6,6 @@
           <pre class="d-flex">Build My <div class="text-primary">Waifu</div></pre>
         </v-card-title>
         <v-card-text>
-          <div class="d-flex">
-            <v-text-field
-              v-model="payload.firstName"
-              class="ma-2"
-              density="compact"
-              label="姓"
-              :rules="rules"
-              variant="solo-filled"
-            />
-            <v-text-field
-              v-model="payload.lastName"
-              class="ma-2 me-auto"
-              density="compact"
-              label="名"
-              :rules="rules"
-              variant="solo-filled"
-            />
-          </div>
           <v-text-field
             v-model="payload.email"
             density="compact"
@@ -64,6 +46,10 @@
       </v-form>
 
     </v-card>
+    <div class="text-center">
+      <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toSignUp">
+        已經有帳號了嗎？</div>
+    </div>
   </v-container>
 </template>
 <script lang="ts" setup>
@@ -84,8 +70,6 @@
     email: '',
     account: '',
     password: '',
-    lastName: '',
-    firstName: '',
   })
   const valid = ref(false)
   const showPassword = ref(false)
@@ -96,7 +80,7 @@
 
   async function toSignUp () {
     await router.push({
-      path: '/signup',
+      path: '/Login',
       query: {
         redirect: route.query.redirect,
       },
