@@ -10,7 +10,7 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 const routes = [
   {
     path: '/',
-    component: () => import('@/pages/Index.vue'),
+    component: () => import('@/pages/index.vue'),
     meta: { requiresAuth: false },
   },
   {

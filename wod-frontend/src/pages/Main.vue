@@ -5,7 +5,8 @@
         <template #prepend>
           <v-avatar /> <!-- avatar for waifu -->
         </template>
-        <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id" @click="updateCurrentWife(companion._id)">
+        <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
+          @click="updateCurrentWife(companion._id)">
           <v-list-item-title>{{ companion._id }}</v-list-item-title>
           <v-list-item-subtitle>
             <div v-if="store.messageMap.get(companion._id)">
@@ -56,59 +57,122 @@
 
     <v-main>
       <v-container style="max-height: 80vh; overflow: auto">
-        chat interface
-        <!-- <pre><code>{{ store.messageMap }}</code></pre> -->
-
+        <!--chat interface-->
         <div v-if="store.messageMap.get('test 1')">
-
+          <!--
           <div v-if="lastMessage('test 1')">
             Last message from waifu: {{ lastMessage('test 1')?.content || 'No messages yet' }}
           </div>
-
-          <v-list-item v-for="(message, index) in store.messageMap.get('test 1')" :key="index">
-            <v-list-item-title>{{ message.role }}:</v-list-item-title>
-            <v-list-item-subtitle>{{ message.content }}</v-list-item-subtitle>
+          -->
+          <!-- 訊息列表 -->
+          <v-list-item v-for="(message, index) in store.messageMap.get('test 1')" :key="index" :class="['message-box', message.role]">
+            <v-list-item-title class="message-content">{{ message.content }}</v-list-item-title>
           </v-list-item>
 
         </div>
-
+      </v-container>
+      <!-- 新增訊息輸入欄 -->
+      <v-container class="message-input-container" >
+        <v-row>
+          <v-col cols="10">
+            <v-text-field v-model="newMessage" label="輸入訊息..." outlined dense />
+          </v-col>
+          <v-col cols="1">
+            <v-btn @click="sendMessage" icon="mdi-send" color="primary" />
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script setup lang="ts">
-  import { useAppStore } from '@/stores/app'
+import { useAppStore } from '@/stores/app'
 
-  const store = useAppStore()
-  const router = useRouter()
+const store = useAppStore()
+const router = useRouter()
 
-  // 控制 navigation drawer 的開關
-  const drawer = ref(true) // 初始改為 undefined，即自動
+// 控制 navigation drawer 的開關
+const drawer = ref(true) // 初始改為 undefined，即自動
 
-  // currentWife 定義為一個 ref，這樣它可以是響應式的
-  const currentWife = ref<string | null>(null)
+// currentWife 定義為一個 ref，這樣它可以是響應式的
+const currentWife = ref<string | null>(null)
 
-  const lastMessage = (Id: string) => {
-    const messages = store.messageMap.get(Id)
-    return messages ? messages[messages.length - 1] : null
+// 新增訊息內容的變數
+const newMessage = ref('');
+
+// 發送訊息函數
+const sendMessage = () => {
+  if (newMessage.value.trim()) {
+    newMessage.value = ''; // 清空輸入框
   }
+};
 
-  // updateCurrentWife 函數來更新 currentWife
-  const updateCurrentWife = (Id: string) => {
-    currentWife.value = Id
-  }
+const lastMessage = (Id: string) => {
+  const messages = store.messageMap.get(Id)
+  return messages ? messages[messages.length - 1] : null
+}
 
-  const goToHome = () => {
-    router.push('/')
-  }
+// updateCurrentWife 函數來更新 currentWife
+const updateCurrentWife = (Id: string) => {
+  currentWife.value = Id
+}
 
-  const goToSettings = () => {
-    console.log('Setting')
-  }
+const goToHome = () => {
+  router.push('/')
+}
 
-  const logout = () => {
-    store.logout()
-    router.push('/')
-  }
+const goToSettings = () => {
+  console.log('Setting')
+}
+
+const logout = () => {
+  store.logout()
+  router.push('/')
+}
 </script>
+
+<style scoped>
+.message-box {
+  display: flex;
+  margin-bottom: 10px;
+  max-width: 60%;
+}
+
+.message-box.user {
+  justify-content: flex-end;
+}
+
+.message-box.wife {
+  justify-content: flex-start;
+}
+
+.message-content {
+  padding: 10px;
+  border-radius: 15px;
+  background-color: #f1f1f1;
+  white-space: pre-wrap;
+  color: black;
+}
+
+.message-box.user .message-content {
+  background-color: #b2dfdb; /* 淺綠色，類似圖中訊息的顏色 */
+  border-bottom-right-radius: 0;
+}
+
+.message-box.wife .message-content {
+  background-color: #e0e0e0; /* 灰色，類似圖中對方訊息的顏色 */
+  border-bottom-left-radius: 0;
+}
+
+.message-role {
+  font-weight: bold;
+}
+
+.message-input-container {
+  background-color: #fafafa;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  overflow: auto;
+}
+</style>
