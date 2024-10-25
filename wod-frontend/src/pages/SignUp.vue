@@ -47,7 +47,7 @@
 
     </v-card>
     <div class="text-center">
-      <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toSignUp">
+      <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toLogIn">
         已經有帳號了嗎？</div>
     </div>
   </v-container>
@@ -78,7 +78,7 @@
   const router = useRouter()
   const appStore = useAppStore()
 
-  async function toSignUp () {
+  async function toLogIn () {
     await router.push({
       path: '/Login',
       query: {

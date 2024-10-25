@@ -1,12 +1,16 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app location="left">
+    <v-navigation-drawer v-model="drawer" app location="left" :permanent="isPermanent">
       <v-list lines="three" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for waifu -->
         </template>
-        <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
-          @click="updateCurrentWife(companion._id)">
+        <v-list-item
+          v-for="companion in store.companionList"
+          :key="companion._id"
+          :value="companion._id"
+          @click="updateCurrentWife(companion._id)"
+        >
           <v-list-item-title>{{ companion._id }}</v-list-item-title>
           <v-list-item-subtitle>
             <div v-if="store.messageMap.get(companion._id)">
@@ -47,7 +51,7 @@
     </v-navigation-drawer>
 
     <v-app-bar>
-      <template #prepend>
+      <template v-if="display.width.value < 500">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       </template>
       <v-app-bar-title>
@@ -72,13 +76,13 @@
         </div>
       </v-container>
       <!-- 新增訊息輸入欄 -->
-      <v-container class="message-input-container" >
+      <v-container class="message-input-container">
         <v-row>
           <v-col cols="10">
-            <v-text-field v-model="newMessage" label="輸入訊息..." outlined dense />
+            <v-text-field v-model="newMessage" dense label="輸入訊息..." outlined />
           </v-col>
           <v-col cols="1">
-            <v-btn @click="sendMessage" icon="mdi-send" color="primary" />
+            <v-btn color="primary" icon="mdi-send" @click="sendMessage" />
           </v-col>
         </v-row>
       </v-container>
@@ -87,49 +91,73 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@/stores/app'
+  import { useAppStore } from '@/stores/app'
+  import { useDisplay } from 'vuetify'
+  import { onMounted } from 'vue'
 
-const store = useAppStore()
-const router = useRouter()
+  const store = useAppStore()
+  const router = useRouter()
 
-// 控制 navigation drawer 的開關
-const drawer = ref(true) // 初始改為 undefined，即自動
+  const display = useDisplay()
 
-// currentWife 定義為一個 ref，這樣它可以是響應式的
-const currentWife = ref<string | null>(null)
+  // 控制 navigation drawer 的開關
+  const drawer = ref(true) // 初始改為 undefined，即自動
 
-// 新增訊息內容的變數
-const newMessage = ref('');
+  // currentWife 定義為一個 ref，這樣它可以是響應式的
+  const currentWife = ref<string | null>(null)
 
-// 發送訊息函數
-const sendMessage = () => {
-  if (newMessage.value.trim()) {
-    newMessage.value = ''; // 清空輸入框
+  const windowISUpper500 = ref(display.width.value >= 500)
+  const isPermanent = ref(display.width.value >= 500)
+
+  // 新增訊息內容的變數
+  const newMessage = ref('')
+
+  // 發送訊息函數
+  const sendMessage = () => {
+    if (newMessage.value.trim()) {
+      newMessage.value = '' // 清空輸入框
+    }
   }
-};
 
-const lastMessage = (Id: string) => {
-  const messages = store.messageMap.get(Id)
-  return messages ? messages[messages.length - 1] : null
-}
+  const lastMessage = (Id: string) => {
+    const messages = store.messageMap.get(Id)
+    return messages ? messages[messages.length - 1] : null
+  }
 
-// updateCurrentWife 函數來更新 currentWife
-const updateCurrentWife = (Id: string) => {
-  currentWife.value = Id
-}
+  // updateCurrentWife 函數來更新 currentWife
+  const updateCurrentWife = (Id: string) => {
+    currentWife.value = Id
+  }
 
-const goToHome = () => {
-  router.push('/')
-}
+  const goToHome = () => {
+    router.push('/')
+  }
 
-const goToSettings = () => {
-  console.log('Setting')
-}
+  const goToSettings = () => {
+    console.log('Setting')
+  }
 
-const logout = () => {
-  store.logout()
-  router.push('/')
-}
+  const logout = () => {
+    store.logout()
+    router.push('/')
+  }
+
+  // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
+  onMounted(() => {
+    window.addEventListener('resize', handleResize)
+    handleResize()
+  })
+  const handleResize = () => {
+    if (windowISUpper500.value && display.width.value < 500) {
+      drawer.value = false
+      windowISUpper500.value = false
+      isPermanent.value = false
+    } else if (!windowISUpper500.value && display.width.value >= 500) {
+      drawer.value = true
+      windowISUpper500.value = true
+      isPermanent.value = true
+    }
+  }
 </script>
 
 <style scoped>
