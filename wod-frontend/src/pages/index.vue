@@ -10,6 +10,7 @@
       <div class="py-4" />
       <div v-if="auth" class="d-flex justify-center">
         <v-btn class="ma-3" to="/app" variant="outlined">進入</v-btn>
+        <v-btn class="ma-3" to="/app" variant="outlined">進入錯誤頁面</v-btn>
       </div>
       <div v-else class="d-flex justify-center">
         <v-alert style="max-width: 500px;" type="warning" variant="tonal">

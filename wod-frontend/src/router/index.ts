@@ -31,6 +31,12 @@ const routes = [
     meta: { requiresAuth: false },
     component: () => import('@/pages/SignUp.vue'),
   },
+  {
+    path:'*',
+    name: 'Error',
+    meta: { requiresAuth: false },
+    component: () => import('@/pages/ErrorPage.vue'),
+  }
 ]
 
 const router = createRouter({
