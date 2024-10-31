@@ -32,11 +32,11 @@ const routes = [
     component: () => import('@/pages/SignUp.vue'),
   },
   {
-    path:'*',
+    path: '/:pathMatch(.*)*',
     name: 'Error',
     meta: { requiresAuth: false },
     component: () => import('@/pages/ErrorPage.vue'),
-  }
+  },
 ]
 
 const router = createRouter({
