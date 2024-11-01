@@ -143,9 +143,15 @@
   }
 
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
+  const windowResizeListener = ref()
   onMounted(() => {
-    window.addEventListener('resize', handleResize)
+    windowResizeListener.value = window.addEventListener('resize', handleResize)
     handleResize()
+  })
+  onUnmounted(() => {
+    if (windowResizeListener.value !== undefined) {
+      window.removeEventListener('resize', windowResizeListener.value)
+    }
   })
   const handleResize = () => {
     if (windowISUpper500.value && display.width.value < 500) {
