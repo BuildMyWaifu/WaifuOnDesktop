@@ -10,7 +10,7 @@
       <div class="py-4" />
       <div v-if="auth" class="d-flex justify-center">
         <v-btn class="ma-3" to="/app" variant="outlined">進入</v-btn>
-        
+
       </div>
       <div v-else class="d-flex justify-center">
         <v-alert style="max-width: 500px;" type="warning" variant="tonal">
@@ -26,7 +26,7 @@
         <v-card-text>
           <!-- <v-btn variant="text" to="/abcd">進入錯誤頁面</v-btn> -->
           <v-btn variant="text" @click="toggleAuthStat">切換登入狀態</v-btn>
-        
+
         </v-card-text>
       </v-card>
     </v-responsive>

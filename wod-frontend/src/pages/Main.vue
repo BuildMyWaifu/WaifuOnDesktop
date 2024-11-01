@@ -49,8 +49,9 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
+    <v-navigation-drawer location="right" />
 
-    <v-app-bar>
+    <v-app-bar elevation="0">
       <template v-if="display.width.value < 500">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       </template>
@@ -59,34 +60,41 @@
       </v-app-bar-title>
     </v-app-bar>
 
-    <v-main>
-      <v-container style="max-height: 80vh; overflow: auto">
+    <v-main style="height: 100vh">
+      <v-container class="pa-2" style="height: 100%; overflow-y: scroll">
         <!--chat interface-->
         <div v-if="store.messageMap.get('test 1')">
-          <!--
-          <div v-if="lastMessage('test 1')">
-            Last message from waifu: {{ lastMessage('test 1')?.content || 'No messages yet' }}
+          <div
+            v-for="(message, index) in store.messageMap.get('test 1')"
+            :key="index"
+            :class="['message-box', message.role]"
+          >
+            <div class="message-content">
+              {{ message.content }}
+            </div>
           </div>
-          -->
-          <!-- 訊息列表 -->
-          <v-list-item v-for="(message, index) in store.messageMap.get('test 1')" :key="index" :class="['message-box', message.role]">
-            <v-list-item-title class="message-content">{{ message.content }}</v-list-item-title>
-          </v-list-item>
-
         </div>
       </v-container>
-      <!-- 新增訊息輸入欄 -->
-      <v-container class="message-input-container">
-        <v-row>
-          <v-col cols="10">
-            <v-text-field v-model="newMessage" dense label="輸入訊息..." outlined />
-          </v-col>
-          <v-col cols="1">
-            <v-btn color="primary" icon="mdi-send" @click="sendMessage" />
-          </v-col>
-        </v-row>
-      </v-container>
     </v-main>
+    <v-form @submit.prevent="sendMessage">
+      <v-footer app class="pa-0" style="background: none">
+        <v-container class="pa-2 pt-0">
+
+          <v-text-field
+            v-model="newMessage"
+            append-icon="mdi-send"
+            density="compact"
+            flat
+            hide-details
+            label="說些什麼吧"
+            single-line
+            variant="solo"
+            @click:append="sendMessage"
+          />
+        </v-container>
+      </v-footer>
+    </v-form>
+
   </v-app>
 </template>
 
@@ -106,6 +114,7 @@
   // currentWife 定義為一個 ref，這樣它可以是響應式的
   const currentWife = ref<string | null>(null)
 
+  // init value with width
   const windowISUpper500 = ref(display.width.value >= 500)
   const isPermanent = ref(display.width.value >= 500)
 
@@ -170,7 +179,6 @@
 .message-box {
   display: flex;
   margin-bottom: 10px;
-  max-width: 60%;
 }
 
 .message-box.user {
@@ -190,23 +198,18 @@
 }
 
 .message-box.user .message-content {
-  background-color: #b2dfdb; /* 淺綠色，類似圖中訊息的顏色 */
+  background-color: #b2dfdb;
+  /* 淺綠色，類似圖中訊息的顏色 */
   border-bottom-right-radius: 0;
 }
 
 .message-box.wife .message-content {
-  background-color: #e0e0e0; /* 灰色，類似圖中對方訊息的顏色 */
+  background-color: #e0e0e0;
+  /* 灰色，類似圖中對方訊息的顏色 */
   border-bottom-left-radius: 0;
 }
 
 .message-role {
   font-weight: bold;
-}
-
-.message-input-container {
-  background-color: #fafafa;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  overflow: auto;
 }
 </style>
