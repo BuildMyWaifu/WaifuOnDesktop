@@ -1,6 +1,16 @@
 export function required (v: string) {
   return !!v || '此欄位不得留空'
 }
+
+export function name (v: string) {
+  if (!v || v.length < 2) {
+    return '名字至少要有2個字符'
+  } else if (v.length >= 100) {
+    return '名字不能超過100個字符'
+  }
+  return true
+}
+
 export function email (v: string) {
   return !v ||
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||

@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center align-center h-100 w-100 flex-column">
     <v-card class="mb-4" :loading="loading" style="max-width: 100%;" width="500">
-      <v-form v-model="valid" validate-on="input" @submit.prevent="submit">
+      <v-form v-model="formValid" validate-on="input" @submit.prevent="submitSignUp">
         <v-card-title class="d-flex text-center justify-center">
           <pre class="d-flex">Build My <div class="text-primary">Waifu</div></pre>
         </v-card-title>
@@ -10,14 +10,14 @@
             v-model="payload.email"
             density="compact"
             label="電子郵件"
-            :rules="emailRule"
+            :rules="[email, required]"
             variant="solo-filled"
           />
           <v-text-field
-            v-model="payload.account"
+            v-model="payload.name"
             density="compact"
             label="帳號"
-            :rules="rules"
+            :rules="[name, required]"
             variant="solo-filled"
           />
           <v-text-field
@@ -25,7 +25,7 @@
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             density="compact"
             label="密碼"
-            :rules="passwordRule"
+            :rules="[password, required]"
             :type="showPassword ? 'text' : 'password'"
             variant="solo-filled"
             @click:append-inner="showPassword = !showPassword"
@@ -37,7 +37,7 @@
               block
               color="primary"
               dark
-              :disabled="!valid"
+              :disabled="!formValid"
               :loading="loading"
               type="submit"
             >註冊</v-btn>
@@ -47,58 +47,58 @@
 
     </v-card>
     <div class="text-center">
-      <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toLogIn">
+      <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="redirectToLogin">
         已經有帳號了嗎？</div>
     </div>
+    <v-snackbar v-model="showSnackBar" :color="snackbar?.status">{{ snackbar?.message }}</v-snackbar>
   </v-container>
 </template>
 <script lang="ts" setup>
-
   import { ref } from 'vue'
-  import { email, password, required } from '@/utils/form'
   import { postApi } from '@/utils/api'
   import { useAppStore } from '@/stores/app'
   import { useRoute, useRouter } from 'vue-router'
+  import { email, name, password, required } from '@/utils/form'
   import { hash } from '@/utils/utils'
   import { SubmitEventPromise } from 'vuetify'
 
-  const rules = [required]
-  const passwordRule = [required, password]
-  const emailRule = [required, email]
+  const store = useAppStore()
+  const { login } = store
+  const router = useRouter()
   const loading = ref(false)
+  const formValid = ref(false)
   const payload = ref({
+    name: '',
     email: '',
-    account: '',
     password: '',
   })
-  const valid = ref(false)
   const showPassword = ref(false)
-
+  const snackbar = ref<{status: string, message: string}>()
+  const showSnackBar = ref(false)
   const route = useRoute()
-  const router = useRouter()
-  const appStore = useAppStore()
 
-  async function toLogIn () {
-    await router.push({
-      path: '/Login',
-      query: {
-        redirect: route.query.redirect,
-      },
-    })
+  const redirectToLogin = () => {
+    router.push('/login')
   }
-
-  async function submit (event: SubmitEventPromise) {
+  async function submitSignUp (event: SubmitEventPromise) {
     loading.value = true
     const results = await event
     if (results.valid) {
-      const res = await postApi('/login', {
-        account: payload.value.account,
+      const res = await postApi('/signup', {
+        name: payload.value.name,
+        email: payload.value.email,
         password: hash(payload.value.password),
       })
+      snackbar.value = res
+      showSnackBar.value = true
       if (res.status === 'success') {
-        appStore.login(res.data)
-
-        await router.push('/')
+        login(res.data)
+        const redirectPath = route.query.redirect
+        if (redirectPath) {
+          await router.push(redirectPath.toString())
+        } else {
+          await router.push('/')
+        }
       }
     }
     loading.value = false

@@ -7,9 +7,9 @@
         </v-card-title>
         <v-card-text>
           <v-text-field
-            v-model="payload.account"
+            v-model="payload.email"
             density="compact"
-            label="帳號"
+            label="電子郵件"
             :rules="rules"
             variant="solo-filled"
           />
@@ -43,7 +43,7 @@
       <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toSignUp">
         沒有帳號嗎？</div>
     </div>
-
+    <v-snackbar v-model="showSnackBar" :color="snackbar?.status">{{ snackbar?.message }}</v-snackbar>
   </v-container>
 </template>
 <script lang="ts" setup>
@@ -59,11 +59,13 @@
   const rules = [required]
   const loading = ref(false)
   const payload = ref({
-    account: '',
+    email: '',
     password: '',
   })
   const valid = ref(false)
   const showPassword = ref(false)
+  const snackbar = ref<{status: string, message: string}>()
+  const showSnackBar = ref(false)
 
   const route = useRoute()
   const router = useRouter()
@@ -83,9 +85,11 @@
     const results = await event
     if (results.valid) {
       const res = await postApi('/login', {
-        account: payload.value.account,
+        email: payload.value.email,
         password: hash(payload.value.password),
       })
+      snackbar.value = res
+      showSnackBar.value = true
       if (res.status === 'success') {
         appStore.login(res.data)
 
