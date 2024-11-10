@@ -10,21 +10,33 @@ export const useAppStore = defineStore('app', {
         _id: 'test 1',
         profile: {
           name: 'test name 1',
-          role: 'wife',
+          description: 'asdf',
+        },
+        prompt: {
+          character: 'asf',
+          backstory: 'asdf',
         },
       },
       {
         _id: 'test 2',
         profile: {
-          name: 'test name 2',
-          role: 'girlfriend',
+          name: 'test name 1',
+          description: 'asdf',
+        },
+        prompt: {
+          character: 'asf',
+          backstory: 'asdf',
         },
       },
       {
         _id: 'test 3',
         profile: {
-          name: 'test name 3',
-          role: 'assistant',
+          name: 'test name 1',
+          description: 'asdf',
+        },
+        prompt: {
+          character: 'asf',
+          backstory: 'asdf',
         },
       },
     ] as Companion[],
@@ -44,7 +56,7 @@ export const useAppStore = defineStore('app', {
         for (let i = 0; i < 10; i++) {
           messages.push({
             _id: `test message ${i}`,
-            role: (i % 2 === 1) ? companion.profile.role : 'user',
+            role: (i % 2 === 1) ? 'bot' : 'user',
             companionId: companion._id,
             content: `test message content ${i}`,
             createdAt: new Date().getTime(),
