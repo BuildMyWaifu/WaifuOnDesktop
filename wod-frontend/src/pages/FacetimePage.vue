@@ -19,7 +19,7 @@
       <!-- <v-img class="mb-4" height="150" src="@/assets/logo.png" /> -->
 
       <div class="text-center">
-        <h1 class="text-h3 font-weight">Facetime Page</h1>
+        <h1 class="text-h3 font-weight">FaceTime Page</h1>
       </div>
 
       <div class="py-4" />
@@ -37,6 +37,7 @@
 
   function showMenu() {
     isCardVisible.value = !isCardVisible.value;
-    isCardVisible.value ? setSize(800, 450) : setSize(600, 450);
+    if (isCardVisible.value) { setSize(800, 450) }
+    else { setSize(600, 450) }
   };
 </script>

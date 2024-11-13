@@ -8,6 +8,7 @@
 
 <script lang="ts" setup>
   import { useAppStore } from './stores/app'
+  import { onMounted } from 'vue';
 
   const store = useAppStore()
   onMounted(store.generateMockMessages)

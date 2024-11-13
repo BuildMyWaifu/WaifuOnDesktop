@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
     <v-navigation-drawer v-model="drawer" app location="left" :permanent="isPermanent">
@@ -101,7 +102,8 @@
 <script setup lang="ts">
   import { useAppStore } from '@/stores/app'
   import { useDisplay } from 'vuetify'
-  import { onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { onMounted, ref, onUnmounted } from 'vue'
 
   const store = useAppStore()
   const router = useRouter()

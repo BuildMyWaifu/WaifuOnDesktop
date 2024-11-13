@@ -34,7 +34,12 @@ const isCardVisible = ref(false);
 
 function showMenu() {
   isCardVisible.value = !isCardVisible.value;
-  isCardVisible.value ? setSize(800, 450) : setSize(600, 450);
+  if (isCardVisible.value) {
+    setSize(800, 450)
+  }
+  else {
+    setSize(600, 450)
+  }
 };
 
 </script>

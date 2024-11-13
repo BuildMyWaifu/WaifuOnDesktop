@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function setTitle (newTitle: string) {
   (window as any).electronAPI.setTitle(newTitle)
 }

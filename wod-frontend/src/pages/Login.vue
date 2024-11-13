@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-container class="d-flex justify-center align-center h-100 w-100 flex-column">
     <v-card class="mb-4" :loading="loading" style="max-width: 100%;" width="500">

@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable-next-line vue/multi-word-component-names -->
 <template>
   <v-container class="fill-height">
     <v-responsive class="align-center fill-height mx-auto" max-width="900">
@@ -35,6 +37,7 @@
 
 <script lang="ts" setup>
   import { useAppStore } from '@/stores/app'
+  import { computed } from 'vue';
 
   const store = useAppStore()
   const auth = computed(() => {
