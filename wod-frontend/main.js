@@ -22,6 +22,7 @@ const createWindow = url => {
       preload: path.join(__dirname, 'preload.js'),
     },
   })
+  win.removeMenu()
   let baseUrl = 'http://localhost:3000'
   if (url) {
     baseUrl = baseUrl + url
