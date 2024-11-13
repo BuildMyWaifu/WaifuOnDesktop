@@ -21,6 +21,14 @@
         </v-list-item>
         <v-divider />
       </v-list>
+      <div class="text-center">
+        <v-btn @click="createNewWife">
+          <template v-slot:prepend>
+            <v-icon icon="mdi-plus"></v-icon>
+          </template>
+          新增老婆
+        </v-btn>
+      </div>
       <template #append>
         <v-divider />
         <v-list-item v-if="store.user" lines="three">
@@ -104,6 +112,7 @@
   import { useDisplay } from 'vuetify'
   import { useRouter } from 'vue-router'
   import { onMounted, ref, onUnmounted } from 'vue'
+  import { broadcast, createWindow } from '@/utils/electronAPI'
 
   const store = useAppStore()
   const router = useRouter()
@@ -134,6 +143,10 @@
     const messages = store.messageMap.get(Id)
     return messages ? messages[messages.length - 1] : null
   }
+
+  const createNewWife =() => {
+    createWindow('/newWife')
+}
 
   // updateCurrentWife 函數來更新 currentWife
   const updateCurrentWife = (Id: string) => {

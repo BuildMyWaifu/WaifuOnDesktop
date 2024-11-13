@@ -43,6 +43,12 @@ const routes = [
     meta: { requiresAuth: false },
     component: () => import('@/pages/ErrorPage.vue'),
   },
+  {
+    path: '/newWife',
+    name: 'CreateNewWife',
+    meta: { requiresAuth: false },
+    component: () => import('@/pages/CreateNewWife.vue'),
+  },
 ]
 
 const router = createRouter({
