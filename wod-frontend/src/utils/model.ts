@@ -2,6 +2,16 @@ type Document = {
     _id: string
 }
 
+export interface SyncCompanionStat {
+    window: {
+        facetime: boolean
+    }  // 目前的設置只是範例，因為目前需要同步的只有視窗的開啟狀態（未來應該還需要同步角色動作）
+}
+
+export interface Sync {
+    companion: { [key: string]: SyncCompanionStat | undefined } // companion[companionId]: SyncCompanionStat
+}
+
 export interface Companion extends Document {
     profile: {
         name: string

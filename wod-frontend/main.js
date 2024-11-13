@@ -1,5 +1,17 @@
-const { app, BrowserWindow, ipcMain } = require('electron/main')
-const path = require('node:path')
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { app, BrowserWindow, ipcMain, webContents } from 'electron/main'
+import { join } from 'node:path'
+import process  from 'node:process';
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+let lastSync = undefined
+
 ipcMain.on('window:set-title', (event, title) => {
   const webContents = event.sender
   const win = BrowserWindow.fromWebContents(webContents)
@@ -14,12 +26,23 @@ ipcMain.on('window:set-size', (event, width, height) => {
   win.setBounds({ width, height })
 })
 
+ipcMain.on('sync:fetch', (event) => {
+  event.sender.send('sync:broadcast', lastSync)
+})
+
+ipcMain.on('sync:submit', (event, content) => {
+  lastSync = content
+   webContents.getAllWebContents().map((webContent) => {
+    webContent.send('sync:broadcast', content)
+  })
+})
+
 const createWindow = url => {
   const win = new BrowserWindow({
     width: 600,
     height: 450,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.js'),
     },
   })
   win.removeMenu()
@@ -29,6 +52,7 @@ const createWindow = url => {
   }
 
   win.loadURL(baseUrl, { frame: false })// 使用 Vue 的開發伺服器地址
+  return win
 }
 
 app.whenReady().then(() => {

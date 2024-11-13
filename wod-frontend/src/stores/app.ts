@@ -1,10 +1,14 @@
 // Utilities
 import { defineStore } from 'pinia'
-import { Companion, Message, User } from '@/utils/model'
+import { Companion, Message, Sync, User } from '@/utils/model'
+
+const defaultSync = {
+  companion: {}
+} as Sync
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    user: undefined as User| undefined,
+    user: undefined as User | undefined,
     companionList: [
       {
         _id: 'test 1',
@@ -41,16 +45,17 @@ export const useAppStore = defineStore('app', {
       },
     ] as Companion[],
     messageMap: new Map() as Map<string, Message[]>,
+    sync: defaultSync as Sync
   }),
   actions: {
-    login (user: User) {
+    login(user: User) {
       // 當你登入後，將登入取得的使用者資訊傳入此函式
       this.user = user
     },
-    logout () {
+    logout() {
       this.user = undefined
     },
-    generateMockMessages () {
+    generateMockMessages() {
       for (const companion of this.companionList) {
         const messages: Message[] = []
         for (let i = 0; i < 10; i++) {
@@ -65,5 +70,8 @@ export const useAppStore = defineStore('app', {
         this.messageMap.set(companion._id, messages)
       }
     },
+    setSync(content: Sync) {
+      this.sync = content
+    }
   },
 })

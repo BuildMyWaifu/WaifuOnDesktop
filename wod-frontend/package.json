@@ -1,6 +1,7 @@
 {
   "name": "wod-frontend",
   "version": "0.0.0",
+  "type": "module",
   "main": "main.js",
   "scripts": {
     "dev": "vite",

@@ -32,6 +32,12 @@ const routes = [
     component: () => import('@/pages/SignUp.vue'),
   },
   {
+    path: '/test',
+    name: 'Test',
+    meta: { requiresAuth: false },
+    component: () => import('@/pages/TestPage.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'Error',
     meta: { requiresAuth: false },

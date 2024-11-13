@@ -35,7 +35,7 @@
               </template>
               <!-- 彈出選單內容 -->
               <v-list>
-                <v-list-item @click="goToHome">
+                <v-list-item to="/">
                   <v-list-item-title>回到主頁面</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="goToSettings">
@@ -138,10 +138,6 @@
   // updateCurrentWife 函數來更新 currentWife
   const updateCurrentWife = (Id: string) => {
     currentWife.value = Id
-  }
-
-  const goToHome = () => {
-    router.push('/')
   }
 
   const goToSettings = () => {
