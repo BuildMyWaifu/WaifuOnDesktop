@@ -58,8 +58,7 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
-
-    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanentRight" />
+    <v-navigation-drawer location="right" />
 
     <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
