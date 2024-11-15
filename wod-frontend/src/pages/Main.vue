@@ -58,8 +58,29 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
+    
+    <!-- 右側 -->
+    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanentRight">
+      <v-container class="d-flex flex-column align-center pt-10" style="height: 100%;">
 
-    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanentRight" />
+        <v-sheet class="mb-4" width="60%" color="grey" style="aspect-ratio: 1; border: 4px solid gray; border-radius: 10%;">
+          <v-img src="https://upload.wikimedia.org/wikipedia/zh/thumb/f/fc/%E5%8E%9F%E7%A5%9E_%E5%9C%8B%E9%9A%9B%E7%89%88.jpeg/220px-%E5%8E%9F%E7%A5%9E_%E5%9C%8B%E9%9A%9B%E7%89%88.jpeg" 
+          alt="image" max-width="100%" max-height="100%" contain style="border-radius: 10%;"></v-img>
+        </v-sheet>
+
+        <v-row justify="center">
+          <v-col class="text-center">
+            <v-card-title class="text-h5">
+              原神
+            </v-card-title>
+            <v-card-text class="text-h7">
+              你說的對，但是《原神》是由米哈游自主研發的一款全新開放世界冒險遊戲。遊戲發生在一個被稱作「提瓦特」的幻想世界，在這裡，被神選中的人將被授予「神之眼」，導引元素之力。
+            </v-card-text>
+            
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-navigation-drawer>
 
     <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
