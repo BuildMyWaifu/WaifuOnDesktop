@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
-    <v-navigation-drawer v-model="leftDrawer" app location="left" :permanent="isPermanent">
+    <v-navigation-drawer v-model="leftDrawer" app location="left" :permanent="isPermanentLeft">
       <v-list lines="three" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for waifu -->
@@ -59,10 +59,10 @@
       </template>
     </v-navigation-drawer>
 
-    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanent" />
+    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanentRight" />
 
     <v-app-bar elevation="0">
-      <template v-if="display.width.value < 960">
+      <template v-if="display.width.value < 750">
         <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
       </template>
       <v-app-bar-title>
@@ -70,7 +70,7 @@
       </v-app-bar-title>
       <template v-if="display.width.value < 960">
         <!--icon可變更-->
-        <v-app-bar-nav-icon @click.stop="rightDrawer = !rightDrawer" />
+        <v-btn icon="mdi-information" @click="rightDrawer=!rightDrawer" />
       </template>
     </v-app-bar>
 
@@ -128,12 +128,14 @@
   const currentWife = ref<string | null>(null)
 
    // init value with width
-   const windowISUpper500 = ref(display.width.value >= 960)
-  const isPermanent = ref(windowISUpper500)
+  const windowISUpper500Left = ref(display.width.value >= 750)
+  const windowISUpper500Right = ref(display.width.value >= 960)
+  const isPermanentLeft = ref(windowISUpper500Left)
+  const isPermanentRight = ref(windowISUpper500Right)
 
   // 控制 navigation drawer 的開關
-  const leftDrawer = ref(windowISUpper500.value)
-  const rightDrawer = ref(windowISUpper500.value)
+  const leftDrawer = ref(windowISUpper500Left.value)
+  const rightDrawer = ref(windowISUpper500Left.value)
 
   // 新增訊息內容的變數
   const newMessage = ref('')
@@ -171,25 +173,36 @@
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
   const windowResizeListener = ref()
   onMounted(() => {
-    windowResizeListener.value = window.addEventListener('resize', handleResize)
-    handleResize()
+    windowResizeListener.value = window.addEventListener('resize', lefthandleResize)
+    windowResizeListener.value = window.addEventListener('resize', righthandleResize)
+    lefthandleResize()
+    righthandleResize()
   })
   onUnmounted(() => {
     if (windowResizeListener.value !== undefined) {
       window.removeEventListener('resize', windowResizeListener.value)
     }
   })
-  const handleResize = () => {
-    if (windowISUpper500.value && display.width.value < 960) {
+  const lefthandleResize = () => {
+    if (windowISUpper500Left.value && display.width.value < 750) {
       leftDrawer.value = false
-      rightDrawer.value = false
-      windowISUpper500.value = false
-      isPermanent.value = false
-    } else if (!windowISUpper500.value && display.width.value >= 960) {
+      windowISUpper500Left.value = false
+      isPermanentLeft.value = false
+    } else if (!windowISUpper500Left.value && display.width.value >= 750) {
       leftDrawer.value = true
+      windowISUpper500Left.value = true
+      isPermanentLeft.value = true
+    }
+  }
+  const righthandleResize = () => {
+    if (windowISUpper500Right.value && display.width.value < 960) {
+      rightDrawer.value = false
+      windowISUpper500Right.value = false
+      isPermanentRight.value = false
+    } else if (!windowISUpper500Right.value && display.width.value >= 960) {
       rightDrawer.value = true
-      windowISUpper500.value = true
-      isPermanent.value = true
+      windowISUpper500Right.value = true
+      isPermanentRight.value = true
     }
   }
 </script>
