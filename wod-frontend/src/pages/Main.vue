@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app location="left" :permanent="isPermanent">
+    <v-navigation-drawer v-model="leftDrawer" app location="left" :permanent="isPermanent">
       <v-list lines="three" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for waifu -->
@@ -58,15 +58,20 @@
         </v-list-item>
       </template>
     </v-navigation-drawer>
-    <v-navigation-drawer location="right" />
+
+    <v-navigation-drawer v-model="rightDrawer" location="right" :permanent="isPermanent" />
 
     <v-app-bar elevation="0">
-      <template v-if="display.width.value < 500">
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <template v-if="display.width.value < 960">
+        <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
       </template>
       <v-app-bar-title>
         {{ currentWife === null ? (currentWife || '老婆名稱') : currentWife }}
       </v-app-bar-title>
+      <template v-if="display.width.value < 960">
+        <!--icon可變更-->
+        <v-app-bar-nav-icon @click.stop="rightDrawer = !rightDrawer" />
+      </template>
     </v-app-bar>
 
     <v-main style="height: 100vh">
@@ -119,15 +124,16 @@
 
   const display = useDisplay()
 
-  // 控制 navigation drawer 的開關
-  const drawer = ref(true) // 初始改為 undefined，即自動
-
   // currentWife 定義為一個 ref，這樣它可以是響應式的
   const currentWife = ref<string | null>(null)
 
-  // init value with width
-  const windowISUpper500 = ref(display.width.value >= 500)
-  const isPermanent = ref(display.width.value >= 500)
+   // init value with width
+   const windowISUpper500 = ref(display.width.value >= 960)
+  const isPermanent = ref(windowISUpper500)
+
+  // 控制 navigation drawer 的開關
+  const leftDrawer = ref(windowISUpper500.value)
+  const rightDrawer = ref(windowISUpper500.value)
 
   // 新增訊息內容的變數
   const newMessage = ref('')
@@ -174,12 +180,14 @@
     }
   })
   const handleResize = () => {
-    if (windowISUpper500.value && display.width.value < 500) {
-      drawer.value = false
+    if (windowISUpper500.value && display.width.value < 960) {
+      leftDrawer.value = false
+      rightDrawer.value = false
       windowISUpper500.value = false
       isPermanent.value = false
-    } else if (!windowISUpper500.value && display.width.value >= 500) {
-      drawer.value = true
+    } else if (!windowISUpper500.value && display.width.value >= 960) {
+      leftDrawer.value = true
+      rightDrawer.value = true
       windowISUpper500.value = true
       isPermanent.value = true
     }
