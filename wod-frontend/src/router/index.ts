@@ -49,6 +49,12 @@ const routes = [
     meta: { requiresAuth: false },
     component: () => import('@/pages/CreateNewWife.vue'),
   },
+  {
+    path: '/live2d',
+    name: 'Live2D',
+    meta: { requiresAuth: false },
+    component: () => import('@/pages/live2d.vue'), // Ensure the casing matches
+  },
 ]
 
 const router = createRouter({

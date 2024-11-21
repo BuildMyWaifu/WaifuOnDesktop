@@ -13,12 +13,18 @@
 
   const store = useAppStore()
   onMounted(() => {
-    store.generateMockMessages()
-    fetchSync()
+  console.log('App.vue: Mounted hook executed.');
+  try {
+    // TODO: fix some error in the mound lifecycle, I don't know what it is
+    store.generateMockMessages();
+    fetchSync(); 
     setBroadcastCallback((sync) => {
-      store.setSync(sync)
-    })
+      store.setSync(sync);
+    });
+  } catch (error) {
+    console.error('App.vue: Error in mounted hook:', error);
   }
-  )
+});
+
 
 </script>
