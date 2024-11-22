@@ -15,17 +15,22 @@
               <v-card-text class="text-h7">
                 {{ companion.profile.description }}
               </v-card-text>
+              <v-dialog >
+
+              </v-dialog>
               
             </v-col>
           </v-row>
         </v-container>
       </v-navigation-drawer>
+      
         
     
 </template>
 <script lang="ts" setup>
 import { useAppStore } from '@/stores/app';
-import { computed } from 'vue';
+import { copy } from '@/utils/utils';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   companionId: {
@@ -34,5 +39,8 @@ const props = defineProps({
   }
 })
 const companion = computed(() => store.getCompanion(props.companionId) )
+const newCompanion = ref()  
+// 在開啟 dialog 之後，透過 copy(companion.value) 來初始化 newCompanion
 const store = useAppStore()
+
 </script>
