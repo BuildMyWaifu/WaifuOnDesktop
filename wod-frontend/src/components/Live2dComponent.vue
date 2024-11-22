@@ -1,64 +1,3 @@
-<script setup>
-import { init, setBackground } from '../components/index';
-import { ref, onMounted } from 'vue';
-
-// Background options
-const backgrounds = [
-  { name: 'Living Room', type: 'image', path: './src/assets/backgrounds/Living_room.jpg' },
-  { name: 'Street 1', type: 'image', path: './src/assets/backgrounds/street.jpg' },
-  { name: 'Street 2', type: 'image', path: './src/assets/backgrounds/street2.jpg' },
-  { name: 'Mountain (Video)', type: 'video', path: './src/assets/backgrounds/Mountain_anime.mp4' },
-];
-
-// State for the settings panel
-const showSettings = ref(false);
-const activeVideo = ref(null); // Keeps track of the currently active video background
-
-// Change the background
-const changeBackground = (background) => {
-  if (background.type === 'video') {
-    activeVideo.value = background.path; // Set active video path
-    setBackground(null); // Disable image background
-  } else {
-    activeVideo.value = null; // Clear active video
-    setBackground(background.path); // Set image background
-  }
-};
-
-// Handle user-uploaded background
-const handleFileUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const fileType = file.type;
-  if (fileType.startsWith('image/')) {
-    const url = URL.createObjectURL(file); // Image file: create blob URL
-    activeVideo.value = null; // Clear active video
-    setBackground(url);
-    console.log('Uploaded image set as background:', url);
-  } else if (fileType === 'video/mp4') {
-    const url = URL.createObjectURL(file); // Video file: create blob URL
-    activeVideo.value = url;
-    setBackground(null); // Disable image background
-    console.log('Uploaded video set as background:', url);
-  } else {
-    alert('Unsupported file format. Please upload a .jpg, .png, or .mp4 file.');
-  }
-
-  event.target.value = ''; // Clear the input value for re-uploading the same file
-};
-
-// Initialize Live2D model
-onMounted(() => {
-  console.log('live2d.vue: Mounted hook started...');
-  try {
-    init();
-    console.log('live2d.vue: init() called successfully...');
-  } catch (error) {
-    console.error('live2d.vue: Error occurred in mounted hook:', error);
-  }
-});
-</script>
 
 <template>
   <div
@@ -205,6 +144,68 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { init, setBackground } from './index';
+import { ref, onMounted } from 'vue';
+
+// Background options
+const backgrounds = [
+  { name: 'Living Room', type: 'image', path: './src/assets/backgrounds/Living_room.jpg' },
+  { name: 'Street 1', type: 'image', path: './src/assets/backgrounds/street.jpg' },
+  { name: 'Street 2', type: 'image', path: './src/assets/backgrounds/street2.jpg' },
+  { name: 'Mountain (Video)', type: 'video', path: './src/assets/backgrounds/Mountain_anime.mp4' },
+];
+
+// State for the settings panel
+const showSettings = ref(false);
+const activeVideo = ref(null); // Keeps track of the currently active video background
+
+// Change the background
+const changeBackground = (background) => {
+  if (background.type === 'video') {
+    activeVideo.value = background.path; // Set active video path
+    setBackground(null); // Disable image background
+  } else {
+    activeVideo.value = null; // Clear active video
+    setBackground(background.path); // Set image background
+  }
+};
+
+// Handle user-uploaded background
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileType = file.type;
+  if (fileType.startsWith('image/')) {
+    const url = URL.createObjectURL(file); // Image file: create blob URL
+    activeVideo.value = null; // Clear active video
+    setBackground(url);
+    console.log('Uploaded image set as background:', url);
+  } else if (fileType === 'video/mp4') {
+    const url = URL.createObjectURL(file); // Video file: create blob URL
+    activeVideo.value = url;
+    setBackground(null); // Disable image background
+    console.log('Uploaded video set as background:', url);
+  } else {
+    alert('Unsupported file format. Please upload a .jpg, .png, or .mp4 file.');
+  }
+
+  event.target.value = ''; // Clear the input value for re-uploading the same file
+};
+
+// Initialize Live2D model
+onMounted(() => {
+  console.log('live2d.vue: Mounted hook started...');
+  try {
+    init();
+    console.log('live2d.vue: init() called successfully...');
+  } catch (error) {
+    console.error('live2d.vue: Error occurred in mounted hook:', error);
+  }
+});
+</script>
 
 <style scoped>
 /* Hover effect for the settings button */

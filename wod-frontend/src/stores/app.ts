@@ -11,14 +11,14 @@ export const useAppStore = defineStore('app', {
     user: undefined as User | undefined,
     companionList: [
       {
-        _id: 'test 1',
+        _id: '咪醬',
         profile: {
-          name: 'test name 1',
-          description: 'asdf',
+          name: '咪醬',
+          description: '可愛又元氣滿滿的貓娘女僕，喜歡撒嬌和主人喵～！',
         },
         prompt: {
-          character: 'asf',
-          backstory: 'asdf',
+          character: '元氣可愛的貓娘女僕',
+          backstory: '咪醬天生就是一隻充滿愛與熱情的貓娘，最喜歡主人，讓主人的每一天都充滿幸福和快樂喵！',
         },
       },
       {
@@ -54,6 +54,13 @@ export const useAppStore = defineStore('app', {
     },
     logout() {
       this.user = undefined
+    },
+    getCompanion(companionId: string): Companion {
+      const companion = this.companionList.find((companion) => companion._id === companionId)
+      if (!companion) {
+        throw new Error(`Companion ${companionId} not found`)
+      }
+      return companion
     },
     generateMockMessages() {
       for (const companion of this.companionList) {
