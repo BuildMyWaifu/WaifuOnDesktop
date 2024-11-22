@@ -25,11 +25,13 @@
       <div class="py-4" />
 
     </v-responsive>
+    <Live2dComponent />
   </v-container>
 </template>
 
 
 <script setup lang="ts">
+  import Live2dComponent from '@/components/Live2dComponent.vue';
   import { createWindow, setSize } from '@/utils/electronAPI'
   import { ref } from 'vue';
 

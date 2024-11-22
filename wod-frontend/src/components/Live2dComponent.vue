@@ -39,7 +39,7 @@
     ></canvas>
 
     <!-- Transparent settings button -->
-    <button
+    <!-- <button
       @click="showSettings = !showSettings"
       style="
         position: absolute;
@@ -57,7 +57,7 @@
       title="Settings"
     >
       ⚙
-    </button>
+    </button> -->
 
     <!-- Settings panel -->
     <div

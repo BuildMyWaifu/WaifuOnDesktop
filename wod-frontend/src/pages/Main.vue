@@ -8,7 +8,8 @@
         </template>
         <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
           @click="updateCurrentCompanion(companion._id)">
-          <v-list-item-title>{{ companion._id }}</v-list-item-title>
+          <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
+          <v-list-item-subtitle >{{ companion.profile.description }}</v-list-item-subtitle>
           <v-list-item-subtitle>
             <div v-if="store.messageMap.get(companion._id)">
               {{ lastMessage(companion._id)?.content || 'No messages yet' }}
@@ -18,12 +19,21 @@
         <v-divider />
       </v-list>
       <div class="text-center">
-        <v-btn @click="createNewCompanion" variant="flat">
-          <template v-slot:prepend>
-            <v-icon icon="mdi-plus"></v-icon>
+        <v-dialog width="500">
+           <template v-slot:activator="{props}">
+            <v-btn             v-bind="props"
+            variant="flat">
+              <template v-slot:prepend>
+                <v-icon icon="mdi-plus"></v-icon>
+              </template>
+              新增老婆
+            </v-btn>
+            
+
           </template>
-          新增老婆
-        </v-btn>
+          <CreateNewWife ></CreateNewWife>
+        </v-dialog>
+        
       </div>
 
       <template #append>
@@ -76,6 +86,7 @@
 <script setup lang="ts">
   import CompanionDrawer from '@/components/CompanionDrawer.vue'
   import ChatInterface from '@/components/ChatInterface.vue'
+  import CreateNewWife from '@/components/CreateNewWife.vue'
 
   import { useAppStore } from '@/stores/app'
   import { useDisplay } from 'vuetify'
@@ -103,11 +114,6 @@
     const messages = store.messageMap.get(Id)
     return messages ? messages[messages.length - 1] : null
   }
-
-  const createNewCompanion = () => {
-    router.push('/newCompanion')
-  }
-
   // updateCurrentCompanion 函數來更新 currentCompanion
   const updateCurrentCompanion = (Id: string) => {
     currentCompanionId.value = Id
