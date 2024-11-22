@@ -4,17 +4,50 @@ import { ref, onMounted } from 'vue';
 
 // Background options
 const backgrounds = [
-  { name: 'Living Room', path: './src/assets/backgrounds/Living_room.jpg' },
-  { name: 'Street 1', path: './src/assets/backgrounds/street.jpg' },
-  { name: 'Street 2', path: './src/assets/backgrounds/street2.jpg' },
+  { name: 'Living Room', type: 'image', path: './src/assets/backgrounds/Living_room.jpg' },
+  { name: 'Street 1', type: 'image', path: './src/assets/backgrounds/street.jpg' },
+  { name: 'Street 2', type: 'image', path: './src/assets/backgrounds/street2.jpg' },
+  { name: 'Mountain (Video)', type: 'video', path: './src/assets/backgrounds/Mountain_anime.mp4' },
 ];
 
 // State for the settings panel
 const showSettings = ref(false);
+const activeVideo = ref(null); // Keeps track of the currently active video background
 
-// Change the background when an option is selected
+// Change the background
 const changeBackground = (background) => {
-  setBackground(background.path);
+  if (background.type === 'video') {
+    activeVideo.value = background.path; // Set active video path
+    setBackground(null); // Disable image background
+  } else {
+    activeVideo.value = null; // Clear active video
+    setBackground(background.path); // Set image background
+  }
+};
+
+// Handle user-uploaded background
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Check file type
+  const fileType = file.type;
+  if (fileType.startsWith('image/')) {
+    const url = URL.createObjectURL(file); // Image file: create blob URL
+    activeVideo.value = null; // Clear active video
+    setBackground(url);
+    console.log('Uploaded image set as background:', url);
+  } else if (fileType === 'video/mp4') {
+    const url = URL.createObjectURL(file); // Video file: create blob URL
+    activeVideo.value = url;
+    setBackground(null); // Disable image background
+    console.log('Uploaded video set as background:', url);
+  } else {
+    alert('Unsupported file format. Please upload a .jpg, .png, or .mp4 file.');
+  }
+
+  // Clear the input value so users can re-upload the same file
+  event.target.value = '';
 };
 
 // Initialize Live2D model
@@ -38,6 +71,25 @@ onMounted(() => {
       overflow: hidden;
     "
   >
+    <!-- Video Background -->
+    <video
+      v-if="activeVideo"
+      :src="activeVideo"
+      autoplay
+      muted
+      loop
+      playsinline
+      style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+      "
+    ></video>
+
     <!-- Canvas for Live2D model -->
     <canvas
       id="canvas_view"
@@ -60,7 +112,7 @@ onMounted(() => {
         width: 40px;
         height: 40px;
         border: none;
-        background: transparent; /* Transparent background */
+        background: transparent;
         color: white;
         font-size: 20px;
         cursor: pointer;
@@ -70,8 +122,9 @@ onMounted(() => {
       ⚙
     </button>
 
-    <!-- Settings panel with animations -->
+    <!-- Settings panel -->
     <div
+      v-if="showSettings"
       :class="{ 'settings-panel': true, visible: showSettings }"
       style="
         position: absolute;
@@ -108,6 +161,41 @@ onMounted(() => {
         >
           {{ background.name }}
         </button>
+      </div>
+
+      <!-- Custom upload button -->
+      <div style="margin-top: 20px;">
+        <label style="font-size: 14px;">Custom Background:</label>
+        <div style="margin-top: 10px; position: relative;">
+          <input
+            type="file"
+            accept="image/jpeg, image/png, video/mp4"
+            @change="handleFileUpload"
+            style="
+              position: absolute;
+              opacity: 0;
+              width: 100%;
+              height: 100%;
+              cursor: pointer;
+            "
+          />
+          <button
+            style="
+              display: block;
+              width: 100%;
+              padding: 10px 15px;
+              font-size: 14px;
+              border: none;
+              border-radius: 4px;
+              background-color: #3498db;
+              color: white;
+              cursor: pointer;
+              text-align: center;
+            "
+          >
+            Upload
+          </button>
+        </div>
       </div>
     </div>
   </div>
