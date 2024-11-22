@@ -4,19 +4,20 @@ import {
   MotionPreloadStrategy,
 } from 'pixi-live2d-display';
 
-// Attach PIXI to global
-window.PIXI = PIXI;
+window.PIXI = PIXI; // Global Pixi
 
 export async function init() {
   console.log('index.js: Initializing Live2D model...');
   try {
-    // Verify the canvas element
     const canvas = document.getElementById('canvas_view');
     if (!canvas) {
       console.error('index.js: Canvas element not found!');
       return;
     }
     console.log('index.js: Canvas element found:', canvas);
+
+    // Set an initial background image dynamically
+    setBackground('./src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
     const app = new PIXI.Application({
@@ -67,5 +68,17 @@ export async function init() {
 
   } catch (error) {
     console.error('index.js: Failed to initialize Live2D model:', error);
+  }
+}
+
+// New function for switching the background dynamically
+export function setBackground(imagePath) {
+  const container = document.getElementById('canvas_view')?.parentElement;
+  if (container) {
+    container.style.backgroundImage = `url('${imagePath}')`;
+    container.style.backgroundRepeat = 'no-repeat';
+    container.style.backgroundPosition = 'center';
+    container.style.backgroundSize = 'cover';
+    console.log(`index.js: Background switched to ${imagePath}`);
   }
 }
