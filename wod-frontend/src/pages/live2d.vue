@@ -30,7 +30,6 @@ const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  // Check file type
   const fileType = file.type;
   if (fileType.startsWith('image/')) {
     const url = URL.createObjectURL(file); // Image file: create blob URL
@@ -46,8 +45,7 @@ const handleFileUpload = (event) => {
     alert('Unsupported file format. Please upload a .jpg, .png, or .mp4 file.');
   }
 
-  // Clear the input value so users can re-upload the same file
-  event.target.value = '';
+  event.target.value = ''; // Clear the input value for re-uploading the same file
 };
 
 // Initialize Live2D model
@@ -131,42 +129,45 @@ onMounted(() => {
         top: 60px;
         left: 10px;
         z-index: 3;
-        width: 200px;
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 15px;
-        border-radius: 8px;
+        width: 250px;
+        background-color: rgba(0, 0, 0, 0.85);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         color: white;
       "
     >
-      <h3 style="margin-top: 0; font-size: 16px;">Settings</h3>
-      <p style="margin: 10px 0; font-size: 14px;">Change Background:</p>
-      <div>
+      <h3 style="margin-top: 0; font-size: 18px; text-align: center;">Settings</h3>
+      <p style="margin: 10px 0; font-size: 16px; text-align: center;">Change Background:</p>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <button
           v-for="background in backgrounds"
           :key="background.name"
           @click="changeBackground(background)"
           style="
-            display: block;
-            margin: 5px 0;
-            padding: 10px 15px;
+            width: 100%;
+            padding: 12px 20px;
             font-size: 14px;
             border: none;
-            border-radius: 4px;
-            background-color: #3498db;
+            border-radius: 8px;
+            background: linear-gradient(120deg, #3498db, #2ecc71);
             color: white;
             cursor: pointer;
-            text-align: left;
-            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
           "
+          @mouseover="this.style.transform = 'scale(1.05)'"
+          @mouseleave="this.style.transform = 'scale(1)'"
         >
           {{ background.name }}
         </button>
       </div>
 
       <!-- Custom upload button -->
-      <div style="margin-top: 20px;">
-        <label style="font-size: 14px;">Custom Background:</label>
-        <div style="margin-top: 10px; position: relative;">
+      <div style="margin-top: 20px; text-align: center;">
+        <label style="font-size: 14px; display: block; margin-bottom: 10px;">Custom Background:</label>
+        <div style="position: relative;">
           <input
             type="file"
             accept="image/jpeg, image/png, video/mp4"
@@ -183,15 +184,19 @@ onMounted(() => {
             style="
               display: block;
               width: 100%;
-              padding: 10px 15px;
+              padding: 12px 20px;
               font-size: 14px;
               border: none;
-              border-radius: 4px;
-              background-color: #3498db;
+              border-radius: 8px;
+              background: linear-gradient(120deg, #9b59b6, #8e44ad);
               color: white;
               cursor: pointer;
               text-align: center;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
             "
+            @mouseover="this.style.transform = 'scale(1.05)'"
+            @mouseleave="this.style.transform = 'scale(1)'"
           >
             Upload
           </button>
@@ -204,8 +209,7 @@ onMounted(() => {
 <style scoped>
 /* Hover effect for the settings button */
 button:hover {
-  color: #3498db; /* Highlight icon color on hover */
-  transform: scale(1.2); /* Slightly enlarge the button */
+  color: #f1c40f;
 }
 
 /* Animation for the settings panel */
