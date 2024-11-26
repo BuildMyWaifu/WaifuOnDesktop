@@ -39,7 +39,7 @@
     ></canvas>
 
     <!-- Transparent settings button -->
-    <!-- <button
+    <-- <button 
       @click="showSettings = !showSettings"
       style="
         position: absolute;
