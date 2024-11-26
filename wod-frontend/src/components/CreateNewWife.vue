@@ -52,7 +52,7 @@
                             上一步
                         </v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" @click="CloseDialog" :disabled="false">
+                        <v-btn color="primary" @click="CloseDialog" :disabled="!isValid">
                             完成
                         </v-btn>
                     </v-card-actions>
