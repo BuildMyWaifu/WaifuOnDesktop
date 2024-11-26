@@ -11,6 +11,7 @@ declare module 'vue' {
     CompanionDrawer: typeof import('./components/CompanionDrawer.vue')['default']
     CreateNewWife: typeof import('./components/CreateNewWife.vue')['default']
     Live2dComponent: typeof import('./components/Live2dComponent.vue')['default']
+    Live2DComponent: typeof import('./components/Live2DComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

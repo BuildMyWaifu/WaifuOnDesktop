@@ -47,7 +47,7 @@ const routes = [
     path: '/live2d',
     name: 'Live2D',
     meta: { requiresAuth: false },
-    component: () => import('@/components/Live2dComponent.vue'), // Ensure the casing matches
+    component: () => import('@/pages/live2d.vue'), // Ensure the casing matches
   }
 ]
 
