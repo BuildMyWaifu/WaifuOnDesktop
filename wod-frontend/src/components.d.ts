@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     ChatInterface: typeof import('./components/ChatInterface.vue')['default']
     CompanionDrawer: typeof import('./components/CompanionDrawer.vue')['default']
-    CreateNewCompanion: typeof import('./components/CreateNewCompanion.vue')['default']
     CreateNewWife: typeof import('./components/CreateNewWife.vue')['default']
     Live2dComponent: typeof import('./components/Live2dComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

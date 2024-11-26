@@ -19,21 +19,7 @@
         <v-divider />
       </v-list>
       <div class="text-center">
-        <v-dialog width="500">
-           <template v-slot:activator="{props}">
-            <v-btn             v-bind="props"
-            variant="flat">
-              <template v-slot:prepend>
-                <v-icon icon="mdi-plus"></v-icon>
-              </template>
-              新增老婆
-            </v-btn>
-            
-
-          </template>
-          <CreateNewWife ></CreateNewWife>
-        </v-dialog>
-        
+        <CreateNewWife/>
       </div>
 
       <template #append>
@@ -164,6 +150,7 @@
       isPermanentRight.value = true
     }
   }
+
 </script>
 
 <style scoped>
