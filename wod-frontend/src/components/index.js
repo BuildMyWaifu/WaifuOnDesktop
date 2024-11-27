@@ -6,6 +6,11 @@ import {
 
 window.PIXI = PIXI; // Global Pixi
 
+let app;
+let model;
+let originalWidth;
+let originalHeight;
+
 export async function init() {
   console.log('index.js: Initializing Live2D model...');
   try {
@@ -20,7 +25,7 @@ export async function init() {
     setBackground('./src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
-    const app = new PIXI.Application({
+    app = new PIXI.Application({
       view: canvas,
       transparent: true,
       autoDensity: true,
@@ -29,33 +34,8 @@ export async function init() {
     });
     console.log('index.js: PIXI application created.');
 
-    // Load the Live2D model
-    const model = await Live2DModel.from('../../src/assets/miku_model/runtime/miku_sample_t04.model3.json', {
-      motionPreload: MotionPreloadStrategy.NONE,
-    });
-    console.log('index.js: Live2D model loaded successfully!');
-
-    // Add the model to the PIXI stage
-    app.stage.addChild(model);
-
-    // Store the original dimensions of the model
-    const originalWidth = model.width;
-    const originalHeight = model.height;
-
-    // Dynamic scaling and centering logic
-    const fitModelToCanvas = () => {
-      const scaleX = window.innerWidth / originalWidth;
-      const scaleY = window.innerHeight / originalHeight;
-      const scale = Math.min(scaleX, scaleY) * 0.75; // Leave some padding
-
-      model.scale.set(scale); // Apply scale
-      model.position.set(
-        (window.innerWidth - originalWidth * scale) / 2, // Center horizontally
-        (window.innerHeight - originalHeight * scale) / 2 // Center vertically
-      );
-    };
-
-    fitModelToCanvas(); // Set initial scale and position
+    // Load the initial Live2D model
+    await loadModel('../../src/assets/miku_model/runtime/miku_sample_t04.model3.json');
 
     // Handle window resize events
     window.addEventListener('resize', () => {
@@ -65,13 +45,57 @@ export async function init() {
     });
 
     console.log('index.js: Live2D model added to the stage.');
-
   } catch (error) {
     console.error('index.js: Failed to initialize Live2D model:', error);
   }
 }
 
-// New function for switching the background dynamically
+async function loadModel(modelPath) {
+  try {
+    console.log(`index.js: Loading model from ${modelPath}`);
+    if (model) {
+      app.stage.removeChild(model); // Remove the previous model from the stage
+      model.destroy(); // Clean up the previous model
+    }
+
+    // Load the new model
+    model = await Live2DModel.from(modelPath, {
+      motionPreload: MotionPreloadStrategy.NONE,
+    });
+
+    // Add the model to the PIXI stage
+    app.stage.addChild(model);
+
+    // Store the original dimensions of the model
+    originalWidth = model.width;
+    originalHeight = model.height;
+
+    fitModelToCanvas(); // Set initial scale and position
+
+    console.log('index.js: Model loaded and added to stage.');
+  } catch (error) {
+    console.error('index.js: Failed to load model:', error);
+  }
+}
+
+function fitModelToCanvas() {
+  if (!model) return;
+  const scaleX = window.innerWidth / originalWidth;
+  const scaleY = window.innerHeight / originalHeight;
+  const scale = Math.min(scaleX, scaleY) * 0.75; // Leave some padding
+
+  model.scale.set(scale); // Apply scale
+  model.position.set(
+    (window.innerWidth - originalWidth * scale) / 2, // Center horizontally
+    (window.innerHeight - originalHeight * scale) / 2 // Center vertically
+  );
+}
+
+export function switchModel(modelPath) {
+  loadModel(modelPath);
+}
+
+// Existing setBackground function remains the same
 export function setBackground(imagePath) {
   const container = document.getElementById('canvas_view')?.parentElement;
   if (container) {

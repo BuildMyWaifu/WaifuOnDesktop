@@ -87,8 +87,8 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
           "
-          @mouseover="this.style.transform = 'scale(1.05)'"
-          @mouseleave="this.style.transform = 'scale(1)'"
+          @mouseover="event => event.target.style.transform = 'scale(1.05)'"
+          @mouseleave="event => event.target.style.transform = 'scale(1)'"
         >
           {{ background.name }}
         </button>
@@ -125,12 +125,38 @@
               box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
               transition: transform 0.2s ease, box-shadow 0.2s ease;
             "
-            @mouseover="this.style.transform = 'scale(1.05)'"
-            @mouseleave="this.style.transform = 'scale(1)'"
+            @mouseover="event => event.target.style.transform = 'scale(1.05)'"
+            @mouseleave="event => event.target.style.transform = 'scale(1)'"
           >
-            Upload
+            Upload Background
           </button>
         </div>
+      </div>
+
+      <!-- Change Model Button -->
+      <div style="margin-top: 20px; text-align: center;">
+        <label style="font-size: 14px; display: block; margin-bottom: 10px;">Change Model:</label>
+        <button
+          @click="changeModel()"
+          style="
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(120deg, #e67e22, #d35400);
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+          "
+          @mouseover="event => event.target.style.transform = 'scale(1.05)'"
+          @mouseleave="event => event.target.style.transform = 'scale(1)'"
+        >
+          Change Model
+        </button>
       </div>
     </div>
   </div>
@@ -139,7 +165,7 @@
 <script setup>
 import { ref } from 'vue';
 import Live2DComponent from '../components/live2dcomponent.vue'; // Import your Live2D component
-import { setBackground } from '../components/index'; // Import background setter
+import { setBackground, switchModel } from '../components/index'; // Import background setter and switchModel
 
 // Background options
 const backgrounds = [
@@ -148,6 +174,15 @@ const backgrounds = [
   { name: 'Street 2', type: 'image', path: './src/assets/backgrounds/street2.jpg' },
   { name: 'Mountain (Video)', type: 'video', path: './src/assets/backgrounds/Mountain_anime.mp4' },
 ];
+
+// Model options
+const models = [
+  { name: 'miku', label: 'Miku', path: '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json' },
+  { name: 'mao', label: 'Mao', path: '../../src/assets/mao_model/runtime/mao_pro.model3.json' },
+  { name: 'hiyori', label: 'Hiyori', path: '../../src/assets/hiyori_model/runtime/hiyori_pro_t11.model3.json' },
+];
+
+let currentModelIndex = 0;
 
 // State for the settings panel
 const showSettings = ref(false);
@@ -185,6 +220,14 @@ const handleFileUpload = (event) => {
   }
 
   event.target.value = ''; // Clear the input value for re-uploading the same file
+};
+
+// Function to change the model
+const changeModel = () => {
+  currentModelIndex = (currentModelIndex + 1) % models.length;
+  const model = models[currentModelIndex];
+  switchModel(model.path);
+  console.log(`Switched to model: ${model.label}`);
 };
 </script>
 
