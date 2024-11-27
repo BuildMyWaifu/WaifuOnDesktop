@@ -11,6 +11,7 @@ declare module 'vue' {
     ChatInterface: typeof import('./components/ChatInterface.vue')['default']
     CompanionDrawer: typeof import('./components/CompanionDrawer.vue')['default']
     CreateNewWife: typeof import('./components/CreateNewWife.vue')['default']
+    FloatingChatInterface: typeof import('./components/FloatingChatInterface.vue')['default']
     Live2dComponent: typeof import('./components/Live2dComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

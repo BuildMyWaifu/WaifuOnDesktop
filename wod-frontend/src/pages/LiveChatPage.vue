@@ -164,8 +164,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import Live2DComponent from '../components/live2dcomponent.vue'; // Import your Live2D component
-import { setBackground, switchModel } from '../components/index'; // Import background setter and switchModel
+import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
+import { setBackground, switchModel } from '@/utils/live2d'; // Import background setter and switchModel
 
 // Background options
 const backgrounds = [

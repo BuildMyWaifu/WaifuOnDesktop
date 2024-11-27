@@ -49,6 +49,14 @@
             </v-menu>
           </template>
         </v-list-item>
+        <v-list-item v-else>
+          <v-list-item-title>
+            目前尚未登入
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            <v-btn to="/login">登入</v-btn>
+          </v-list-item-subtitle>
+        </v-list-item>
       </template>
     </v-navigation-drawer>
 

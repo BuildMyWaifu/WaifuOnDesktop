@@ -44,10 +44,10 @@ const routes = [
     component: () => import('@/pages/ErrorPage.vue'),
   },
   {
-    path: '/live2d',
-    name: 'Live2D',
+    path: '/liveChat',
+    name: 'LiveChat',
     meta: { requiresAuth: false },
-    component: () => import('@/pages/live2d.vue'), // Ensure the casing matches
+    component: () => import('@/pages/LiveChatPage.vue'), // Ensure the casing matches
   }
 ]
 

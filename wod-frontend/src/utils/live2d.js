@@ -12,14 +12,14 @@ let originalWidth;
 let originalHeight;
 
 export async function init() {
-  console.log('index.js: Initializing Live2D model...');
+  console.log('live2d.js: Initializing Live2D model...');
   try {
     const canvas = document.getElementById('canvas_view');
     if (!canvas) {
-      console.error('index.js: Canvas element not found!');
+      console.error('live2d.js: Canvas element not found!');
       return;
     }
-    console.log('index.js: Canvas element found:', canvas);
+    console.log('live2d.js: Canvas element found:', canvas);
 
     // Set an initial background image dynamically
     setBackground('./src/assets/backgrounds/Living_room.jpg');
@@ -32,27 +32,27 @@ export async function init() {
       resizeTo: window,
       resolution: window.devicePixelRatio || 1, // Use device pixel ratio for better rendering
     });
-    console.log('index.js: PIXI application created.');
+    console.log('live2d.js: PIXI application created.');
 
     // Load the initial Live2D model
     await loadModel('../../src/assets/miku_model/runtime/miku_sample_t04.model3.json');
 
     // Handle window resize events
     window.addEventListener('resize', () => {
-      console.log('index.js: Window resized, adjusting model...');
+      console.log('live2d.js: Window resized, adjusting model...');
       app.renderer.resize(window.innerWidth, window.innerHeight); // Resize PIXI renderer
       fitModelToCanvas(); // Adjust model size and position
     });
 
-    console.log('index.js: Live2D model added to the stage.');
+    console.log('live2d.js: Live2D model added to the stage.');
   } catch (error) {
-    console.error('index.js: Failed to initialize Live2D model:', error);
+    console.error('live2d.js: Failed to initialize Live2D model:', error);
   }
 }
 
 async function loadModel(modelPath) {
   try {
-    console.log(`index.js: Loading model from ${modelPath}`);
+    console.log(`live2d.js: Loading model from ${modelPath}`);
     if (model) {
       app.stage.removeChild(model); // Remove the previous model from the stage
       model.destroy(); // Clean up the previous model
@@ -72,9 +72,9 @@ async function loadModel(modelPath) {
 
     fitModelToCanvas(); // Set initial scale and position
 
-    console.log('index.js: Model loaded and added to stage.');
+    console.log('live2d.js: Model loaded and added to stage.');
   } catch (error) {
-    console.error('index.js: Failed to load model:', error);
+    console.error('live2d.js: Failed to load model:', error);
   }
 }
 
@@ -103,6 +103,6 @@ export function setBackground(imagePath) {
     container.style.backgroundRepeat = 'no-repeat';
     container.style.backgroundPosition = 'center';
     container.style.backgroundSize = 'cover';
-    console.log(`index.js: Background switched to ${imagePath}`);
+    console.log(`live2d.js: Background switched to ${imagePath}`);
   }
 }

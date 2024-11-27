@@ -14,7 +14,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { init } from '../components/index'; // Import your Live2D setup logic
+import { init } from '../utils/live2d'; // Import your Live2D setup logic
 
 // State for error handling
 const isModelLoaded = ref(false);
