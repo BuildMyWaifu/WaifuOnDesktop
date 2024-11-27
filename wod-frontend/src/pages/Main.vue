@@ -2,24 +2,23 @@
 <template>
   <v-app>
     <v-navigation-drawer v-model="leftDrawer" app location="left" :permanent="isPermanentLeft">
-      <v-list lines="three" select-strategy="single-independent">
+      <v-list lines="two" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
         </template>
         <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
           @click="updateCurrentCompanion(companion._id)">
           <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
-          <v-list-item-subtitle >{{ companion.profile.description }}</v-list-item-subtitle>
-          <v-list-item-subtitle>
-            <div v-if="store.messageMap.get(companion._id)">
-              {{ lastMessage(companion._id)?.content || 'No messages yet' }}
-            </div>
-          </v-list-item-subtitle>
+          <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
+          <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
+            {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
+              lastMessage(companion._id)?.content }}
+          </div>
         </v-list-item>
         <v-divider />
       </v-list>
       <div class="text-center">
-        <CreateNewWife/>
+        <CreateNewWife />
       </div>
 
       <template #append>
@@ -60,7 +59,8 @@
       </template>
     </v-navigation-drawer>
 
-    <CompanionDrawer v-model="rightDrawer" location="right" :permanent="isPermanentRight" v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionDrawer>
+    <CompanionDrawer v-model="rightDrawer" location="right" :permanent="isPermanentRight"
+      v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionDrawer>
     <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
         <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
@@ -73,7 +73,7 @@
         <v-btn icon="mdi-information" @click="rightDrawer = !rightDrawer" />
       </template>
     </v-app-bar>
-    <ChatInterface v-if="currentCompanionId !== null" :companionId="currentCompanionId"/>
+    <ChatInterface v-if="currentCompanionId !== null" :companionId="currentCompanionId" />
   </v-app>
 </template>
 
@@ -106,7 +106,7 @@
 
   const lastMessage = (Id: string) => {
     const messages = store.messageMap.get(Id)
-    return messages ? messages[messages.length - 1] : null
+    return messages ? messages[messages.length - 1] : undefined
   }
   // updateCurrentCompanion 函數來更新 currentCompanion
   const updateCurrentCompanion = (Id: string) => {
@@ -161,5 +161,4 @@
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
