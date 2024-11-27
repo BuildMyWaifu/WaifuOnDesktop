@@ -40,7 +40,9 @@
       </v-form>
 
     </v-card>
-    <div class="text-center">
+    <div class="text-center d-flex">
+      <div class="text-caption text-info text-decoration-underline pr-4" style="cursor: pointer;" @click="()=>{router.push('/')}">
+        返回首頁</div>
       <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="toSignUp">
         沒有帳號嗎？</div>
     </div>
