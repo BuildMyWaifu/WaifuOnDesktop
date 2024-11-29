@@ -34,6 +34,7 @@
                 </template>
 
                 <template v-slot:item.2>
+                    <CompanionEdit v-model="companion"></CompanionEdit>
                     <v-card class="mx-auto" style="max-width: 500px">
                         <v-form ref="form" v-model="isValid" class="pa-4 pt-6">
                             <v-textarea v-model="name" color="deep-purple" label="name" :rules="[rules.name]"
@@ -63,9 +64,9 @@
 </template>
 
 <script lang="ts" setup>
-    import { useAppStore } from '@/stores/app';
+import CompanionEdit from './CompanionEdit.vue';
 
-    const store = useAppStore()
+
 
     const isDialogOpen = ref(false)
     const steps = ['新增老婆', '人格構建']
