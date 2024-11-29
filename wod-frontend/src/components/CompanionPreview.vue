@@ -28,7 +28,7 @@
 
           <v-card>
             <v-card-title class="text-hˊ">
-              背景故事
+              背景設定
             </v-card-title>
             <v-card-text class="text-h7" style="border: 1px solid #ccc; border-radius:10px; padding: 16px;">
               {{ companion.prompt.backstory }}
@@ -38,6 +38,7 @@
           <v-dialog max-width="500">
             <template v-slot:activator="{ props: activatorProps }">
               <v-btn v-bind="activatorProps" color="surface-variant" text="編輯" variant="flat" class="ma-4"></v-btn>
+              <v-btn color="surface-variant" text="確定選擇" variant="flat" class="ma-4"></v-btn>
             </template>
 
             <template v-slot:default="{ isActive }">
@@ -45,7 +46,7 @@
                 <v-card-text>
                   這是一個dialog
                 </v-card-text>
-
+                
                 <v-card-actions>
                   <v-spacer></v-spacer>
 
