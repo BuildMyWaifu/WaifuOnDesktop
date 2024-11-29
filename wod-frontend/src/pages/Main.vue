@@ -59,8 +59,8 @@
       </template>
     </v-navigation-drawer>
 
-    <CompanionDrawer v-model="rightDrawer" location="right" :permanent="isPermanentRight"
-      v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionDrawer>
+    <CompanionPreview v-model="rightDrawer" location="right" :permanent="isPermanentRight"
+      v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
     <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
         <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
   import CompanionDrawer from '@/components/CompanionDrawer.vue'
+  import CompanionPreview from '@/components/CompanionPreview.vue'
   import ChatInterface from '@/components/ChatInterface.vue'
   import CreateNewWife from '@/components/CreateNewWife.vue'
 
