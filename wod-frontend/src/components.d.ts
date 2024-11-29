@@ -10,6 +10,8 @@ declare module 'vue' {
     ChatComponent: typeof import('./components/ChatComponent.vue')['default']
     ChatInterface: typeof import('./components/ChatInterface.vue')['default']
     CompanionDrawer: typeof import('./components/CompanionDrawer.vue')['default']
+    CompanionPreview: typeof import('./components/CompanionPreview.vue')['default']
+    copy: typeof import('./components/CompanionDrawer copy.vue')['default']
     CreateNewWife: typeof import('./components/CreateNewWife.vue')['default']
     FloatingChatInterface: typeof import('./components/FloatingChatInterface.vue')['default']
     Live2dComponent: typeof import('./components/Live2dComponent.vue')['default']
