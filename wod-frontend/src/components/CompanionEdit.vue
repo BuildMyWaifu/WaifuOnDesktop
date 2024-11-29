@@ -5,8 +5,9 @@
 </template>
 <script lang="ts" setup>
     import { Companion } from '@/utils/model';
-    import { PropType } from 'vue';
+    import { PropType, ref } from 'vue';
 
+    const companion = ref<Companion>()
 
     defineProps({
         modelValue: {
@@ -16,5 +17,6 @@
     })
 
     const emits = defineEmits(['update:modelValue'])
+    emits('update:modelValue', companion.value)
 
 </script>
