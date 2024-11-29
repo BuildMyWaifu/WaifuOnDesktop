@@ -59,9 +59,9 @@
       </template>
     </v-navigation-drawer>
 
-    <CompanionPreview v-model="rightDrawer" location="right" :permanent="isPermanentRight"
+    <CompanionPreview
       v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
-    <v-app-bar elevation="0">
+    <!-- <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
         <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
       </template>
@@ -69,11 +69,10 @@
         {{ currentCompanionId === null ? (currentCompanionId || '老婆名稱') : currentCompanionId }}
       </v-app-bar-title>
       <template v-if="display.width.value < 960">
-        <!--icon可變更-->
         <v-btn icon="mdi-information" @click="rightDrawer = !rightDrawer" />
       </template>
     </v-app-bar>
-    <ChatInterface v-if="currentCompanionId !== null" :companionId="currentCompanionId" />
+    <ChatInterface v-if="currentCompanionId !== null" :companionId="currentCompanionId" /> -->
   </v-app>
 </template>
 

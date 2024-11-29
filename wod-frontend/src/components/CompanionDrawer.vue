@@ -1,6 +1,6 @@
 <template>
     
-    <v-navigation-drawer>
+
         <v-container class="d-flex flex-column align-center pt-10" style="height: 100%;">
   
           <!-- <v-sheet class="mb-4" width="60%" color="grey" style="aspect-ratio: 1; border: 4px solid gray; border-radius: 10%;">
@@ -22,7 +22,7 @@
             </v-col>
           </v-row>
         </v-container>
-      </v-navigation-drawer>
+
       
         
     
