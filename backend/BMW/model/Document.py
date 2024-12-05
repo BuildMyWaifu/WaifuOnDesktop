@@ -150,7 +150,9 @@ class Document(BaseModel, metaclass=ABCMeta):
         cls: Type[T],
         skip=0,
         limit=0,
-        sort=[("timestamp", -1),],
+        sort=[
+            ("timestamp", -1),
+        ],
         **kwargs
     ) -> List[T]:
         collection_name = cls.model_fields["collection_name"].default
@@ -176,7 +178,7 @@ class Document(BaseModel, metaclass=ABCMeta):
 
     async def validate_delete(self, user: IUser):
         raise HTTPException(403, "沒有權限刪除")
-    
+
     async def permanent_delete(self):
         return BMW.Manager.db_manager.get_mongodb()[self.collection_name].delete_one(
             {"_id": self.id}

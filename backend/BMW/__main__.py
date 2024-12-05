@@ -1,4 +1,3 @@
-import io
 import traceback
 from contextlib import asynccontextmanager
 from multiprocessing import Manager
@@ -11,7 +10,7 @@ from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
 # from BMW.config import config
 from BMW.Manager import connection_manager, websocket_manager
-from BMW.model import ChatRoom, Document, File, Message, Payload, User
+from BMW.model import ChatRoom, Document, File, Message, Payload, User, Companion
 from BMW.model.Message import MessageCreatePayload
 from BMW.Process import BackgroundProcess
 from BMW.Thread import DeliveryThread
@@ -23,11 +22,10 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
-    UploadFile,
     WebSocket,
 )
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.websockets import WebSocketDisconnect
@@ -217,28 +215,75 @@ async def list_message(
 @app.get("/companion")
 async def list_companion(
     user: User = Depends(get_current_user),
-): ...
+):
+    companions = await Companion.find_any(userId=user._id)
+    return Payload.success(
+        "成功獲取伴侶列表", [await companion.get_dict(user) for companion in companions]
+    )
 
 
 @app.get("/companion/{companion_id}")
 async def get_companion(
     companion_id: str,
     user: User = Depends(get_current_user),
-): ...
+):
+    companion = await Companion.find(_id=companion_id)
+    if not companion:
+        raise HTTPException(404, "找不到這個伴侶")
+    if companion.userId != user._id:
+        raise HTTPException(403, "您沒有權限查看這個伴侶")
+    return Payload.success("成功獲取伴侶資料", await companion.get_dict(user))
+
+
+class CompanionEditPayload(BaseModel):
+    name: str | None = None
+    avatar: str | None = None
+    description: str | None = None
 
 
 @app.patch("/companion/{companion_id}")
 async def patch_companion(
     companion_id: str,
+    payload: CompanionEditPayload,
     user: User = Depends(get_current_user),
-): ...
+):
+    companion = await Companion.find(_id=companion_id)
+    if not companion:
+        raise HTTPException(404, "找不到這個伴侶")
+    if companion.userId != user._id:
+        raise HTTPException(403, "您沒有權限編輯這個伴侶")
+    await companion.update(**payload.model_dump(exclude_unset=True))
+    return Payload.success("成功編輯伴侶", await companion.get_dict(user))
+
+
+class CompanionCreatePayload(BaseModel):
+    name: str
+    avatar: str | None = None
+    description: str | None = None
+
+
+@app.post("/companion")
+async def create_companion(
+    payload: CompanionCreatePayload,
+    user: User = Depends(get_current_user),
+):
+    companion = Companion.empty(**payload.model_dump(), userId=user._id)
+    await companion.create()
+    return Payload.success("成功創建伴侶", await companion.get_dict(user))
 
 
 @app.delete("/companion/{companion_id}")
 async def delete_companion(
     companion_id: str,
     user: User = Depends(get_current_user),
-): ...
+):
+    companion = await Companion.find(_id=companion_id)
+    if not companion:
+        raise HTTPException(404, "找不到這個伴侶")
+    if companion.userId != user._id:
+        raise HTTPException(403, "您沒有權限刪除這個伴侶")
+    await companion.update(deleted=True)
+    return Payload.success("成功刪除伴侶")
 
 
 @app.get("/user/{user_id}")
@@ -275,44 +320,44 @@ async def user_token_reset(user_id: str, user: User = Depends(get_current_user))
     raise HTTPException(403, "您沒有權限重設這個使用者的 token")
 
 
-@app.post("/file")
-async def create_upload_file(file: UploadFile, user: User = Depends(get_current_user)):
-    # console.log(upload_file)
-    if user.level < 0:
-        raise HTTPException(403, "您沒有權限上傳檔案")
-    file_document = await File.from_file(file)
-    file_id = await file_document.create()
-    return Payload.success("成功上傳檔案", file_id)
+# @app.post("/file")
+# async def create_upload_file(file: UploadFile, user: User = Depends(get_current_user)):
+#     # console.log(upload_file)
+#     if user.level < 0:
+#         raise HTTPException(403, "您沒有權限上傳檔案")
+#     file_document = await File.from_file(file)
+#     file_id = await file_document.create()
+#     return Payload.success("成功上傳檔案", file_id)
 
 
-@app.get("/file/{file_id}")
-async def get_file_info_by_id(file_id: str, user: User = Depends(get_current_user)):
-    if user.level < 0:
-        raise HTTPException(403, "您沒有權限取得檔案資訊")
-    file = await File.find(_id=file_id)
-    return Payload.success("成功獲得檔案資訊", file.safe_dict())
+# @app.get("/file/{file_id}")
+# async def get_file_info_by_id(file_id: str, user: User = Depends(get_current_user)):
+#     if user.level < 0:
+#         raise HTTPException(403, "您沒有權限取得檔案資訊")
+#     file = await File.find(_id=file_id)
+#     return Payload.success("成功獲得檔案資訊", file.safe_dict())
 
 
-@app.get("/file/{file_id}/download")
-async def download_file_by_id(file_id: str, user: User = Depends(get_current_user)):
-    if user.level < 0:
-        raise HTTPException(403, "您沒有權限下載檔案")
+# @app.get("/file/{file_id}/download")
+# async def download_file_by_id(file_id: str, user: User = Depends(get_current_user)):
+#     if user.level < 0:
+#         raise HTTPException(403, "您沒有權限下載檔案")
 
-    file = await File.find(_id=file_id)
-    file_stream = io.BytesIO(file.data)
+#     file = await File.find(_id=file_id)
+#     file_stream = io.BytesIO(file.data)
 
-    response = StreamingResponse(file_stream)
+#     response = StreamingResponse(file_stream)
 
-    try:
-        response.headers["Content-Disposition"] = (
-            f"attachment; filename={file.filename}"
-        )
-    except UnicodeEncodeError:
-        response.headers["Content-Disposition"] = (
-            f"attachment; filename={file_id}.{file.filename.split('.')[-1]}"
-        )
+#     try:
+#         response.headers["Content-Disposition"] = (
+#             f"attachment; filename={file.filename}"
+#         )
+#     except UnicodeEncodeError:
+#         response.headers["Content-Disposition"] = (
+#             f"attachment; filename={file_id}.{file.filename.split('.')[-1]}"
+#         )
 
-    return response
+#     return response
 
 
 @app.get("/version")
