@@ -16,7 +16,6 @@
   console.log('App.vue: Mounted hook executed.');
   try {
     // TODO: fix some error in the mound lifecycle, I don't know what it is
-    store.generateMockMessages();
     fetchSync(); 
     setBroadcastCallback((sync) => {
       store.setSync(sync);

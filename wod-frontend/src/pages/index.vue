@@ -53,6 +53,8 @@
     } else {
       await store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
       store.generateMockCompanionList()
+      store.generateMockMessages();
+
     }
   }
 </script>
