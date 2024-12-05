@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
-    <v-navigation-drawer  app location="left" permanent>
+    <v-navigation-drawer  app location="left" permanent width="250">
       <v-list lines="two" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
