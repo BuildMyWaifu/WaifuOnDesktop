@@ -70,6 +70,14 @@ export async function deleteApi (path = '') {
   }
 }
 
+export function handleErrorAlert (res: { status: NonNullable<'success' | 'error' | 'info' | 'warning'>, message: string, data: object }) {
+  if (res.status === 'success') {
+    return res.data
+  } else {
+    alert(res.message)
+  }
+}
+
 // export function handleErrorSnackbar (res: { status: NonNullable<'success' | 'error' | 'info' | 'warning'>, message: string, data: object }) {
 //   const store = useViewStore()
 //   if (res.status === 'success') {

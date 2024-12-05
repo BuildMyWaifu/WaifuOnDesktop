@@ -216,7 +216,7 @@ async def list_message(
 async def list_companion(
     user: User = Depends(get_current_user),
 ):
-    companions = await Companion.find_any(userId=user._id)
+    companions = await Companion.find_any(userId=user.id)
     return Payload.success(
         "成功獲取伴侶列表", [await companion.get_dict(user) for companion in companions]
     )
@@ -230,7 +230,7 @@ async def get_companion(
     companion = await Companion.find(_id=companion_id)
     if not companion:
         raise HTTPException(404, "找不到這個伴侶")
-    if companion.userId != user._id:
+    if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限查看這個伴侶")
     return Payload.success("成功獲取伴侶資料", await companion.get_dict(user))
 
@@ -250,7 +250,7 @@ async def patch_companion(
     companion = await Companion.find(_id=companion_id)
     if not companion:
         raise HTTPException(404, "找不到這個伴侶")
-    if companion.userId != user._id:
+    if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限編輯這個伴侶")
     await companion.update(**payload.model_dump(exclude_unset=True))
     return Payload.success("成功編輯伴侶", await companion.get_dict(user))
@@ -267,7 +267,7 @@ async def create_companion(
     payload: CompanionCreatePayload,
     user: User = Depends(get_current_user),
 ):
-    companion = Companion.empty(**payload.model_dump(), userId=user._id)
+    companion = Companion.empty(**payload.model_dump(), userId=user.id)
     await companion.create()
     return Payload.success("成功創建伴侶", await companion.get_dict(user))
 
@@ -280,7 +280,7 @@ async def delete_companion(
     companion = await Companion.find(_id=companion_id)
     if not companion:
         raise HTTPException(404, "找不到這個伴侶")
-    if companion.userId != user._id:
+    if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限刪除這個伴侶")
     await companion.update(deleted=True)
     return Payload.success("成功刪除伴侶")
