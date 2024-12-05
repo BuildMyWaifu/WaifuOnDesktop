@@ -1,8 +1,8 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
-    <v-navigation-drawer  app location="left" permanent width="250">
-      <v-list lines="two" select-strategy="single-independent">
+    <v-navigation-drawer app location="left" permanent>
+      <v-list lines="two" select-strategy="single-independent" width="256">
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
         </template>
@@ -12,7 +12,7 @@
           <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
           <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
             {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
-              lastMessage(companion._id)?.content }}
+            lastMessage(companion._id)?.content }}
           </div>
         </v-list-item>
         <v-divider />
@@ -59,8 +59,7 @@
       </template>
     </v-navigation-drawer>
 
-    <CompanionPreview
-      v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
+    <CompanionPreview v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
     <!-- <v-app-bar elevation="0">
       <template v-if="display.width.value < 750">
         <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
