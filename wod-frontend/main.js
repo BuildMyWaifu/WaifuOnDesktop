@@ -27,7 +27,9 @@ ipcMain.on('window:set-size', (event, width, height) => {
 })
 
 ipcMain.on('sync:fetch', (event) => {
-  event.sender.send('sync:broadcast', lastSync)
+  if (lastSync) {
+    event.sender.send('sync:broadcast', lastSync)
+  }
 })
 
 ipcMain.on('sync:submit', (event, content) => {
