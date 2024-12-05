@@ -94,9 +94,8 @@
       snackbar.value = res
       showSnackBar.value = true
       if (res.status === 'success') {
-        appStore.login(res.data)
-
-        await router.push('/')
+        await appStore.login(res.data)
+        await router.push('/app')
       }
     }
     loading.value = false

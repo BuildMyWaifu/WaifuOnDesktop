@@ -65,7 +65,6 @@
   import { SubmitEventPromise } from 'vuetify'
 
   const store = useAppStore()
-  const { login } = store
   const router = useRouter()
   const loading = ref(false)
   const formValid = ref(false)
@@ -94,12 +93,12 @@
       snackbar.value = res
       showSnackBar.value = true
       if (res.status === 'success') {
-        login(res.data)
+        await store.login(res.data)
         const redirectPath = route.query.redirect
         if (redirectPath) {
           await router.push(redirectPath.toString())
         } else {
-          await router.push('/')
+          await router.push('/app')
         }
       }
     }

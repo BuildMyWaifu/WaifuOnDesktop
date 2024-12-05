@@ -47,11 +47,11 @@
     }
     return false
   })
-  function toggleAuthStat () {
+  async function toggleAuthStat () {
     if (store.user !== undefined) {
       store.logout()
     } else {
-      store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
+      await store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
     }
   }
 </script>
