@@ -6,6 +6,16 @@
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
         </template>
+        <v-list-item v-show="store.companionList == undefined">
+          <v-card-text class="d-flex text-center">
+            載入伴侶列表中
+          </v-card-text>
+        </v-list-item>
+        <v-list-item v-show="store.companionList != undefined && store.companionList.length == 0">
+          <v-card-text class="d-flex text-center">
+            伴侶列表為空
+          </v-card-text>
+        </v-list-item>
         <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
           @click="updateCurrentCompanion(companion._id)">
           <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
@@ -122,7 +132,9 @@
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
   const windowResizeListener = ref()
   onMounted(() => {
-    currentCompanionId.value = store.companionList[0]._id
+    if (store.companionList != undefined) {
+      currentCompanionId.value = store.companionList[0]._id
+    }
     windowResizeListener.value = window.addEventListener('resize', lefthandleResize)
     windowResizeListener.value = window.addEventListener('resize', righthandleResize)
     lefthandleResize()

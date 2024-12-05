@@ -10,42 +10,7 @@ const defaultSync = {
 export const useAppStore = defineStore("app", {
   state: () => ({
     user: undefined as User | undefined,
-    companionList: [
-      {
-        _id: "咪醬",
-        profile: {
-          name: "咪醬",
-          description: "可愛又元氣滿滿的貓娘女僕，喜歡撒嬌和主人喵～！",
-        },
-        prompt: {
-          character: "元氣可愛的貓娘女僕",
-          backstory:
-            "咪醬天生就是一隻充滿愛與熱情的貓娘，最喜歡主人，讓主人的每一天都充滿幸福和快樂喵！",
-        },
-      },
-      {
-        _id: "test 2",
-        profile: {
-          name: "test name 1",
-          description: "asdf",
-        },
-        prompt: {
-          character: "asf",
-          backstory: "asdf",
-        },
-      },
-      {
-        _id: "test 3",
-        profile: {
-          name: "test name 1",
-          description: "asdf",
-        },
-        prompt: {
-          character: "asf",
-          backstory: "asdf",
-        },
-      },
-    ] as Companion[],
+    companionList: undefined as Companion[] | undefined,
     messageMap: new Map() as Map<string, Message[]>,
     sync: defaultSync as Sync,
   }),
@@ -67,6 +32,9 @@ export const useAppStore = defineStore("app", {
       this.user = undefined;
     },
     getCompanion(companionId: string): Companion {
+      if (!this.companionList) {
+        throw new Error("Companion list not loaded");
+      }
       const companion = this.companionList.find(
         (companion) => companion._id === companionId,
       );
@@ -75,7 +43,54 @@ export const useAppStore = defineStore("app", {
       }
       return companion;
     },
+    generateMockCompanionList() {
+      if (!this.user) {
+        return;
+      }
+      this.companionList = [
+        {
+          _id: "咪醬",
+          userId: this.user._id,
+          profile: {
+            name: "咪醬",
+            description: "可愛又元氣滿滿的貓娘女僕，喜歡撒嬌和主人喵～！",
+          },
+          prompt: {
+            character: "元氣可愛的貓娘女僕",
+            backstory:
+              "咪醬天生就是一隻充滿愛與熱情的貓娘，最喜歡主人，讓主人的每一天都充滿幸福和快樂喵！",
+          },
+        },
+        {
+          _id: "test 2",
+          userId: this.user._id,
+          profile: {
+            name: "test name 1",
+            description: "asdf",
+          },
+          prompt: {
+            character: "asf",
+            backstory: "asdf",
+          },
+        },
+        {
+          _id: "test 3",
+          userId: this.user._id,
+          profile: {
+            name: "test name 1",
+            description: "asdf",
+          },
+          prompt: {
+            character: "asf",
+            backstory: "asdf",
+          },
+        },
+      ];
+    },
     generateMockMessages() {
+      if (!this.companionList) {
+        throw new Error("Companion list not loaded");
+      }
       for (const companion of this.companionList) {
         const messages: Message[] = [];
         for (let i = 0; i < 10; i++) {

@@ -17,7 +17,7 @@ export interface Companion extends Document {
         name: string
         description: string // 給使用者看的敘述
     }
-    avatarId: string // 現階段先不做這部分
+    // avatarId: string // 現階段先不做這部分
     prompt: {
         character: string,
         backstory: string
