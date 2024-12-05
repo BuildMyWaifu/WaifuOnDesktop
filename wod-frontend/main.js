@@ -41,8 +41,8 @@ ipcMain.on('sync:submit', (event, content) => {
 
 const createWindow = url => {
   const win = new BrowserWindow({
-    width: 600,
-    height: 450,
+    width: 800,
+    height: 600,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
     },

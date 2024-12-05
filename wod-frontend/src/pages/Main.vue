@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <v-app>
-    <v-navigation-drawer v-model="leftDrawer" app location="left" :permanent="isPermanentLeft">
+    <v-navigation-drawer  app location="left" permanent>
       <v-list lines="two" select-strategy="single-independent">
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
@@ -77,9 +77,7 @@
 </template>
 
 <script setup lang="ts">
-  import CompanionDrawer from '@/components/CompanionDrawer.vue'
   import CompanionPreview from '@/components/CompanionPreview.vue'
-  import ChatInterface from '@/components/ChatInterface.vue'
   import CreateNewWife from '@/components/CreateNewWife.vue'
 
   import { useAppStore } from '@/stores/app'
