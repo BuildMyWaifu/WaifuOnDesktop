@@ -1,55 +1,41 @@
-from typing import Annotated
-from contextlib import asynccontextmanager
 import io
 import traceback
+from contextlib import asynccontextmanager
 from multiprocessing import Manager
+from typing import Annotated
 
+import BMW.Manager
+import BMW.model
+import git
+from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
+# from BMW.config import config
+from BMW.Manager import connection_manager, websocket_manager
+from BMW.model import ChatRoom, Document, File, Message, Payload, User
+from BMW.model.Message import MessageCreatePayload
+from BMW.Process import BackgroundProcess
+from BMW.Thread import DeliveryThread
+from BMW.utils import console
 from fastapi import (
+    Cookie,
+    Depends,
     FastAPI,
     HTTPException,
-    Cookie,
+    Request,
     Response,
-    Depends,
     UploadFile,
-    Request ,
     WebSocket,
 )
-from starlette.websockets import WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
-import git
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.websockets import WebSocketDisconnect
 
 # from starlette.requests import Request
 
-from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
-from BMW.utils import (
-    console,
-)
-
-from BMW.model import (
-    Payload,
-    User,
-    Document,
-    File,
-    Editable,
-    ChatRoom,
-    Message,
-)
-from BMW.Process import  BackgroundProcess
-
-import BMW.Manager
 
 BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
-
-from BMW.Manager import (
-    websocket_manager,
-    connection_manager,
-)
-from BMW.Thread import DeliveryThread
-from BMW.config import config
 
 
 lower_collection_name2object: dict[POSSIBLE_COLLECTION_NAME_LOWERCASE, Document] = {
@@ -139,7 +125,6 @@ async def general_exception_handler(request, exc):
     )
 
 
-
 async def get_current_user(
     token: Annotated[str | None, Cookie()] = None,
 ) -> User:
@@ -195,11 +180,65 @@ async def registration(payload: UserSignUpPayload, response: Response):
     user.profile.name = payload.name
     user.profile.email = payload.email
     await user.create()
-    
+
     await user.update_token()
     await user.set_password(payload.password)
     response.set_cookie(key="token", value=user.token)
     return Payload.success("註冊成功", user.safe_dict())
+
+
+@app.post("/message")
+async def create_message(
+    payload: MessageCreatePayload,
+    user: User = Depends(get_current_user),
+):
+    message = Message.empty(**payload.model_dump())
+    await message.create()
+    return Payload.success("成功發送訊息", await message.get_dict(user))
+
+
+@app.get("/message/{companion_id}")
+async def list_message(
+    companion_id: str,
+    before: int | None = None,
+    after: int | None = None,
+    limit: int = 50,
+    offset: int = 0,
+    user: User = Depends(get_current_user),
+):
+    messages = await Message.find_any(
+        companionId=companion_id, limit=limit, offset=offset
+    )
+    return Payload.success(
+        "成功獲取訊息列表", [await message.get_dict(user) for message in messages]
+    )
+
+
+@app.get("/companion")
+async def list_companion(
+    user: User = Depends(get_current_user),
+): ...
+
+
+@app.get("/companion/{companion_id}")
+async def get_companion(
+    companion_id: str,
+    user: User = Depends(get_current_user),
+): ...
+
+
+@app.patch("/companion/{companion_id}")
+async def patch_companion(
+    companion_id: str,
+    user: User = Depends(get_current_user),
+): ...
+
+
+@app.delete("/companion/{companion_id}")
+async def delete_companion(
+    companion_id: str,
+    user: User = Depends(get_current_user),
+): ...
 
 
 @app.get("/user/{user_id}")
@@ -209,6 +248,7 @@ async def get_user_by_id(user_id: str, user: User = Depends(get_current_user)):
         raise HTTPException(404, "找不到此使用者")
 
     return Payload.success("成功獲取使用者資料", await target_user.get_dict(user))
+
 
 class UserSetPasswordPayload(BaseModel):
     password: str
@@ -245,9 +285,8 @@ async def create_upload_file(file: UploadFile, user: User = Depends(get_current_
     return Payload.success("成功上傳檔案", file_id)
 
 
-
 @app.get("/file/{file_id}")
-async def download_file_by_id(file_id: str, user: User = Depends(get_current_user)):
+async def get_file_info_by_id(file_id: str, user: User = Depends(get_current_user)):
     if user.level < 0:
         raise HTTPException(403, "您沒有權限取得檔案資訊")
     file = await File.find(_id=file_id)
@@ -276,8 +315,6 @@ async def download_file_by_id(file_id: str, user: User = Depends(get_current_use
     return response
 
 
-
-
 @app.get("/version")
 async def get_version():
     repo = git.Repo(search_parent_directories=True)
@@ -299,131 +336,131 @@ async def websocket_endpoint(
     websocket_manager.regist(userId=user.id, websocket=websocket)
     try:
         while True:
-            data = await websocket.receive_json()
+            await websocket.receive_json()
             # should not recv anything from client
 
     except WebSocketDisconnect:
         websocket_manager.unregist(userId=user.id)
 
 
-class SearchPayload(BaseModel):
-    filter: dict = {}
-    sort: dict = {}
+# class SearchPayload(BaseModel):
+#     filter: dict = {}
+#     sort: dict = {}
 
 
-@app.post("/{collection_name}/search")
-async def search_document(
-    collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-    payload: SearchPayload,
-    user: User = Depends(get_current_user),
-    offset: int = 0,
-    limit: int = 50,
-):
-    Object = lower_collection_name2object[collection_name]
-    if not await Object.check_search_permission(user):
-        raise HTTPException(403, "無搜索此類別的權限")
-    filter_payload, sort_payload = await Object.validate_search(
-        user=user, sort=payload.sort, filter=payload.filter
-    )
-    console.log(filter_payload)
-    console.log(sort_payload)
+# @app.post("/{collection_name}/search")
+# async def search_document(
+#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
+#     payload: SearchPayload,
+#     user: User = Depends(get_current_user),
+#     offset: int = 0,
+#     limit: int = 50,
+# ):
+#     Object = lower_collection_name2object[collection_name]
+#     if not await Object.check_search_permission(user):
+#         raise HTTPException(403, "無搜索此類別的權限")
+#     filter_payload, sort_payload = await Object.validate_search(
+#         user=user, sort=payload.sort, filter=payload.filter
+#     )
+#     console.log(filter_payload)
+#     console.log(sort_payload)
 
-    return Payload.success(
-        "成功加載資料",
-        [
-            await document.get_dict(user)
-            for document in await Object.find_any(
-                skip=offset,
-                limit=limit,
-                sort=list(sort_payload.items()),
-                **filter_payload,
-            )
-        ],
-    )
-
-
-@app.get("/{collection_name}/{document_id}")
-async def get_document(
-    collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-    document_id: str,
-    user: User = Depends(get_current_user),
-):
-    Object = lower_collection_name2object[collection_name]
-    document = await Object.find(_id=document_id)
-    if not document:
-        raise HTTPException(404, "找不到此文件")
-
-    output_dict = await document.get_dict(user)
-    if output_dict:
-        return Payload.success("成功存取資料", output_dict)
-    else:
-        raise HTTPException(403, "無存取此文件的權限")
+#     return Payload.success(
+#         "成功加載資料",
+#         [
+#             await document.get_dict(user)
+#             for document in await Object.find_any(
+#                 skip=offset,
+#                 limit=limit,
+#                 sort=list(sort_payload.items()),
+#                 **filter_payload,
+#             )
+#         ],
+#     )
 
 
-@app.post("/{collection_name}")
-async def create_document(
-    collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-    dict_payload: dict,
-    user: User = Depends(get_current_user),
-):
-    console.log(dict_payload)
-    Object = lower_collection_name2object[collection_name]
-    if not issubclass(Object, Editable):
-        raise HTTPException(500, "該類型不支援創建")
-    if not await Object.check_create_permission(user):
-        raise HTTPException(403, "無建立此類型文件的權限")
+# @app.get("/{collection_name}/{document_id}")
+# async def get_document(
+#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
+#     document_id: str,
+#     user: User = Depends(get_current_user),
+# ):
+#     Object = lower_collection_name2object[collection_name]
+#     document = await Object.find(_id=document_id)
+#     if not document:
+#         raise HTTPException(404, "找不到此文件")
 
-    create_payload = await Object.validate_create(user=user, create=dict_payload)
-
-    document = Object.empty(**create_payload)
-    await document.create()
-    return Payload.success("成功創建文件", await document.get_dict(user))
+#     output_dict = await document.get_dict(user)
+#     if output_dict:
+#         return Payload.success("成功存取資料", output_dict)
+#     else:
+#         raise HTTPException(403, "無存取此文件的權限")
 
 
-@app.patch("/{collection_name}/{document_id}")
-async def update_document(
-    collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-    document_id: str,
-    dict_payload: dict,
-    user: User = Depends(get_current_user),
-):
-    Object = lower_collection_name2object[collection_name]
-    document = await Object.find(_id=document_id)
+# @app.post("/{collection_name}")
+# async def create_document(
+#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
+#     dict_payload: dict,
+#     user: User = Depends(get_current_user),
+# ):
+#     console.log(dict_payload)
+#     Object = lower_collection_name2object[collection_name]
+#     if not issubclass(Object, Editable):
+#         raise HTTPException(500, "該類型不支援創建")
+#     if not await Object.check_create_permission(user):
+#         raise HTTPException(403, "無建立此類型文件的權限")
 
-    if not document:
-        raise HTTPException(404, "找不到此文件")
+#     create_payload = await Object.validate_create(user=user, create=dict_payload)
 
-    if not isinstance(document, Editable):
-        raise HTTPException(500, "該類型不支援編輯")
-
-    if not await document.check_permission(user):
-        raise HTTPException(403, "無存取此文件的權限")
-
-    update_payload = await document.validate_update(user=user, update=dict_payload)
-
-    await document.update(**update_payload, )
-    return Payload.success("成功更新文件", await document.get_dict(user))
+#     document = Object.empty(**create_payload)
+#     await document.create()
+#     return Payload.success("成功創建文件", await document.get_dict(user))
 
 
-@app.delete("/{collection_name}/{document_id}")
-async def delete_document(
-    collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-    document_id: str,
-    user: User = Depends(get_current_user),
-):
-    Object = lower_collection_name2object[collection_name]
-    document = await Object.find(_id=document_id)
+# # @app.patch("/{collection_name}/{document_id}")
+# # async def update_document(
+# #     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
+# #     document_id: str,
+# #     dict_payload: dict,
+# #     user: User = Depends(get_current_user),
+# # ):
+# #     Object = lower_collection_name2object[collection_name]
+# #     document = await Object.find(_id=document_id)
 
-    if not document:
-        raise HTTPException(404, "找不到此文件")
+# #     if not document:
+# #         raise HTTPException(404, "找不到此文件")
 
-    if not isinstance(document, Editable):
-        raise HTTPException(500, "該類型不支援刪除")
+# #     if not isinstance(document, Editable):
+# #         raise HTTPException(500, "該類型不支援編輯")
 
-    await document.validate_delete(user)
+# #     if not await document.check_permission(user):
+# #         raise HTTPException(403, "無存取此文件的權限")
 
-    await document.update(deleted=True)
-    return Payload.success("成功刪除文件")
+# #     update_payload = await document.validate_update(user=user, update=dict_payload)
+
+# #     await document.update(**update_payload, )
+# #     return Payload.success("成功更新文件", await document.get_dict(user))
+
+
+# @app.delete("/{collection_name}/{document_id}")
+# async def delete_document(
+#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
+#     document_id: str,
+#     user: User = Depends(get_current_user),
+# ):
+#     Object = lower_collection_name2object[collection_name]
+#     document = await Object.find(_id=document_id)
+
+#     if not document:
+#         raise HTTPException(404, "找不到此文件")
+
+#     if not isinstance(document, Editable):
+#         raise HTTPException(500, "該類型不支援刪除")
+
+#     await document.validate_delete(user)
+
+#     await document.update(deleted=True)
+#     return Payload.success("成功刪除文件")
 
 
 @app.api_route("/{full_path:path}")

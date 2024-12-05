@@ -1,15 +1,14 @@
 from typing import Literal
 
-from pydantic import Field
-from fastapi import HTTPException
-
-from .ABC import IUser
 from BMW.config import config
+from fastapi import HTTPException
+from pydantic import Field
 
-from .Document import FilterPayload, SortPayload, Document
-from .Editable import Editable, UpdatePayload, CreatePayload
-from .User import User
 from .ChatRoom import ChatRoom
+from .Document import Document, FilterPayload, SortPayload
+from .Editable import CreatePayload, Editable, UpdatePayload
+from .User import User
+
 
 class MessageFilterPayload(FilterPayload):
     chatRoomId: str | None = None
@@ -41,9 +40,7 @@ class MessageFilterPayload(FilterPayload):
 
 
 class MessageSortPayload(SortPayload):
-    createTimestamp: Literal[1, -1] = Field(
-        alias="timestamp", default=-1
-    )
+    createTimestamp: Literal[1, -1] = Field(alias="timestamp", default=-1)
 
     async def validate_user_sort(self, user: User) -> dict:
         return self.model_dump(by_alias=True)
@@ -68,7 +65,7 @@ class MessageCreatePayload(CreatePayload):
         author = await User.find(_id=self.authorId)
         if not await author.check_permission(user):
             raise HTTPException(403, "您沒有權限發送此訊息")
-        if not author.id in chat_room.members:
+        if author.id not in chat_room.members:
             raise HTTPException(403, "發送者不在這個聊天室內")
 
         self.text = self.text.strip()
@@ -85,10 +82,11 @@ class MessageCreatePayload(CreatePayload):
 
 class Message(Editable):
     collection_name: str = "Message"
-    authorId: str | None
-    chatRoomId: str
-    text: str
-    reply: str | None = None
+
+    role: str
+    companionId: str
+    content: str
+    createdAt: int  # unix timestamp ms int
 
     _FilterPayload = MessageFilterPayload
     _SortPayload = MessageSortPayload
@@ -122,10 +120,8 @@ class Message(Editable):
     def empty(cls, *args, **kwargs):
         return cls(*args, **kwargs)
 
-    async def create(
-        self, *args, **kwargs
-    ):
-        result = await super().create( *args, **kwargs)
+    async def create(self, *args, **kwargs):
+        result = await super().create(*args, **kwargs)
         chatroom = await ChatRoom.find(_id=self.chatRoomId)
         await chatroom.update_to_message(self)
         return result

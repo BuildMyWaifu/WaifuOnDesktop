@@ -1,9 +1,8 @@
-from abc import abstractmethod
-import threading
 import asyncio
+import threading
+from abc import abstractmethod
 
 from BMW.Manager import ConnectionManager, WebsocketManager
-from BMW.model import Payload
 from BMW.utils import console
 
 
@@ -27,7 +26,6 @@ class StoppableThread(threading.Thread):
 
 
 class DeliveryThread(StoppableThread):
-
     connection_manager: ConnectionManager
     websocket_manager: WebsocketManager
 
@@ -49,23 +47,59 @@ class DeliveryThread(StoppableThread):
         while True:
             if self.stopped():
                 return
-            await asyncio.sleep(0.01)   
-            for userId in self.connection_manager.user_pipe_dict.keys():
-                data = self.connection_manager.read(userId=userId)
-                if data:
-                    websocket_list = self.websocket_manager.websocket_dict.get(
-                        userId
-                    )
-                    if websocket_list:
-                        good_websocket_list = []
-                        for i, websocket in enumerate(websocket_list):
-                            try:
-                                await websocket.send_json(data)
-                                good_websocket_list.append(websocket)
-                            except Exception as e:
-                                console.log(e)
-                                console.log(f"{userId} connection broken?")
-                        self.websocket_manager.websocket_dict[userId] = (
-                            good_websocket_list
-                        )
+            await asyncio.sleep(0.01)
 
+            user_ids = list(self.connection_manager.user_pipe_dict.keys())
+            tasks = [self.handle_user(user_id) for user_id in user_ids]
+            await asyncio.gather(*tasks)
+
+    async def handle_user(self, user_id: str):
+        """
+        Handle data delivery for a single user, including all associated websockets.
+        """
+
+        mailbox = {}
+        other_data = []
+        while True:
+            data = self.connection_manager.read(userId=user_id)
+            if not data:
+                break
+
+            data_type = data.get("type")
+            data_document_id = data.get("document_id")
+            if data_type and data_document_id:
+                mailbox[f"{data_type}_{data_document_id}"] = data
+            else:
+                other_data.append(data)
+
+        payloads = list(mailbox.values()) + other_data
+
+        if payloads:
+            for data in payloads:
+                websocket_list = self.websocket_manager.websocket_dict.get(user_id)
+                if websocket_list:
+                    # Create a task pool to send data concurrently to multiple websockets
+                    results = await asyncio.gather(
+                        *[
+                            self.send_data(websocket, data)
+                            for websocket in websocket_list
+                        ],
+                        return_exceptions=True,
+                    )
+                    # Update the websocket list by filtering out broken connections
+                    self.websocket_manager.websocket_dict[user_id] = [
+                        websocket
+                        for websocket, result in zip(websocket_list, results)
+                        if not isinstance(result, Exception)
+                    ]
+
+    async def send_data(self, websocket, data):
+        """
+        Attempt to send data to a websocket. Exceptions are logged but not raised.
+        """
+        try:
+            await websocket.send_json(data)
+        except Exception as e:
+            console.log(e)
+            console.log(f"Websocket connection broken for {websocket}.")
+            raise e
