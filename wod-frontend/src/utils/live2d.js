@@ -80,14 +80,20 @@ async function loadModel(modelPath) {
 
 function fitModelToCanvas() {
   if (!model) return;
-  const scaleX = window.innerWidth / originalWidth;
-  const scaleY = window.innerHeight / originalHeight;
-  const scale = Math.min(scaleX, scaleY) * 0.75; // Leave some padding
+  
+  // 根據drawer調整大小
+  const drawerWidth = document.getElementById('drawer')?.offsetWidth || 0;
+  const availableWidth = window.innerWidth - drawerWidth;
+  const availableHeight = window.innerHeight;
 
-  model.scale.set(scale); // Apply scale
+  const scaleX = availableWidth / originalWidth;
+  const scaleY = availableHeight / originalHeight;
+  const scale = Math.min(scaleX, scaleY) * 0.75; 
+
+  model.scale.set(scale);
   model.position.set(
-    (window.innerWidth - originalWidth * scale) / 2, // Center horizontally
-    (window.innerHeight - originalHeight * scale) / 2 // Center vertically
+    (availableWidth - originalWidth * scale) / 2 + drawerWidth, 
+    (availableHeight - originalHeight * scale) / 2 
   );
 }
 
