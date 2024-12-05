@@ -82,7 +82,8 @@ function fitModelToCanvas() {
   if (!model) return;
   
   // 根據drawer調整大小
-  const drawerWidth = document.getElementById('drawer')?.offsetWidth || 0;
+  const drawer = document.getElementById('drawer');
+  const drawerWidth = drawer ? drawer.offsetWidth : 0;
   const availableWidth = window.innerWidth - drawerWidth;
   const availableHeight = window.innerHeight;
 
