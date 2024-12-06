@@ -142,7 +142,7 @@
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
   const windowResizeListener = ref()
   onMounted(() => {
-    if (store.companionList != undefined) {
+    if (store.companionList != undefined && store.companionList.length != 0) {
       currentCompanionId.value = store.companionList[0]._id
     }
     windowResizeListener.value = window.addEventListener('resize', lefthandleResize)
