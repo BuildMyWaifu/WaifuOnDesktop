@@ -89,7 +89,7 @@ router.beforeEach(async function (to) {
   if (to.meta.requiresAuth && !store.user) {
     const res = await fetchApi("/me");
     if (res.status == "success") {
-      store.login(res.data);
+      await store.login(res.data);
     } else {
       if (getCookie("token").length > 0) {
         alert("登入已過期！請重新登入");
