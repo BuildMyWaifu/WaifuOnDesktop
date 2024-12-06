@@ -12,8 +12,7 @@
         </v-container>
   </v-main>-->
   <v-main>
-    <v-container class="pa-2" style="height: 100%; overflow-y: scroll">
-      <!--chat interface-->
+    <v-container class="pa-2" style="height: 100%;">
       <div>
         <div class="message-box">
           <div class="message-content">
