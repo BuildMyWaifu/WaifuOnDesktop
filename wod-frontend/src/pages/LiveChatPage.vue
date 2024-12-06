@@ -129,6 +129,44 @@
         </button>
       </div>
     </div>
+
+    <div style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    ">
+      <!-- Switch Half Body Button -->
+      <button @click="isHalfBody = !isHalfBody" style="
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: transparent;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+      " title="Switch Half Body">
+        <v-icon>mdi-account-convert</v-icon>
+      </button>
+      <!-- Show Previous Chat Button -->
+      <button @click="openPreviousChat" style="
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: transparent;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+      " title="previousChat">
+        <v-icon>mdi-text-long</v-icon>
+      </button>
+    </div>
+
+    <!-- Floating Chat Interface -->
+    <FloatingChatInterface :companionId="companionId" />
+
+    <!-- Previous Chat Interface -->
+    <PreviousChatInterface v-if="isPreviousChatOpen" :companionId="companionId"/>
   </div>
 </template>
 
@@ -136,6 +174,9 @@
   import { ref } from 'vue';
   import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
   import { setBackground, switchModel } from '@/utils/live2d'; // Import background setter and switchModel
+  import FloatingChatInterface from '@/components/FloatingChatInterface.vue'; // Import the floating chat interface component
+  import PreviousChatInterface from '@/components/PreviousChatInterface.vue'; // Import the previous chat interface component
+  import { createWindow } from '@/utils/electronAPI';
 
   // Background options
   const backgrounds = [
@@ -157,6 +198,9 @@
   // State for the settings panel
   const showSettings = ref(false);
   const activeVideo = ref(null); // Keeps track of the currently active video background
+
+  const isHalfBody = ref(false); // Switch between full body and half body
+  const isPreviousChatOpen = ref(false); // Show previous chat
 
   // Change the background
   const changeBackground = (background) => {
@@ -198,6 +242,10 @@
     const model = models[currentModelIndex];
     switchModel(model.path);
     console.log(`Switched to model: ${model.label}`);
+  };
+
+  const openPreviousChat = () => {
+    createWindow('/previousChat');
   };
 </script>
 

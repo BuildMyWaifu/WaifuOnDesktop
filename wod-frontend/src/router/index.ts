@@ -48,6 +48,12 @@ const routes = [
     name: 'LiveChat',
     meta: { requiresAuth: false },
     component: () => import('@/pages/LiveChatPage.vue'), // Ensure the casing matches
+  },
+  {
+    path: '/PreviousChat',
+    name: 'PreviousChat',
+    meta: { requiresAuth: false },
+    component: () => import('../components/PreviousChatInterface.vue'), // Ensure the casing matches
   }
 ]
 
