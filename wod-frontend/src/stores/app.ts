@@ -30,6 +30,11 @@ export const useAppStore = defineStore("app", {
     },
     logout() {
       this.user = undefined;
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      this.reset();
+    },
+    reset() {
+      this.$reset();
     },
     getCompanion(companionId: string): Companion {
       if (!this.companionList) {
