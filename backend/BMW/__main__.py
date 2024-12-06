@@ -8,6 +8,8 @@ import BMW.model
 import git
 from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
+BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
+
 # from BMW.config import config
 from BMW.Manager import connection_manager, websocket_manager
 from BMW.model import ChatRoom, Document, File, Message, Payload, User, Companion
@@ -31,9 +33,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.websockets import WebSocketDisconnect
 
 # from starlette.requests import Request
-
-
-BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
 
 
 lower_collection_name2object: dict[POSSIBLE_COLLECTION_NAME_LOWERCASE, Document] = {
