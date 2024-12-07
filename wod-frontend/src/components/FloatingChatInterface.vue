@@ -1,84 +1,79 @@
 <template>
-  <div style="position: absolute; z-index: 1;">
-    <!--<v-container style="position: fixed; top: 20%; left: 60%;">
-      <div v-if="store.messageMap.get(companionId)">
-        <div v-for="(message, index) in store.messageMap.get(companionId)" :key="index"
-          :class="['message-box', message.role]">
-          <div class="message-content">
-            {{ message.content }}
-          </div>
-        </div>
-      </div>
-    </v-container>-->
-
-    <v-container style="position: fixed; top: 10%; left: 65%;">
-      <div class="message-box">
-        <div class="message-content">
-          test
-        </div>
-      </div>
-    </v-container>
-
-    <v-form @submit.prevent="sendMessage">
-      <v-footer app class="pa-0" style=" background: none">
-        <v-container class="pa-2 pt-0">
-          <v-text-field v-model="newMessage" append-icon="mdi-send" density="compact" flat hide-details label="說些什麼吧"
-            single-line variant="solo" @click:append="sendMessage" style="width: 100%;" />
-        </v-container>
-      </v-footer>
-    </v-form>
+  <div class="floating-chat">
+    <textarea
+      v-model="message"
+      placeholder="What do you wnat to say, my dear..."
+      @keydown.enter="sendMessage"
+      class="chat-input"
+    ></textarea>
+    <button @click="sendMessage" class="send-button">Send</button>
   </div>
 </template>
 
-<script setup lang="ts">
-import { useAppStore } from '@/stores/app'
-import { ref } from 'vue'
+<script setup>
+import { ref } from 'vue';
 
-defineProps({
-  companionId: {
-    type: String,
-    required: true
-  }
-})
+const message = ref('');
 
-const store = useAppStore()
-
-// 新增訊息內容的變數
-const newMessage = ref('')
-
-// 發送訊息函數
 const sendMessage = () => {
-  if (newMessage.value.trim()) {
-    newMessage.value = '' // 清空輸入框
+  if (message.value.trim() !== '') {
+    console.log('Message sent:', message.value);
+    message.value = ''; // Clear the input after sending
   }
-}
+};
 </script>
 
 <style scoped>
-  .message-box {
-    display: flex;
-    margin-bottom: 10px;
-  }
+.floating-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center; /* Keeps items aligned vertically center */
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 120px;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 
-  .message-box.bot {
-    justify-content: flex-start;
-  }
+  /* Add this to make the chat box longer horizontally */
+  min-width: 400px; /* Increase this value as needed */
+}
 
-  .message-content {
-    padding: 10px;
-    border-radius: 15px;
-    background-color: #f1f1f1;
-    white-space: pre-wrap;
-    color: black;
-  }
+.chat-input {
+  flex: 1;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
 
-  .message-box.bot .message-content {
-    background-color: #e0e0e0;
-    /* 灰色，類似圖中對方訊息的顏色 */
-    border-bottom-left-radius: 0;
-  }
+  /* Increase padding to give more vertical space, making the placeholder appear centered */
+  padding: 12px 8px;
 
-  .message-role {
-    font-weight: bold;
-  }
+  /* Set a line-height to help with vertical centering of text */
+  line-height: 1.5;
+
+  outline: none;
+  resize: none;
+}
+
+.chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  /* The vertical centering of placeholder is controlled by the padding and line-height above */
+}
+
+.send-button {
+  background-color: #3498db;
+  border: none;
+  color: white;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #2980b9;
+}
 </style>
