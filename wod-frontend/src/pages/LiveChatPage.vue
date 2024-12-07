@@ -19,6 +19,17 @@
     <!-- Live2D Component -->
     <Live2DComponent />
 
+    <!-- Speech Bubble -->
+    <!-- Pass the message to the bubble component here using bubbleMessage-->
+    <SpeechBubble
+      :message="bubbleMessage"
+      :visible="showBubble"
+      :x="bubbleX"
+      :y="bubbleY"
+    />
+
+    <FloatingChatInterface />
+
     <div style="
      position: absolute;
      top: 10px;
@@ -41,7 +52,7 @@
       <v-btn to="/">返回首頁</v-btn>
     </div>
 
-    <FloatingChatInterface />
+
     <!-- Settings panel -->
     <div v-if="showSettings" :class="{ 'settings-panel': true, visible: showSettings }" style="
         position: absolute;
@@ -137,7 +148,24 @@
   import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
   import { setBackground, switchModel } from '@/utils/live2d'; // Import background setter and switchModel
   import FloatingChatInterface from '../components/FloatingChatInterface.vue';
-  //import SpeechBubble from '../components/SpeechBubble.vue';
+  import SpeechBubble from '../components/SpeechBubble.vue';
+
+  // Speech bubble visibility and content
+  const showBubble = ref(true); // Initially show the bubble --> set to false to hide we could use backend to control this
+  const bubbleMessage = ref('Hi, I am your AI girlfriend!');
+
+  // Position of the bubble (example: top-right of the model)
+  const bubbleX = ref(1400); // Adjust these values as needed
+  const bubbleY = ref(150);
+
+  // Simulate receiving a message from the model
+  function handleModelReply(reply) {
+    bubbleMessage.value = reply;
+    showBubble.value = true;
+
+    // Optionally hide the bubble after a few seconds
+    setTimeout(() => showBubble.value = false, 5000);
+  }
 
   // Background options
   const backgrounds = [

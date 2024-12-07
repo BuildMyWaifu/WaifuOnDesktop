@@ -17,5 +17,6 @@ declare module 'vue' {
     PreviousChatInterface: typeof import('./components/PreviousChatInterface.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SpeechBubble: typeof import('./components/SpeechBubble.vue')['default']
   }
 }
