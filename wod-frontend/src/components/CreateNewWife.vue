@@ -2,7 +2,7 @@
 <template>
     <v-dialog v-model="isDialogOpen" @update:model-value="() => {
         currentStep = 1
-    }">
+    }" scrollable fullscreen>
         <template v-slot:activator="{ props }">
             <v-btn v-bind="props" variant="flat">
                 <template v-slot:prepend>
@@ -11,22 +11,23 @@
                 新增老婆
             </v-btn>
         </template>
-        <v-container>
-            <v-stepper v-model="currentStep" :items="steps" prev-text="上一步"
-                :next-text="currentStep == 2 ? '完成' : '下一步'">
+        <v-container class="d-flex align-center h-100">
+            <v-stepper v-model="currentStep" :items="steps" prev-text="上一步" :next-text="currentStep == 2 ? '完成' : '下一步'"
+                >
                 <template v-slot:item.1>
-                    <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
-                    <div class="d-flex">
-                        <v-list width="256px" lines="three">
-                            <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
-                                :subtitle="companion.profile.description" @click="selectBase(i)"
-                                :active="baseCompanionIndex == i">
-                            </v-list-item>
-                        </v-list>
-                        <v-divider vertical></v-divider>
-                        <CompanionPreview readonly style="height: 60vh;width: 60vh"
-                            :companion="wives[baseCompanionIndex]">
-                        </CompanionPreview>
+                    <div>
+                        <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
+                        <div class="d-flex" style="max-height: 60vh;">
+                            <v-list lines="three" style="max-height: 100%;min-width: 256px;" class="overflow-y-auto">
+                                <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
+                                    :subtitle="companion.profile.description" @click="selectBase(i)"
+                                    :active="baseCompanionIndex == i">
+                                </v-list-item>
+                            </v-list>
+                            <v-divider vertical></v-divider>
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="overflow-y-auto">
+                            </CompanionPreview>
+                        </div>
                     </div>
                 </template>
                 <template v-slot:item.2>
