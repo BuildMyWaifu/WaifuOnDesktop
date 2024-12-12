@@ -15,19 +15,16 @@
         object-fit: cover;
         z-index: 0;
       "></video>
-
+    <div style="position: fixed; top: 0; left: 0;z-index: 100" class="w-100 h-100 d-flex justify-center">
+      <v-container style="margin-top: 106px; max-width: 800px" class="d-flex flex-column align-start">
+        <SpeechBubble :message="bubbleMessage" :visible="showBubble" class="mt-4" v-for="i in 20" :key="i" />
+      </v-container>
+    </div>
     <!-- Live2D Component -->
     <Live2DComponent />
 
     <!-- Speech Bubble -->
     <!-- Pass the message to the bubble component here using bubbleMessage-->
-    <SpeechBubble
-      :message="bubbleMessage"
-      :visible="showBubble"
-      :x="bubbleX"
-      :y="bubbleY"
-    />
-
     <FloatingChatInterface />
 
     <div style="
@@ -155,8 +152,6 @@
   const bubbleMessage = ref('Hi, I am your AI girlfriend!');
 
   // Position of the bubble (example: top-right of the model)
-  const bubbleX = ref(1400); // Adjust these values as needed
-  const bubbleY = ref(150);
 
   // Simulate receiving a message from the model
   function handleModelReply(reply) {
