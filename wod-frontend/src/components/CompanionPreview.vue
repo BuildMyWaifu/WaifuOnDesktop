@@ -1,7 +1,5 @@
 <template>
-
-
-  <v-container>
+  <v-container class="overflow-hidden" style="max-height: 100vh" v-if="localCompanion">
     <v-row>
       <v-col cols="6">
         <Live2dComponent></Live2dComponent>
