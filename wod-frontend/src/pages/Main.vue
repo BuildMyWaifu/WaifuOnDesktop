@@ -2,31 +2,37 @@
 <template>
   <v-app>
     <v-navigation-drawer app location="left" permanent>
+
       <v-list lines="two" select-strategy="single-independent" width="256">
         <template #prepend>
           <v-avatar /> <!-- avatar for Companion -->
         </template>
+
         <v-list-item v-show="store.companionList == undefined">
           <v-card-text class="d-flex text-center">
             載入伴侶列表中
           </v-card-text>
         </v-list-item>
+
         <v-list-item v-show="store.companionList != undefined && store.companionList.length == 0">
           <v-card-text class="d-flex text-center">
             伴侶列表為空
           </v-card-text>
         </v-list-item>
+
         <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
           @click="updateCurrentCompanion(companion._id)">
           <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
           <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
           <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
             {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
-            lastMessage(companion._id)?.content }}
+              lastMessage(companion._id)?.content }}
           </div>
         </v-list-item>
+
         <v-divider />
       </v-list>
+
       <div class="text-center">
         <CreateNewWife />
       </div>
@@ -34,6 +40,7 @@
       <template #append>
         <v-divider />
         <v-list-item v-if="store.user" lines="three">
+
           <v-list-item-title>
             {{ store.user?.profile.name }}
           </v-list-item-title>
@@ -57,7 +64,9 @@
               </v-list>
             </v-menu>
           </template>
+
         </v-list-item>
+
         <v-list-item v-else>
           <v-list-item-title>
             目前尚未登入
@@ -66,117 +75,53 @@
             <v-btn to="/login">登入</v-btn>
           </v-list-item-subtitle>
         </v-list-item>
+        
       </template>
     </v-navigation-drawer>
 
-    <v-main>
+    <v-main app>
       <CompanionPreview v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
     </v-main>
-    <!-- <v-navigation-drawer >
-    </v-navigation-drawer> -->
-
-    <!-- <v-app-bar elevation="0">
-      <template v-if="display.width.value < 750">
-        <v-app-bar-nav-icon @click.stop="leftDrawer = !leftDrawer" />
-      </template>
-      <v-app-bar-title>
-        {{ currentCompanionId === null ? (currentCompanionId || '老婆名稱') : currentCompanionId }}
-      </v-app-bar-title>
-      <template v-if="display.width.value < 960">
-        <v-btn icon="mdi-information" @click="rightDrawer = !rightDrawer" />
-      </template>
-    </v-app-bar>
-    <ChatInterface v-if="currentCompanionId !== null" :companionId="currentCompanionId" /> -->
 
   </v-app>
 </template>
 
 <script setup lang="ts">
-  import CompanionPreview from '@/components/CompanionPreview.vue'
-  import CreateNewWife from '@/components/CreateNewWife.vue'
+import { useDisplay } from 'vuetify';
+import CompanionPreview from '@/components/CompanionPreview.vue';
+import CreateNewWife from '@/components/CreateNewWife.vue';
+import { useAppStore } from '@/stores/app';
+import { useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
 
-  import { useAppStore } from '@/stores/app'
-  import { useDisplay } from 'vuetify'
-  import { useRouter } from 'vue-router'
-  import { onMounted, ref, onUnmounted } from 'vue'
+const store = useAppStore();
+const router = useRouter();
+const display = useDisplay();
 
-  const store = useAppStore()
-  const router = useRouter()
+const currentCompanionId = ref<string | null>(null);
+const leftDrawer = computed(() => display.smAndUp); // 小屏幕以上顯示
+const rightDrawer = computed(() => display.mdAndUp); // 中屏幕以上顯示
 
-  const display = useDisplay()
-  const currentCompanionId = ref<string | null>(null)
+const isPermanentLeft = computed(() => display.smAndUp); // 固定左側抽屜
+const isPermanentRight = computed(() => display.mdAndUp); // 固定右側抽屜
 
-  const windowISUpper500Left = ref(display.width.value >= 750)
-  const windowISUpper500Right = ref(display.width.value >= 960)
-  const isPermanentLeft = ref(windowISUpper500Left)
-  const isPermanentRight = ref(windowISUpper500Right)
+const lastMessage = (Id: string) => {
+  const messages = store.messageMap.get(Id);
+  return messages ? messages[messages.length - 1] : undefined;
+};
 
-  // 控制 navigation drawer 的開關
-  const leftDrawer = ref(windowISUpper500Left.value)
-  const rightDrawer = ref(windowISUpper500Left.value)
+const updateCurrentCompanion = (Id: string) => {
+  currentCompanionId.value = currentCompanionId.value === Id ? null : Id;
+};
 
-  // 新增訊息內容的變數
+const goToSettings = () => {
+  console.log('Setting');
+};
 
-  const lastMessage = (Id: string) => {
-    const messages = store.messageMap.get(Id)
-    return messages ? messages[messages.length - 1] : undefined
-  }
-  // updateCurrentCompanion 函數來更新 currentCompanion
-  const updateCurrentCompanion = (Id: string) => {
-    if (currentCompanionId.value === Id) {
-      currentCompanionId.value = null; // 關閉
-    } else {
-      currentCompanionId.value = Id; // 切換到新的
-    }
-  }
-
-  const goToSettings = () => {
-    console.log('Setting')
-  }
-
-  const logout = () => {
-    store.logout()
-    router.push('/')
-  }
-
-  // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
-  const windowResizeListener = ref()
-  onMounted(() => {
-    if (store.companionList != undefined && store.companionList.length != 0) {
-      currentCompanionId.value = store.companionList[0]._id
-    }
-    windowResizeListener.value = window.addEventListener('resize', lefthandleResize)
-    windowResizeListener.value = window.addEventListener('resize', righthandleResize)
-    lefthandleResize()
-    righthandleResize()
-  })
-  onUnmounted(() => {
-    if (windowResizeListener.value !== undefined) {
-      window.removeEventListener('resize', windowResizeListener.value)
-    }
-  })
-  const lefthandleResize = () => {
-    if (windowISUpper500Left.value && display.width.value < 750) {
-      leftDrawer.value = false
-      windowISUpper500Left.value = false
-      isPermanentLeft.value = false
-    } else if (!windowISUpper500Left.value && display.width.value >= 750) {
-      leftDrawer.value = true
-      windowISUpper500Left.value = true
-      isPermanentLeft.value = true
-    }
-  }
-  const righthandleResize = () => {
-    if (windowISUpper500Right.value && display.width.value < 960) {
-      rightDrawer.value = false
-      windowISUpper500Right.value = false
-      isPermanentRight.value = false
-    } else if (!windowISUpper500Right.value && display.width.value >= 960) {
-      rightDrawer.value = true
-      windowISUpper500Right.value = true
-      isPermanentRight.value = true
-    }
-  }
+const logout = () => {
+  store.logout();
+  router.push('/');
+};
 
 </script>
 
