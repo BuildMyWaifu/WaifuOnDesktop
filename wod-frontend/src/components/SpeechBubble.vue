@@ -1,7 +1,6 @@
 <template>
   <div
     class="speech-bubble"
-    v-if="visible"
   >
     <p>{{ message }}</p>
     <div class="speech-bubble-arrow"></div>
@@ -14,10 +13,6 @@ defineProps({
   message: {
     type: String,
   },
-  visible: {
-    type: Boolean,
-    default: false
-  }
 })
 
 </script>
