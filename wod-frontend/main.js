@@ -47,6 +47,7 @@ const createWindow = url => {
       preload: join(__dirname, 'preload.js'),
     },
   })
+  win.webContents.openDevTools()
   win.removeMenu()
   let baseUrl = 'http://localhost:3000'
   if (url) {

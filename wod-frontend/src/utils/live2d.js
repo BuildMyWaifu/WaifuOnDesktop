@@ -11,7 +11,7 @@ let model;
 let originalWidth;
 let originalHeight;
 
-export async function init() {
+export async function init(index, path) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
     const canvas = document.getElementById('canvas_view');
@@ -35,7 +35,7 @@ export async function init() {
     console.log('live2d.js: PIXI application created.');
 
     // Load the initial Live2D model
-    await loadModel('../../src/assets/miku_model/runtime/miku_sample_t04.model3.json');
+    await loadModel(path);
 
     // Handle window resize events
     window.addEventListener('resize', () => {

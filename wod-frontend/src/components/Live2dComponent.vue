@@ -13,8 +13,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineProps } from 'vue';
 import { init } from '../utils/live2d'; // Import your Live2D setup logic
+
+defineProps({
+  index: {
+    type: Number,
+    required: true,
+  },
+});
 
 // State for error handling
 const isModelLoaded = ref(false);
@@ -22,7 +29,8 @@ const isModelLoaded = ref(false);
 onMounted(async () => {
   console.log('Live2DComponent: Mounted hook started...');
   try {
-    await init();
+    const modelPath = `../../src/assets/miku_model/runtime/miku_sample_t04.model3.json`;
+    await init(0, modelPath);
     isModelLoaded.value = true;
     console.log('Live2DComponent: Live2D model initialized successfully.');
   } catch (error) {

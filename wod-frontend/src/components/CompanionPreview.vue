@@ -2,7 +2,7 @@
   <v-container class="overflow-hidden" style="max-height: 100vh" v-if="localCompanion">
     <v-row>
       <v-col cols="6" class="d-flex justify-center align-center">
-        <Live2dComponent></Live2dComponent>
+        <Live2dComponent :index="0"/>
       </v-col>
       <v-col cols="6" class="text-center">
         <v-card-title class="text-h5">
