@@ -55,7 +55,7 @@
                 <v-list-item to="/">
                   <v-list-item-title>回到主頁面</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="goToSettings">
+                <v-list-item @click="openUserSetting">
                   <v-list-item-title>設定</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="logout">
@@ -63,6 +63,7 @@
                 </v-list-item>
               </v-list>
             </v-menu>
+            <UserSetting v-if="isUserSettingOpen" @close="isUserSettingOpen = false" />
           </template>
 
         </v-list-item>
