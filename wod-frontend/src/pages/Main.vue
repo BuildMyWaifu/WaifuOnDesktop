@@ -48,7 +48,7 @@
                 <v-list-item to="/">
                   <v-list-item-title>回到主頁面</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="goToSettings">
+                <v-list-item @click="openUserSetting">
                   <v-list-item-title>設定</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="logout">
@@ -56,6 +56,7 @@
                 </v-list-item>
               </v-list>
             </v-menu>
+            <UserSetting v-if="isUserSettingOpen" @close="isUserSettingOpen = false" />
           </template>
         </v-list-item>
         <v-list-item v-else>
@@ -94,6 +95,7 @@
 <script setup lang="ts">
   import CompanionPreview from '@/components/CompanionPreview.vue'
   import CreateNewWife from '@/components/CreateNewWife.vue'
+  import UserSetting from '@/components/UserSetting.vue';
 
   import { useAppStore } from '@/stores/app'
   import { useDisplay } from 'vuetify'
@@ -115,6 +117,8 @@
   const leftDrawer = ref(windowISUpper500Left.value)
   const rightDrawer = ref(windowISUpper500Left.value)
 
+  const isUserSettingOpen = ref(false)
+
   // 新增訊息內容的變數
 
   const lastMessage = (Id: string) => {
@@ -130,13 +134,15 @@
     }
   }
 
-  const goToSettings = () => {
-    console.log('Setting')
+  const openUserSetting = () => {
+    isUserSettingOpen.value = true;
+    console.log("isUserSettingOpen.value = " , isUserSettingOpen.value);
   }
 
   const logout = () => {
     store.logout()
     router.push('/')
+
   }
 
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
