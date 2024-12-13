@@ -1,7 +1,7 @@
 <template>
   <v-container class="overflow-hidden" style="max-height: 100vh" v-if="localCompanion">
     <v-row>
-      <v-col cols="6">
+      <v-col cols="6" class="d-flex justify-center align-center">
         <Live2dComponent></Live2dComponent>
       </v-col>
       <v-col cols="6" class="text-center">
