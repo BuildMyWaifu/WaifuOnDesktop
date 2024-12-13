@@ -1,4 +1,5 @@
 <template>
+
   <div style="
       width: 100%;
       height: 100%;
@@ -6,15 +7,6 @@
       overflow: hidden;
     ">
 
-    <div style="
-     position: fixed;
-     top: 10px;
-     left: 10px;
-     z-index: 2;
-
-   ">
-      <v-btn to="/">返回首頁</v-btn>
-    </div>
     <div style="position: fixed; top: 0; left: 0;z-index: 100" class="w-100 h-100 d-flex justify-center">
       <v-container style="margin-top: 8vh; max-width: 800px; max-height: 80%;"
         class="d-flex flex-column align-start fade-container">
@@ -25,7 +17,14 @@
     <Live2DComponent />
     <FloatingChatInterface />
 
-
+    <div style="
+     position: fixed;
+     top: 10px;
+     left: 10px;
+     z-index: 200;
+   ">
+      <v-btn to="/">返回首頁</v-btn>
+    </div>
   </div>
 </template>
 
