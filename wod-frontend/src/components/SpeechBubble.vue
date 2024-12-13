@@ -19,8 +19,8 @@ defineProps({
 
 <style scoped>
 .speech-bubble {
-  min-height: 100px;
-  min-width: 300px;
+  
+  
   max-width: 1000px;
   /* Use a semi-transparent background for the bubble */
   background: rgba(255, 255, 255, 0.8);

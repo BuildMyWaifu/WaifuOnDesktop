@@ -15,7 +15,14 @@
     </div>
 
     <Live2DComponent />
-    <FloatingChatInterface />
+    <div>
+      <div class="floating-chat">
+        
+        <textarea v-model="message" placeholder="What do you wnat to say, my dear..." @keydown.enter="sendMessage"
+        class="chat-input"></textarea>
+        <button @click="sendMessage" class="send-button">Send</button>
+      </div>
+    </div>
 
     <div style="
      position: fixed;
@@ -32,12 +39,21 @@
   import { ref, onMounted, computed } from 'vue';
   import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
 
-  import FloatingChatInterface from '../components/FloatingChatInterface.vue';
   import SpeechBubble from '../components/SpeechBubble.vue';
   import { useAppStore } from '@/stores/app';
   import { Message } from '@/utils/model';
 
+
   const store = useAppStore()
+
+  const message = ref('');
+
+  const sendMessage = () => {
+    if (message.value.trim() !== '') {
+      console.log('Message sent:', message.value);
+      message.value = ''; // Clear the input after sending
+    }
+  };
 
   function getMessageList(): Message[] {
     if (companionId.value == undefined) return []
@@ -57,6 +73,8 @@
   const companionId = ref<string>()  // 正常來說，會需要透過 props 來傳入這個參數，不過目前測試時先這樣用就夠了
 
   onMounted(() => {
+    store.generateMockCompanionList()
+    store.generateMockMessages()
     if (companionId.value == undefined) {
       if (!store.companionList || store.companionList.length == 0) return
       companionId.value = store.companionList[0]._id
@@ -73,5 +91,60 @@
     mask-repeat: no-repeat;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
+  }
+
+  .floating-chat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    /* Keeps items aligned vertically center */
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 120px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+    /* Add this to make the chat box longer horizontally */
+    min-width: 400px;
+    /* Increase this value as needed */
+  }
+
+  .chat-input {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 14px;
+
+    /* Increase padding to give more vertical space, making the placeholder appear centered */
+    padding: 12px 8px;
+
+    /* Set a line-height to help with vertical centering of text */
+    line-height: 1.5;
+
+    outline: none;
+    resize: none;
+  }
+
+  .chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    /* The vertical centering of placeholder is controlled by the padding and line-height above */
+  }
+
+  .send-button {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .send-button:hover {
+    background-color: #2980b9;
   }
 </style>
