@@ -5,16 +5,13 @@ import {
 } from 'pixi-live2d-display';
 
 window.PIXI = PIXI; // Global Pixi
-
 let app;
 let model;
-let originalWidth;
-let originalHeight;
 
-export async function init(index, path) {
+export async function init(canvasId, path) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
-    const canvas = document.getElementById('canvas_view');
+    const canvas = document.getElementById(canvasId);
     if (!canvas) {
       console.error('live2d.js: Canvas element not found!');
       return;
@@ -22,7 +19,7 @@ export async function init(index, path) {
     console.log('live2d.js: Canvas element found:', canvas);
 
     // Set an initial background image dynamically
-    setBackground('./src/assets/backgrounds/Living_room.jpg');
+    setBackground('./src/assets/backgrounds/Living_room.jpg', canvasId);
 
     // Create PIXI application with improved resolution
     app = new PIXI.Application({
@@ -66,9 +63,6 @@ async function loadModel(modelPath) {
     // Add the model to the PIXI stage
     app.stage.addChild(model);
 
-    // Store the original dimensions of the model
-    originalWidth = model.width;
-    originalHeight = model.height;
 
     fitModelToCanvas(); // Set initial scale and position
 
@@ -80,12 +74,13 @@ async function loadModel(modelPath) {
 
 function fitModelToCanvas() {
   if (!model) return;
-  
   // 根據drawer調整大小
-  const drawer = document.getElementById('drawer');
-  const drawerWidth = drawer ? drawer.offsetWidth : 0;
-  const availableWidth = window.innerWidth - drawerWidth;
+
+  const availableWidth = window.innerWidth;
   const availableHeight = window.innerHeight;
+
+    const originalWidth = model.width;
+    const originalHeight = model.height;
 
   const scaleX = availableWidth / originalWidth;
   const scaleY = availableHeight / originalHeight;
@@ -93,7 +88,7 @@ function fitModelToCanvas() {
 
   model.scale.set(scale);
   model.position.set(
-    (availableWidth - originalWidth * scale) / 2 + drawerWidth, 
+    (availableWidth - originalWidth * scale) / 2, 
     (availableHeight - originalHeight * scale) / 2 
   );
 }
@@ -103,8 +98,11 @@ export function switchModel(modelPath) {
 }
 
 // Existing setBackground function remains the same
-export function setBackground(imagePath) {
-  const container = document.getElementById('canvas_view')?.parentElement;
+export function setBackground(imagePath, canvasId = undefined) {
+  if (!canvasId) {
+    return
+  }
+  const container = document.getElementById(canvasId)?.parentElement;
   if (container) {
     container.style.backgroundImage = `url('${imagePath}')`;
     container.style.backgroundRepeat = 'no-repeat';
