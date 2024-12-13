@@ -14,7 +14,7 @@
                     <v-row class="align-center">
                         <v-col>設定</v-col>
                         <v-col class="text-end">
-                            <v-btn icon="mdi-close" @click="isActive.value = false" />
+                            <v-btn flat icon="mdi-close" @click="isActive.value = false" />
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -36,12 +36,12 @@
 
                         <!-- Right Content Area -->
                         <v-col cols="9">
-                            <div v-if="selectedItem === 0">
+                            <div v-if="false">  <!-- 由於現階段沒有用到，刪掉又很可惜，所以就先留著 -->
                                 <div class="text-h6">一般</div>
                                 <p>不需要就刪除</p>
                             </div>
-                            <div v-else-if="selectedItem === 1">
-                                <v-card>
+                            <div v-else-if="selectedItem === 0">
+                                <v-card flat>
                                     <v-textarea class="mx-2" label="用戶ID" rows="1"></v-textarea>
                                     <v-textarea class="mx-2" label="姓名" rows="1"></v-textarea>
                                     <v-textarea class="mx-2" label="Email" rows="1"></v-textarea>
@@ -53,14 +53,13 @@
 
                                 </v-card>
                             </div>
-                            <div v-else-if="selectedItem === 2">
-                                <v-card>
+                            <div v-else-if="selectedItem === 1">
+                                <v-card flat>
                                     <v-card-text class="d-flex justify-space-between align-center">
                                         修改密碼
                                         <v-btn rounded="xl">修改</v-btn>
                                     </v-card-text>
-                                </v-card>
-                                <v-card>
+                                
                                     <v-card-text class="d-flex justify-space-between align-center">
                                         刪除帳號
                                         <v-btn rounded="xl">刪除</v-btn>
@@ -86,7 +85,7 @@
     const selectedItem = ref(0);
 
     const navigationItems = [
-        { title: '一般', icon: 'mdi-cog' },
+        // { title: '一般', icon: 'mdi-cog' },
         { title: '個人化', icon: 'mdi-account' },
         { title: '安全性', icon: 'mdi-lock' },
     ];
