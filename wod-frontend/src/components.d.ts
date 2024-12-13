@@ -19,5 +19,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SpeechBubble: typeof import('./components/SpeechBubble.vue')['default']
     UserSetting: typeof import('./components/UserSetting.vue')['default']
+    UserSettingListItem: typeof import('./components/UserSettingListItem.vue')['default']
   }
 }

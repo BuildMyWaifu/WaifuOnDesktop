@@ -55,15 +55,13 @@
                 <v-list-item to="/">
                   <v-list-item-title>回到主頁面</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="openUserSetting">
-                  <v-list-item-title>設定</v-list-item-title>
-                </v-list-item>
+                <UserSettingListItem />
                 <v-list-item @click="logout">
                   <v-list-item-title>登出</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
-            <UserSetting v-if="isUserSettingOpen" @close="isUserSettingOpen = false" />
+
           </template>
 
         </v-list-item>
@@ -76,7 +74,7 @@
             <v-btn to="/login">登入</v-btn>
           </v-list-item-subtitle>
         </v-list-item>
-        
+
       </template>
     </v-navigation-drawer>
 
@@ -88,41 +86,42 @@
 </template>
 
 <script setup lang="ts">
-import { useDisplay } from 'vuetify';
-import CompanionPreview from '@/components/CompanionPreview.vue';
-import CreateNewWife from '@/components/CreateNewWife.vue';
-import { useAppStore } from '@/stores/app';
-import { useRouter } from 'vue-router';
-import { computed, ref } from 'vue';
 
-const store = useAppStore();
-const router = useRouter();
-const display = useDisplay();
+  import CompanionPreview from '@/components/CompanionPreview.vue'
+  import CreateNewWife from '@/components/CreateNewWife.vue'
+  import UserSettingListItem from '@/components/UserSettingListItem.vue';
+  import { useAppStore } from '@/stores/app';
+  import { useRouter } from 'vue-router';
+  import { ref, onMounted } from 'vue';
 
-const currentCompanionId = ref<string | null>(null);
-const leftDrawer = computed(() => display.smAndUp); // 小屏幕以上顯示
-const rightDrawer = computed(() => display.mdAndUp); // 中屏幕以上顯示
+  const store = useAppStore();
+  const router = useRouter();
 
-const isPermanentLeft = computed(() => display.smAndUp); // 固定左側抽屜
-const isPermanentRight = computed(() => display.mdAndUp); // 固定右側抽屜
+  const currentCompanionId = ref<string | null>(null);
 
-const lastMessage = (Id: string) => {
-  const messages = store.messageMap.get(Id);
-  return messages ? messages[messages.length - 1] : undefined;
-};
 
-const updateCurrentCompanion = (Id: string) => {
-  currentCompanionId.value = currentCompanionId.value === Id ? null : Id;
-};
+  // 新增訊息內容的變數
 
-const goToSettings = () => {
-  console.log('Setting');
-};
+  const lastMessage = (Id: string) => {
+    const messages = store.messageMap.get(Id)
+    return messages ? messages[messages.length - 1] : undefined
+  }
+  // updateCurrentCompanion 函數來更新 currentCompanion
+  const updateCurrentCompanion = (Id: string) => {
+    currentCompanionId.value = Id; // 切換到新的
+  }
+  const logout = () => {
+    store.logout()
+    router.push('/')
+  }
 
-const logout = () => {
-  store.logout();
-  router.push('/');
-};
+  // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
+  onMounted(() => {
+    if (store.companionList != undefined && store.companionList.length != 0) {
+      currentCompanionId.value = store.companionList[0]._id
+    }
+
+  })
 
 </script>
 
