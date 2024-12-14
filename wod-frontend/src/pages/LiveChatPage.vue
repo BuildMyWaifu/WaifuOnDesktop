@@ -15,6 +15,9 @@
     </div>
 
     <Live2DComponent />
+
+    <HistoryDialogInterface v-if="showHistoryDialog" :companionId="companionId" @close="showHistoryDialog = false" />
+    
     <div>
       <div class="floating-chat">
         
@@ -31,13 +34,37 @@
      z-index: 200;
    ">
       <v-btn to="/">返回首頁</v-btn>
+
+      <!-- Previous Chat Button -->
+      <button @click="showHistoryDialog = true">
+        <v-icon>mdi-text-long</v-icon>
+      </button>
     </div>
+
+    <!-- Close Previous Chat Button -->
+    <button v-if="showHistoryDialog" @click="showHistoryDialog = false" style="
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 201;
+    background-color: rgb(237, 172, 231);
+    color: rgb(255, 255, 255);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(71, 17, 77, 0.82);
+    ">
+      <v-icon>mdi-redo</v-icon>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, onMounted, computed } from 'vue';
   import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
+  import HistoryDialogInterface from '@/components/HistoryDialogInterface.vue';
 
   import SpeechBubble from '../components/SpeechBubble.vue';
   import { useAppStore } from '@/stores/app';
@@ -47,6 +74,8 @@
   const store = useAppStore()
 
   const message = ref('');
+
+  const showHistoryDialog = ref(false);
 
   const sendMessage = () => {
     if (message.value.trim() !== '') {
