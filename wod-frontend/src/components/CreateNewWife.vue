@@ -11,9 +11,9 @@
                 新增老婆
             </v-btn>
         </template>
-        <v-container class="d-flex align-center h-100">
-            <v-stepper v-model="currentStep" :items="steps" prev-text="上一步" :next-text="currentStep == 2 ? '完成' : '下一步'"
-                >
+        <v-container class="d-flex align-center justify-center h-100">
+            <v-stepper v-model="currentStep" :items="steps" prev-text="上一步"
+                :next-text="currentStep == 2 ? '完成' : '下一步'">
                 <template v-slot:item.1>
                     <div>
                         <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
@@ -25,7 +25,8 @@
                                 </v-list-item>
                             </v-list>
                             <v-divider vertical></v-divider>
-                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="overflow-y-auto">
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="overflow-y-auto"
+                                style="max-width: 600px">
                             </CompanionPreview>
                         </div>
                     </div>
@@ -139,5 +140,10 @@
 
     const companion = ref<Companion>(wives[0]);
 
+    async function createNewWife() {
+        console.log(companion.value)
+        // 
+
+    }
 
 </script>
