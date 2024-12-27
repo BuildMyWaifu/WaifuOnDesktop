@@ -1,10 +1,10 @@
 <template>
-  <v-container class="overflow-hidden" style="max-height: 100vh" v-if="localCompanion">
-    <v-row>
-      <v-col cols="6" class="d-flex justify-center align-center">
+  <div  v-if="localCompanion">
+    <v-row class="align-center">
+      <v-col cols="6" class="d-flex justify-center align-center overflow-hidden" style="height: 100vh" >
         <Live2dComponent></Live2dComponent>
       </v-col>
-      <v-col cols="6" class="text-center">
+      <v-col cols="6" class="text-center pa-8">
         <v-card-title class="text-h5">
           {{ localCompanion.profile.name }}
         </v-card-title>
@@ -33,8 +33,8 @@
 
         <v-dialog max-width="500" v-if="!readonly">
           <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" color="surface-variant" text="編輯" variant="flat" class="ma-4"></v-btn>
-            <v-btn color="surface-variant" text="確定選擇" variant="flat" class="ma-4"></v-btn>
+            <v-btn v-bind="activatorProps" flat class="ma-4">編輯</v-btn>
+
           </template>
 
           <template v-slot:default="{ isActive }">
@@ -51,11 +51,10 @@
             </v-card>
           </template>
         </v-dialog>
-
+        <v-btn :to="`/liveChat/${companionId}`" variant="outlined" class="ma-4" color="primary">開始聊天</v-btn>
       </v-col>
-
     </v-row>
-  </v-container>
+  </div>
 
 
 

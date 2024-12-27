@@ -47,7 +47,7 @@ const routes = [
     component: () => import("@/pages/ErrorPage.vue"),
   },
   {
-    path: "/liveChat",
+    path: "/liveChat/:companionId",
     name: "LiveChat",
     meta: { requiresAuth: false },
     component: () => import('@/pages/LiveChatPage.vue'), // Ensure the casing matches
