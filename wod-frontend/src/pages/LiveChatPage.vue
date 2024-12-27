@@ -1,12 +1,10 @@
 <template>
-
   <div style="
       width: 100%;
       height: 100%;
       position: relative;
       overflow: hidden;
     ">
-
     <div style="position: fixed; top: 0; left: 0;z-index: 100" class="w-100 h-100 d-flex justify-center">
       <v-container style="margin-top: 8vh; max-width: 800px; max-height: 80%;"
         class="d-flex flex-column align-start fade-container">
@@ -17,13 +15,13 @@
     <Live2DComponent />
 
     <HistoryDialogInterface v-if="showHistoryDialog" :companionId="companionId" @close="showHistoryDialog = false" />
-    
+
     <div>
       <div class="floating-chat">
-        
-        <textarea v-model="message" placeholder="What do you wnat to say, my dear..." @keydown.enter="sendMessage"
-        class="chat-input"></textarea>
-        <button @click="sendMessage" class="send-button">Send</button>
+
+        <textarea v-model="message" placeholder="請輸入想要傳送的訊息..." @keydown.enter="sendMessage"
+          class="chat-input"></textarea>
+        <v-btn @click="sendMessage" variant="outlined" icon flat color="primary"><v-icon>mdi-send</v-icon></v-btn>
       </div>
     </div>
 
@@ -33,8 +31,7 @@
      left: 10px;
      z-index: 200;
    ">
-      <v-btn to="/">返回首頁</v-btn>
-
+      <v-btn to="/app" prepend-icon="mdi-menu">返回選單</v-btn>
       <!-- Previous Chat Button -->
       <button @click="showHistoryDialog = true">
         <v-icon>mdi-text-long</v-icon>
@@ -62,15 +59,17 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue';
   import Live2DComponent from '../components/Live2dComponent.vue'; // Import your Live2D component
   import HistoryDialogInterface from '@/components/HistoryDialogInterface.vue';
-
   import SpeechBubble from '../components/SpeechBubble.vue';
+
+  import { ref, onMounted, computed} from 'vue';
+  import { useRouter, useRoute } from 'vue-router'
+
   import { useAppStore } from '@/stores/app';
   import { Message } from '@/utils/model';
 
-
+  const route = useRoute();
   const store = useAppStore()
 
   const message = ref('');
@@ -99,14 +98,17 @@
     })
   })
 
-  const companionId = ref<string>()  // 正常來說，會需要透過 props 來傳入這個參數，不過目前測試時先這樣用就夠了
-
+  const companionId = ref<string>() 
+  // const companion = computed(() => {
+  //   return store.getCompanion(companionId.value)
+  // })
+const router = useRouter();
   onMounted(() => {
-    store.generateMockCompanionList()
-    store.generateMockMessages()
+    
+    companionId.value = route.params.companionId
     if (companionId.value == undefined) {
-      if (!store.companionList || store.companionList.length == 0) return
-      companionId.value = store.companionList[0]._id
+      alert("沒有指定聊天的伴侶")
+      router.push("/main")
     }
   })
 
