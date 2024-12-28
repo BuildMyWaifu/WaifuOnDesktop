@@ -17,16 +17,16 @@
                 <template v-slot:item.1>
                     <div>
                         <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
-                        <div class="d-flex" style="max-height: 60vh;">
-                            <v-list lines="three" style="max-height: 100%;min-width: 256px;" class="overflow-y-auto">
+                        <div class="d-flex" style="max-height: 60vh;height: 60vh;">
+                            <v-list lines="three" style="min-width: 256px;" class="overflow-y-auto">
                                 <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
                                     :subtitle="companion.profile.description" @click="selectBase(i)"
                                     :active="baseCompanionIndex == i">
                                 </v-list-item>
                             </v-list>
                             <v-divider vertical></v-divider>
-                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="overflow-y-auto"
-                                style="max-width: 600px">
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]"
+                                style="max-width: 600px;">
                             </CompanionPreview>
                         </div>
                     </div>
