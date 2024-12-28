@@ -1,63 +1,59 @@
 <template>
-  <div  v-if="localCompanion">
-    <v-row class="align-center">
-      <v-col cols="6" class="d-flex justify-center align-center overflow-hidden" style="height: 100vh" >
-        <Live2dComponent></Live2dComponent>
-      </v-col>
-      <v-col cols="6" class="text-center pa-8">
-        <v-card-title class="text-h5">
-          {{ localCompanion.profile.name }}
+
+  <div class="d-flex align-center h-100" v-if="localCompanion" style="max-width: 100%;max-height: 1j00vh;">
+    <div class="d-flex justify-center h-100 w-50 align-center overflow-hidden align-center justify-center">
+        <Live2dComponent class="h-100 w-100" style="max-height: 100%;max-width: 100%;"></Live2dComponent>
+    </div>
+    <div class="text-center pa-8 w-50 overflow-auto" style="max-height: 100%;">
+      <v-card-title class="text-h5">
+        {{ localCompanion.profile.name }}
+      </v-card-title>
+      <v-card-text class="text-h7">
+        {{ localCompanion.profile.description }}
+      </v-card-text>
+
+
+      <v-container>
+        <v-card-title class="text-h6">
+          性格
         </v-card-title>
-        <v-card-text class="text-h7">
-          {{ localCompanion.profile.description }}
+        <v-card-text class="text-h7" style="border: 1px solid #ccc; border-radius:10px; padding: 16px;">
+          {{ localCompanion.prompt.character }}
         </v-card-text>
+      </v-container>
 
+      <v-container>
+        <v-card-title class="text-h">
+          背景設定
+        </v-card-title>
+        <v-card-text class="text-h7" style="border: 1px solid #ccc; border-radius:10px; padding: 16px;">
+          {{ localCompanion.prompt.backstory }}
+        </v-card-text>
+      </v-container>
 
-        <v-container>
-          <v-card-title class="text-h6">
-            性格
-          </v-card-title>
-          <v-card-text class="text-h7" style="border: 1px solid #ccc; border-radius:10px; padding: 16px;">
-            {{ localCompanion.prompt.character }}
-          </v-card-text>
-        </v-container>
+      <v-dialog max-width="500" v-if="!readonly">
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-btn v-bind="activatorProps" flat class="ma-4">編輯</v-btn>
 
-        <v-container>
-          <v-card-title class="text-h">
-            背景設定
-          </v-card-title>
-          <v-card-text class="text-h7" style="border: 1px solid #ccc; border-radius:10px; padding: 16px;">
-            {{ localCompanion.prompt.backstory }}
-          </v-card-text>
-        </v-container>
+        </template>
 
-        <v-dialog max-width="500" v-if="!readonly">
-          <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" flat class="ma-4">編輯</v-btn>
+        <template v-slot:default="{ isActive }">
+          <v-card title="編輯角色">
+            <v-card-text>
+              這是一個dialog
+            </v-card-text>
 
-          </template>
+            <v-card-actions>
+              <v-spacer></v-spacer>
 
-          <template v-slot:default="{ isActive }">
-            <v-card title="編輯角色">
-              <v-card-text>
-                這是一個dialog
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <v-btn text="關閉" @click="isActive.value = false"></v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
-        </v-dialog>
-        <v-btn :to="`/liveChat/${companionId}`" variant="outlined" class="ma-4" color="primary">開始聊天</v-btn>
-      </v-col>
-    </v-row>
+              <v-btn text="關閉" @click="isActive.value = false"></v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+      <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" variant="outlined" class="ma-4" color="primary">開始聊天</v-btn>
+    </div>
   </div>
-
-
-
 </template>
 <script lang="ts" setup>
   import { useAppStore } from '@/stores/app';

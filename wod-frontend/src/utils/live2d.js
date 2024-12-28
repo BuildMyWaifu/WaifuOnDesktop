@@ -6,15 +6,16 @@ import {
 
 window.PIXI = PIXI; // Global Pixi
 
-let app;
+// let app;
 let model;
 let originalWidth;
 let originalHeight;
 
-export async function init() {
+export async function init(elementId) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
-    const canvas = document.getElementById('canvas_view');
+    const canvas = document.getElementById(elementId);
+    const container = canvas.parentElement;
     if (!canvas) {
       console.error('live2d.js: Canvas element not found!');
       return;
@@ -22,36 +23,22 @@ export async function init() {
     console.log('live2d.js: Canvas element found:', canvas);
 
     // Set an initial background image dynamically
-    setBackground('./src/assets/backgrounds/Living_room.jpg');
+    setBackground(canvas, './src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
-    app = new PIXI.Application({
+    let app = new PIXI.Application({
       view: canvas,
       transparent: true,
       autoDensity: true,
-      resizeTo: window,
+      resizeTo: container,
       resolution: window.devicePixelRatio || 1, // Use device pixel ratio for better rendering
     });
     console.log('live2d.js: PIXI application created.');
 
     // Load the initial Live2D model
-    await loadModel('../../src/assets/miku_model/runtime/miku_sample_t04.model3.json');
 
-    // Handle window resize events
-    window.addEventListener('resize', () => {
-      console.log('live2d.js: Window resized, adjusting model...');
-      app.renderer.resize(window.innerWidth, window.innerHeight); // Resize PIXI renderer
-      fitModelToCanvas(); // Adjust model size and position
-    });
-
-    console.log('live2d.js: Live2D model added to the stage.');
-  } catch (error) {
-    console.error('live2d.js: Failed to initialize Live2D model:', error);
-  }
-}
-
-async function loadModel(modelPath) {
-  try {
+    const modelPath = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json'
+    try {
     console.log(`live2d.js: Loading model from ${modelPath}`);
     if (model) {
       app.stage.removeChild(model); // Remove the previous model from the stage
@@ -70,41 +57,49 @@ async function loadModel(modelPath) {
     originalWidth = model.width;
     originalHeight = model.height;
 
-    fitModelToCanvas(); // Set initial scale and position
+    fitModelToCanvas(canvas); // Set initial scale and position
 
     console.log('live2d.js: Model loaded and added to stage.');
   } catch (error) {
     console.error('live2d.js: Failed to load model:', error);
   }
+
+    // Handle window resize events
+    window.addEventListener('resize', () => {
+      console.log('live2d.js: Window resized, adjusting model...');
+      app.renderer.resize(container.clientWidth, container.clientHeight); // Resize PIXI renderer
+      fitModelToCanvas(canvas); // Adjust model size and position
+    });
+
+    console.log('live2d.js: Live2D model added to the stage.');
+  } catch (error) {
+    console.error('live2d.js: Failed to initialize Live2D model:', error);
+  }
 }
 
-function fitModelToCanvas() {
+function fitModelToCanvas(canvas) {
   if (!model) return;
   
   // 根據drawer調整大小
-  const drawer = document.getElementById('drawer');
-  const drawerWidth = drawer ? drawer.offsetWidth : 0;
-  const availableWidth = window.innerWidth - drawerWidth;
-  const availableHeight = window.innerHeight;
+  const container = canvas.parentElement;
+  const availableWidth = container.clientWidth;
+  const availableHeight = container.clientHeight;
 
   const scaleX = availableWidth / originalWidth;
   const scaleY = availableHeight / originalHeight;
-  const scale = Math.min(scaleX, scaleY) * 0.75; 
+  const scale = Math.min(scaleX, scaleY) ; 
 
   model.scale.set(scale);
   model.position.set(
-    (availableWidth - originalWidth * scale) / 2 + drawerWidth, 
+    (availableWidth - originalWidth * scale) / 2 , 
     (availableHeight - originalHeight * scale) / 2 
   );
 }
 
-export function switchModel(modelPath) {
-  loadModel(modelPath);
-}
 
 // Existing setBackground function remains the same
-export function setBackground(imagePath) {
-  const container = document.getElementById('canvas_view')?.parentElement;
+export function setBackground(canvas, imagePath) {
+  const container = canvas.parentElement;
   if (container) {
     container.style.backgroundImage = `url('${imagePath}')`;
     container.style.backgroundRepeat = 'no-repeat';
