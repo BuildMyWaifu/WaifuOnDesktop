@@ -12,8 +12,25 @@
             </v-btn>
         </template>
         <v-container class="d-flex align-center justify-center h-100">
-            <v-stepper v-model="currentStep" :items="steps" prev-text="上一步"
-                :next-text="currentStep == 2 ? '完成' : '下一步'">
+            <v-stepper v-model="currentStep" :items="steps">
+                <!-- 自訂的 actions slot -->
+                <template #actions="{ next, prev }">
+                    <div class="d-flex justify-space-between px-4 py-2">
+                        <v-btn @click="prev" :disabled="currentStep === 1">
+                        上一步
+                        </v-btn>
+                        <v-btn
+                        :disabled="currentStep === 2 && !childIsValid"
+                        @click="
+                            currentStep === 2
+                            ? doFinish()
+                            : next()
+                        "
+                        >
+                        {{ currentStep === 2 ? '完成' : '下一步' }}
+                        </v-btn>
+                    </div>
+                </template>
                 <template v-slot:item.1>
                     <div>
                         <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
@@ -32,7 +49,7 @@
                     </div>
                 </template>
                 <template v-slot:item.2>
-                    <CompanionEdit v-if="companion != undefined" v-model="companion"></CompanionEdit>
+                    <CompanionEdit v-if="companion != undefined" v-model="companion" @valid-change="childIsValid = $event"></CompanionEdit>
                     <v-card-text v-else>
                         不合法的選擇，請回上一步
                         <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
@@ -123,11 +140,13 @@
                 description: '',
             },
             prompt: {
-                character: '',
-                backstory: '',
+                character: '尚未定義的靈魂',
+                backstory: '未被提及的篇章，等待有人開啟',
             },
         }
     ] as Companion[];
+    // 接收子層 CompanionEdit 的 isValid 狀態
+    const childIsValid = ref(false);
 
     const baseCompanionIndex = ref(0)
     function selectBase(index: number) {
@@ -140,9 +159,13 @@
 
     const companion = ref<Companion>(wives[0]);
 
+    function doFinish() {
+        // 這裡可以進一步呼叫 API / 寫入資料庫 / 關掉 dialog 等
+        isDialogOpen.value = false;
+    }
+
     async function createNewWife() {
-        console.log(companion.value)
-        // 
+        console.log(companion.value) 
 
     }
 
