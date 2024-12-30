@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { app, BrowserWindow, ipcMain, webContents } from 'electron/main'
+import { app, BrowserWindow, ipcMain, webContents, nativeImage } from 'electron/main'
 import { join } from 'node:path'
 import process  from 'node:process';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-
+const icon = nativeImage.createFromPath('src/assets/BMW_icon.png')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -43,6 +43,7 @@ const createWindow = url => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: icon,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
     },
