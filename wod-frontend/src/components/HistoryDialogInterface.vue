@@ -1,25 +1,29 @@
 <template>
-  <v-infinite-scroll :onLoad="load" :items="items" style="
-  position: fixed;
-  top:0px;
-  left:0px;
-  height: 100%;
-  width: 100%;
-  z-index: 201;
-  background-color: rgba(234, 165, 250, 0.7);
+  <div style="
+  height: 100vh;
+  width: 99vw;
+  background: linear-gradient(to bottom, rgba(234, 165, 250, 0.7), rgba(234, 211, 240, 0.7));
   overflow-y: scroll;
   scrollbar-width: thin;
   scrollbar-color: #e0e0e0 rgba(0, 0, 0, 0);
   ">
-    <div class="pa-2">
-      <!--test-->
-      <div v-for="(item, index) in items" :key="item" class="message-box" :class="index % 2 === 1 ? 'user' : 'bot'">
-        <div class="message-content">
-          {{ index % 2 === 1 ? 'user test message' : 'bot test message' }}
+    <v-infinite-scroll :onLoad="load" :items="items">
+      <div class="pa-2">
+        <!--test-->
+        <div v-for="(item, index) in items" :key="item" class="message-box" :class="index % 2 === 1 ? 'user' : 'bot'">
+          <div class="message-content">
+            {{ index % 2 === 1 ? 'user test message' : 'bot test message' }}
+          </div>
         </div>
+        <!--<div v-for="(message, index) in store.messageMap.get(companionId)" :key="index"
+            :class="['message-box', message.role]">
+          <div class="message-content">
+            {{ message.content }}
+          </div>
+        </div>-->
       </div>
-    </div>
-  </v-infinite-scroll>
+    </v-infinite-scroll>
+  </div>
 </template>
   
 <script setup lang="ts">
@@ -44,6 +48,15 @@
         }, 1000)
       })
     }
+
+    // async function api () {
+    //   return new Promise(resolve => {
+    //     setTimeout(() => {
+    //       const messages = store.messageMap.get(prop.companionId) || [];
+    //         resolve(messages);
+    //       }, 1000);
+    //       });
+    //     }
 
     async function load ({ done }) {
       // Perform API call

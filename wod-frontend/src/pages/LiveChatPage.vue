@@ -13,8 +13,10 @@
     </div>
 
     <Live2DComponent />
-
-    <HistoryDialogInterface v-if="showHistoryDialog" :companionId="companionId" @close="showHistoryDialog = false" />
+    
+    <v-overlay v-model="showHistoryDialog" style="z-index: 201;">
+      <HistoryDialogInterface :companionId="companionId" @close="showHistoryDialog = false"/>
+    </v-overlay>
 
     <div>
       <div class="floating-chat">
@@ -32,18 +34,18 @@
      z-index: 200;
    ">
       <v-btn to="/app" prepend-icon="mdi-menu">返回選單</v-btn>
-      <!-- Previous Chat Button -->
+      <!-- History Dialog Button -->
       <button @click="showHistoryDialog = true">
         <v-icon>mdi-text-long</v-icon>
       </button>
     </div>
 
-    <!-- Close Previous Chat Button -->
+    <!-- Close History Dialog Button -->
     <button v-if="showHistoryDialog" @click="showHistoryDialog = false" style="
     position: absolute;
     bottom: 20px;
     right: 20px;
-    z-index: 201;
+    z-index: 202;
     background-color: rgb(237, 172, 231);
     color: rgb(255, 255, 255);
     border-radius: 50%;
