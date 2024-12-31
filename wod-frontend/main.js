@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { app, BrowserWindow, ipcMain, webContents, nativeImage } from 'electron/main'
 import { join } from 'node:path'
-import process  from 'node:process';
+import process from 'node:process';
+import Store from 'electron-store';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+const store = new Store()
 const icon = nativeImage.createFromPath('src/assets/BMW_icon.png')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 let lastSync = undefined
 
 ipcMain.on('window:set-title', (event, title) => {
@@ -34,10 +35,18 @@ ipcMain.on('sync:fetch', (event) => {
 
 ipcMain.on('sync:submit', (event, content) => {
   lastSync = content
-   webContents.getAllWebContents().map((webContent) => {
+  webContents.getAllWebContents().map((webContent) => {
     webContent.send('sync:broadcast', content)
   })
 })
+ipcMain.handle('store:get', async (_event, key) => {
+  return store.get(key); // 返回值將作為 Promise 的解析值
+});
+
+ipcMain.handle('store:set', async (_event, key, val) => {
+  store.set(key, val);
+});
+
 
 const createWindow = url => {
   const win = new BrowserWindow({

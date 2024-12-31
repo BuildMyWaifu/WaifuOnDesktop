@@ -28,6 +28,7 @@ from fastapi import (
 )
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.websockets import WebSocketDisconnect
@@ -78,7 +79,7 @@ class RewritePathMiddleware(BaseHTTPMiddleware):
 
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(RewritePathMiddleware)
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.exception_handler(RequestValidationError)
 async def not_found_exception_handler(request, exc: RequestValidationError):
@@ -122,9 +123,7 @@ async def general_exception_handler(request, exc):
     )
 
 
-async def get_current_user(
-    token: Annotated[str | None, Cookie()] = None,
-) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme),) -> User:
     if token:
         user = await User.find(token=token)
         if user:
@@ -155,9 +154,7 @@ async def login(payload: UserLoginPayload, response: Response, request: Request)
     if not user:
         raise HTTPException(404, "找不到這個使用者")
     if user.check_password(payload.password):
-        response.set_cookie(key="token", value=user.token)
-
-        return Payload.success("登入成功", user.safe_dict())
+        return Payload.success("登入成功", user.token)
     else:
         raise HTTPException(500, "密碼錯誤")
 
@@ -180,8 +177,7 @@ async def registration(payload: UserSignUpPayload, response: Response):
 
     await user.update_token()
     await user.set_password(payload.password)
-    response.set_cookie(key="token", value=user.token)
-    return Payload.success("註冊成功", user.safe_dict())
+    return Payload.success("註冊成功", user.token)
 
 
 @app.post("/message")

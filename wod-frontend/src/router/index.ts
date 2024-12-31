@@ -8,8 +8,7 @@
 import { useAppStore } from "@/stores/app";
 import { fetchApi } from "@/utils/api";
 import { createRouter, createWebHistory } from "vue-router/auto";
-import { getCookie } from "@/utils/utils";
-
+import { electronStoreGet } from "@/utils/electronAPI";
 const routes = [
   {
     path: "/",
@@ -86,21 +85,26 @@ router.isReady().then(() => {
 
 router.beforeEach(async function (to) {
   const store = useAppStore();
-  if (to.meta.requiresAuth && !store.user) {
-    const res = await fetchApi("/me");
-    if (res.status == "success") {
-      await store.login(res.data);
-    } else {
-      if (getCookie("token").length > 0) {
-        alert("登入已過期！請重新登入");
-      } else {
-        alert("您尚未登入！此頁面登入後方可閱覽");
+  if (!store.user) {
+    if (await electronStoreGet('token')) {
+      const res = await fetchApi("/me");
+      if (res.status == "success") {
+        await store.login(res.data);
       }
-      return {
-        path: "/login",
-        query: { redirect: to.fullPath },
-      };
     }
+  }
+
+  if (to.meta.requiresAuth && !store.user) {
+
+    if (await electronStoreGet('token')) {
+      alert("登入已過期！請重新登入");
+    } else {
+      alert("您尚未登入！此頁面登入後方可閱覽");
+    }
+    return {
+      path: "/login",
+      query: { redirect: to.fullPath },
+    };
   }
 });
 

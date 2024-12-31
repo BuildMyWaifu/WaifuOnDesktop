@@ -6,48 +6,25 @@
           <pre class="d-flex">Build My <div class="text-primary">Waifu</div></pre>
         </v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="payload.email"
-            density="compact"
-            label="電子郵件"
-            :rules="[email, required]"
-            variant="solo-filled"
-          />
-          <v-text-field
-            v-model="payload.name"
-            density="compact"
-            label="帳號"
-            :rules="[name, required]"
-            variant="solo-filled"
-          />
-          <v-text-field
-            v-model="payload.password"
-            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            density="compact"
-            label="密碼"
-            :rules="[password, required]"
-            :type="showPassword ? 'text' : 'password'"
-            variant="solo-filled"
-            @click:append-inner="showPassword = !showPassword"
-          />
+          <v-text-field v-model="payload.email" density="compact" label="電子郵件" :rules="[email, required]"
+            variant="solo-filled" />
+          <v-text-field v-model="payload.name" density="compact" label="帳號" :rules="[name, required]"
+            variant="solo-filled" />
+          <v-text-field v-model="payload.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            density="compact" label="密碼" :rules="[password, required]" :type="showPassword ? 'text' : 'password'"
+            variant="solo-filled" @click:append-inner="showPassword = !showPassword" />
 
           <v-divider />
           <v-card-actions>
-            <v-btn
-              block
-              color="primary"
-              dark
-              :disabled="!formValid"
-              :loading="loading"
-              type="submit"
-            >註冊</v-btn>
+            <v-btn block color="primary" dark :disabled="!formValid" :loading="loading" type="submit">註冊</v-btn>
           </v-card-actions>
         </v-card-text>
       </v-form>
 
     </v-card>
     <div class="text-center d-flex">
-      <div class="text-caption text-info text-decoration-underline pr-4" style="cursor: pointer;" @click="()=>{router.push('/')}">
+      <div class="text-caption text-info text-decoration-underline pr-4" style="cursor: pointer;"
+        @click="() => { router.push('/') }">
         返回首頁</div>
       <div class="text-caption text-info text-decoration-underline" style="cursor: pointer;" @click="redirectToLogin">
         已經有帳號了嗎？</div>
@@ -57,12 +34,13 @@
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue'
-  import { postApi } from '@/utils/api'
+  import { postApi, fetchApi } from '@/utils/api'
   import { useAppStore } from '@/stores/app'
   import { useRoute, useRouter } from 'vue-router'
   import { email, name, password, required } from '@/utils/form'
   import { hash } from '@/utils/utils'
   import { SubmitEventPromise } from 'vuetify'
+  import { electronStoreSet } from '@/utils/electronAPI'
 
   const store = useAppStore()
   const router = useRouter()
@@ -74,18 +52,18 @@
     password: '',
   })
   const showPassword = ref(false)
-  const snackbar = ref<{status: string, message: string}>()
+  const snackbar = ref<{ status: string, message: string }>()
   const showSnackBar = ref(false)
   const route = useRoute()
 
   const redirectToLogin = () => {
     router.push('/login')
   }
-  async function submitSignUp (event: SubmitEventPromise) {
+  async function submitSignUp(event: SubmitEventPromise) {
     loading.value = true
     const results = await event
     if (results.valid) {
-      const res = await postApi('/signup', {
+      let res = await postApi('/signup', {
         name: payload.value.name,
         email: payload.value.email,
         password: hash(payload.value.password),
@@ -93,6 +71,8 @@
       snackbar.value = res
       showSnackBar.value = true
       if (res.status === 'success') {
+        await electronStoreSet('token', res.data)
+        res = await fetchApi('/me')
         await store.login(res.data)
         const redirectPath = route.query.redirect
         if (redirectPath) {

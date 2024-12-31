@@ -8,8 +8,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   createWindow: url => ipcRenderer.send('window:create', url),
   broadcast: content => ipcRenderer.send('sync:submit', content),
   onBroadcast: callback => ipcRenderer.on('sync:broadcast', (event, content) => callback(JSON.parse(content))),
-  fetch: () => ipcRenderer.send('sync:fetch')
+  fetch: () => ipcRenderer.send('sync:fetch'),
+
 })
+
+contextBridge.exposeInMainWorld('electronStore', {
+  get: async (key) => { return await ipcRenderer.invoke('store:get', key) },
+  set: async (key, val) => { await ipcRenderer.invoke('store:set', key, val) },
+}
+)
 
 contextBridge.exposeInMainWorld('versions', {
   node: () => process.versions.node,
@@ -17,4 +24,3 @@ contextBridge.exposeInMainWorld('versions', {
   electron: () => process.versions.electron,
   // 除函数之外，我们也可以暴露变量
 })
-  

@@ -2,6 +2,7 @@
 import { defineStore } from "pinia";
 import { Companion, Message, Sync, User } from "@/utils/model";
 import { fetchApi, handleErrorAlert } from "@/utils/api";
+import { electronStoreSet } from "@/utils/electronAPI";
 
 const defaultSync = {
   companion: {},
@@ -28,10 +29,10 @@ export const useAppStore = defineStore("app", {
       }
       this.companionList = companionList;
     },
-    logout() {
+    async logout() {
       this.user = undefined;
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      this.reset();
+      await electronStoreSet("token", "");
+      this.reset()
     },
     reset() {
       this.$reset();

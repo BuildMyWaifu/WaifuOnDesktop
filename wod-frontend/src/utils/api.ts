@@ -1,10 +1,14 @@
-// import { useViewStore } from '@/store/view'
+import { electronStoreGet } from "./electronAPI";
+
 
 export async function fetchApi (path: string = '') {
   try {
+    const token = await electronStoreGet("token"); 
     const response = await fetch(`/api${path}`, {
       method: 'GET',
-      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${token}`, // 使用 token
+      },
     })
 
     return await response.json()
@@ -17,14 +21,15 @@ export async function fetchApi (path: string = '') {
 
 export async function postApi (path: string = '', data: object) {
   try {
+    const token = await electronStoreGet("token"); 
     const response = await fetch(`/api${path}`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // 使用 token
       },
       body: JSON.stringify(data),
-      credentials: 'include',
     })
 
     return await response.json()
@@ -37,14 +42,15 @@ export async function postApi (path: string = '', data: object) {
 
 export async function patchApi (path = '', data: object) {
   try {
+    const token = await electronStoreGet("token"); 
     const response = await fetch(`/api${path}`, {
       method: 'PATCH',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // 使用 token
       },
       body: JSON.stringify(data),
-      credentials: 'include',
     })
 
     return await response.json()
@@ -57,9 +63,12 @@ export async function patchApi (path = '', data: object) {
 
 export async function deleteApi (path = '') {
   try {
+    const token = await electronStoreGet("token"); 
     const response = await fetch(`/api${path}`, {
       method: 'DELETE',
-      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${token}`, // 使用 token
+      }
     })
 
     return await response.json()

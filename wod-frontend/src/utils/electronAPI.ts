@@ -31,3 +31,10 @@ export function setBroadcastCallback(callback: (sync: Sync) => void) {
 export function fetchSync() {
   (window as any).electronAPI.fetch()
 }
+
+export async function electronStoreSet(key: string, value: string) {
+ await (window as any).electronStore.set(key, value)
+}
+export async function electronStoreGet(key: string) {
+  return await  (window as any).electronStore.get(key)
+}
