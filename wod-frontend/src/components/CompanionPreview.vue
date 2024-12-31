@@ -1,8 +1,8 @@
 <template>
 
-  <div class="d-flex align-center h-100" v-if="localCompanion" style="max-width: 100%;max-height: 1j00vh;">
+  <div class="d-flex align-center h-100" v-if="localCompanion" style="max-width: 100%;max-height: 100vh;">
     <div class="d-flex justify-center h-100 w-50 align-center overflow-hidden align-center justify-center">
-        <Live2dComponent class="h-100 w-100" style="max-height: 100%;max-width: 100%;"></Live2dComponent>
+        <Live2dComponent class="h-100 w-100" style="max-height: 100%;max-width: 100%;" :key="randomLive2dKey"></Live2dComponent>
     </div>
     <div class="text-center pa-8 w-50 overflow-auto" style="max-height: 100%;">
       <v-card-title class="text-h5">
@@ -59,8 +59,10 @@
   import { useAppStore } from '@/stores/app';
   import Live2dComponent from './Live2dComponent.vue';
 
-  import { computed, PropType } from 'vue';
+  import { computed, PropType, ref } from 'vue';
   import { Companion } from '@/utils/model';
+
+  const randomLive2dKey = ref(crypto.getRandomValues(new Uint32Array(1))[0].toString(16))
 
   const props = defineProps({
     companionId: {

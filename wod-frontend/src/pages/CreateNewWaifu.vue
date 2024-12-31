@@ -1,73 +1,48 @@
 <!-- eslint-disable vue/valid-v-slot -->
 <template>
-    <v-dialog v-model="isDialogOpen" @update:model-value="() => {
-        currentStep = 1
-    }" scrollable fullscreen>
-        <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" variant="flat">
-                <template v-slot:prepend>
-                    <v-icon icon="mdi-plus"></v-icon>
-                </template>
-                新增老婆
-            </v-btn>
+    <v-stepper v-model="currentStep" :items="steps" editable elevation="0" class="h-100 w-100"
+        style="max-width: 100%;max-height: 100%;">
+        <template v-slot:item.1>
+            <div class="h-100 w-100" style="max-width: 100%;max-height: 100%;">
+                <v-btn to="/app">返回</v-btn>
+                <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
+                <div class="d-flex">
+                    <v-list lines="three" style="min-width: 256px;" class="overflow-y-auto">
+                        <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
+                            :subtitle="companion.profile.description" @click="selectBase(i)"
+                            :active="baseCompanionIndex == i">
+                        </v-list-item>
+                    </v-list>
+                    <v-divider vertical></v-divider>
+                    <CompanionPreview readonly :companion="wives[baseCompanionIndex]" style="max-width: 600px;"
+                        :key="baseCompanionIndex * currentStep" v-if="showPreview">
+                    </CompanionPreview>
+                </div>
+            </div>
         </template>
-        <v-container class="d-flex align-center justify-center h-100">
-            <v-stepper v-model="currentStep" :items="steps">
-                <!-- 自訂的 actions slot -->
-                <template #actions="{ next, prev }">
-                    <div class="d-flex justify-space-between px-4 py-2">
-                        <v-btn @click="prev" :disabled="currentStep === 1">
-                        上一步
-                        </v-btn>
-                        <v-btn
-                        :disabled="currentStep === 2 && !childIsValid"
-                        @click="
-                            currentStep === 2
-                            ? doFinish()
-                            : next()
-                        "
-                        >
-                        {{ currentStep === 2 ? '完成' : '下一步' }}
-                        </v-btn>
-                    </div>
-                </template>
-                <template v-slot:item.1>
-                    <div>
-                        <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
-                        <div class="d-flex" style="max-height: 60vh;height: 60vh;">
-                            <v-list lines="three" style="min-width: 256px;" class="overflow-y-auto">
-                                <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
-                                    :subtitle="companion.profile.description" @click="selectBase(i)"
-                                    :active="baseCompanionIndex == i">
-                                </v-list-item>
-                            </v-list>
-                            <v-divider vertical></v-divider>
-                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]"
-                                style="max-width: 600px;">
-                            </CompanionPreview>
-                        </div>
-                    </div>
-                </template>
-                <template v-slot:item.2>
-                    <CompanionEdit v-if="companion != undefined" v-model="companion" @valid-change="childIsValid = $event"></CompanionEdit>
-                    <v-card-text v-else>
-                        不合法的選擇，請回上一步
-                        <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
-                    </v-card-text>
-                </template>
-            </v-stepper>
-        </v-container>
-    </v-dialog>
+        <template v-slot:item.2>
+            <div :key="baseCompanionIndex">
+
+                <CompanionEdit v-if="companion != undefined" v-model="companion" @valid-change="childIsValid = $event">
+                </CompanionEdit>
+                <v-card-text v-else>
+                    不合法的選擇，請回上一步
+                    <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
+                </v-card-text>
+            </div>
+        </template>
+    </v-stepper>
+
+
 </template>
 
 <script lang="ts" setup>
-    import CompanionEdit from './CompanionEdit.vue';
+    import CompanionEdit from '@/components/CompanionEdit.vue';
     import CompanionPreview from '@/components/CompanionPreview.vue'
     import { Companion } from '@/utils/model';
     import { copy } from '@/utils/utils'
-    import { ref } from 'vue';
+    import { ref, watch, nextTick } from 'vue';
 
-    const isDialogOpen = ref(false)
     const steps = ['選擇老婆', '設定']
     const currentStep = ref(1)
     const wives = [
@@ -154,19 +129,16 @@
         baseCompanion.value = wives[index]
         companion.value = copy(baseCompanion.value)
     }
+    const showPreview = ref(false)
+    function reloadPreview() {
+        showPreview.value = false
+        nextTick(() => { showPreview.value = true })
+    }
+    watch(currentStep, reloadPreview)
+    reloadPreview()
 
     const baseCompanion = ref<Companion>(wives[0])
 
     const companion = ref<Companion>(wives[0]);
-
-    function doFinish() {
-        // 這裡可以進一步呼叫 API / 寫入資料庫 / 關掉 dialog 等
-        isDialogOpen.value = false;
-    }
-
-    async function createNewWife() {
-        console.log(companion.value) 
-
-    }
 
 </script>

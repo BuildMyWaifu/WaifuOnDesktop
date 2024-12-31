@@ -19,22 +19,25 @@
             伴侶列表為空
           </v-card-text>
         </v-list-item>
+        <template v-for="companion in store.companionList" :key="companion._id">
 
-        <v-list-item v-for="companion in store.companionList" :key="companion._id" :value="companion._id"
-          @click="updateCurrentCompanion(companion._id)">
-          <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
-          <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
-          <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
-            {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
+          <v-list-item :value="companion._id" @click="updateCurrentCompanion(companion._id)">
+            <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
+            <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
+            <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
+              {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
               lastMessage(companion._id)?.content }}
-          </div>
-        </v-list-item>
+            </div>
+          </v-list-item>
+          <v-divider />
+        </template>
 
-        <v-divider />
       </v-list>
 
-      <div class="text-center">
-        <CreateNewWife />
+      <div class="px-4">
+        <v-btn variant="outlined" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu">
+          新增老婆
+        </v-btn>
       </div>
 
       <template #append>
@@ -88,7 +91,6 @@
 <script setup lang="ts">
 
   import CompanionPreview from '@/components/CompanionPreview.vue'
-  import CreateNewWife from '@/components/CreateNewWife.vue'
   import UserSettingListItem from '@/components/UserSettingListItem.vue';
   import { useAppStore } from '@/stores/app';
   import { useRouter } from 'vue-router';

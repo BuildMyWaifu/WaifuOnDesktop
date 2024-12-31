@@ -41,6 +41,12 @@ const routes = [
     component: () => import("@/pages/TestPage.vue"),
   },
   {
+    path: "/createNewWaifu",
+    name: "CreateNewWaifu",
+    meta: { requiresAuth: true },
+    component: () => import("@/pages/CreateNewWaifu.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "Error",
     meta: { requiresAuth: false },

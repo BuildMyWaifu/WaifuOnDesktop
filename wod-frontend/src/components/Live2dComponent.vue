@@ -4,7 +4,7 @@
     max-width: 100%;
     max-height: 100%;" class="overflow-hidden">
 
-    <canvas v-if="elementId" :id="elementId" style="
+    <canvas id="live2dCanvas" style="
     display: block;
     margin: 0 auto;
     position: relative;
@@ -18,21 +18,28 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, nextTick } from 'vue';
+  import { onMounted } from 'vue';
   import { init } from '../utils/live2d'; // Import your Live2D setup logic
 
-  const elementId = ref<string>(crypto.randomUUID() + "_live2d");
   onMounted(async () => {
     console.log('Live2DComponent: Mounted hook started...');
-
-    nextTick(async () => {
-
       try {
-        await init(elementId.value);
+        await init("live2dCanvas");
+        // alert('live2d init')
         console.log('Live2DComponent: Live2D model initialized successfully.');
       } catch (error) {
-        console.error('Live2DComponent: Failed to initialize Live2D model:', error);
+      alert('Live2DComponent: Failed to initialize Live2D model:', error);
       }
-    })
   });
+
+  // onUpdated(async () => {
+  //   try {
+  //     await init("live2dCanvas");
+  //     // alert('live2d init')
+  //     console.log('Live2DComponent: Live2D model initialized successfully.');
+  //   } catch (error) {
+  //     alert('Live2DComponent: Failed to initialize Live2D model:', error);
+  //   }
+  //   return true;
+  // })
 </script>

@@ -6,7 +6,7 @@ import {
 
 window.PIXI = PIXI; // Global Pixi
 
-// let app;
+let app;
 let model;
 let originalWidth;
 let originalHeight;
@@ -26,7 +26,10 @@ export async function init(elementId) {
     setBackground(canvas, './src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
-    let app = new PIXI.Application({
+    if (app) {
+      app.destroy(); // Clean up the previous PIXI application
+    }
+    app = new PIXI.Application({
       view: canvas,
       transparent: true,
       autoDensity: true,
@@ -39,30 +42,28 @@ export async function init(elementId) {
 
     const modelPath = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json'
     try {
-    console.log(`live2d.js: Loading model from ${modelPath}`);
-    if (model) {
-      app.stage.removeChild(model); // Remove the previous model from the stage
-      model.destroy(); // Clean up the previous model
+      console.log(`live2d.js: Loading model from ${modelPath}`);
+      if (model) {
+        app.stage.removeChild(model); // Remove the previous model from the stage
+        model.destroy(); // Clean up the previous model
+      }
+      model = await Live2DModel.from(modelPath, {
+        motionPreload: MotionPreloadStrategy.NONE,
+      });
+
+      // Add the model to the PIXI stage
+      app.stage.addChild(model);
+
+      // Store the original dimensions of the model
+      originalWidth = model.width;
+      originalHeight = model.height;
+
+      fitModelToCanvas(canvas); // Set initial scale and position
+
+      console.log('live2d.js: Model loaded and added to stage.');
+    } catch (error) {
+      console.error('live2d.js: Failed to load model:', error);
     }
-
-    // Load the new model
-    model = await Live2DModel.from(modelPath, {
-      motionPreload: MotionPreloadStrategy.NONE,
-    });
-
-    // Add the model to the PIXI stage
-    app.stage.addChild(model);
-
-    // Store the original dimensions of the model
-    originalWidth = model.width;
-    originalHeight = model.height;
-
-    fitModelToCanvas(canvas); // Set initial scale and position
-
-    console.log('live2d.js: Model loaded and added to stage.');
-  } catch (error) {
-    console.error('live2d.js: Failed to load model:', error);
-  }
 
     // Handle window resize events
     window.addEventListener('resize', () => {
@@ -79,7 +80,7 @@ export async function init(elementId) {
 
 function fitModelToCanvas(canvas) {
   if (!model) return;
-  
+
   // 根據drawer調整大小
   const container = canvas.parentElement;
   const availableWidth = container.clientWidth;
@@ -87,13 +88,14 @@ function fitModelToCanvas(canvas) {
 
   const scaleX = availableWidth / originalWidth;
   const scaleY = availableHeight / originalHeight;
-  const scale = Math.min(scaleX, scaleY) ; 
+  const scale = Math.min(scaleX, scaleY);
 
   model.scale.set(scale);
   model.position.set(
-    (availableWidth - originalWidth * scale) / 2 , 
-    (availableHeight - originalHeight * scale) / 2 
+    (availableWidth - originalWidth * scale) / 2,
+    (availableHeight - originalHeight * scale) / 2
   );
+  console.log('live2d.js: Model adjusted to fit the canvas.');
 }
 
 
