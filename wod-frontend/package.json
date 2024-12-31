@@ -25,13 +25,13 @@
     ],
     "asar": true,
     "win": {
-      "icon": "src/assets/BMW_icon.png"
+      "icon": "src/assets/icon.png"
     },
     "mac": {
-      "icon": "src/assets/BMW_icon.png"
+      "icon": "src/assets/icon.png"
     },
     "linux": {
-      "icon": "src/assets/BMW_icon.png"
+      "icon": "src/assets/icon.png"
     }
   },
   "dependencies": {
