@@ -42,7 +42,7 @@
 
     <!-- Close History Dialog Button -->
     <button v-if="showHistoryDialog" @click="showHistoryDialog = false" style="
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 202;

@@ -7,21 +7,15 @@
   scrollbar-width: thin;
   scrollbar-color: #e0e0e0 rgba(0, 0, 0, 0);
   ">
-    <v-infinite-scroll :onLoad="load" :items="items">
-      <div class="pa-2">
-        <!--test-->
-        <div v-for="(item, index) in items" :key="item" class="message-box" :class="index % 2 === 1 ? 'user' : 'bot'">
-          <div class="message-content">
-            {{ index % 2 === 1 ? 'user test message' : 'bot test message' }}
-          </div>
-        </div>
-        <!--<div v-for="(message, index) in store.messageMap.get(companionId)" :key="index"
+    <v-infinite-scroll @load="load">
+      <template class="pa-2">
+        <div v-for="(message, index) in items" :key="index"
             :class="['message-box', message.role]">
           <div class="message-content">
             {{ message.content }}
           </div>
-        </div>-->
-      </div>
+        </div>
+      </template>
     </v-infinite-scroll>
   </div>
 </template>
@@ -31,41 +25,21 @@
     import { useAppStore } from '@/stores/app'
     import { ref } from 'vue'
   
-    defineProps({
+    const prop = defineProps({
       companionId: {
         type: String,
         required: true
       }
     })
   
-    const store = useAppStore()
-    const items = ref(Array.from({ length: 20 }, (k, v) => v + 1))
+    const messageMap = useAppStore().messageMap
+    const items = ref(messageMap.get(prop.companionId)?.slice(0, 20) || [])
 
-    async function api () {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(Array.from({ length:10 }, (k, v) => v + (items.value.at(-1) ?? 0) + 1))
-        }, 1000)
-      })
+    const load = () => {
+      items.value.push(...(messageMap.get(prop.companionId) || []))
     }
 
-    // async function api () {
-    //   return new Promise(resolve => {
-    //     setTimeout(() => {
-    //       const messages = store.messageMap.get(prop.companionId) || [];
-    //         resolve(messages);
-    //       }, 1000);
-    //       });
-    //     }
-
-    async function load ({ done }) {
-      // Perform API call
-      const res = await api()
-
-      items.value.push(...res)
-
-      done('ok')
-    }
+    load()
 </script>
   
 <style scoped>
