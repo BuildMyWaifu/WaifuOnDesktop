@@ -8,7 +8,31 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore",
-    "electron": "electron ."
+    "electron": "electron .",
+    "pack": "electron-builder --dir",
+    "pack-dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.example.app",
+    "productName": "Build My Waifu",
+    "directories": {
+      "output": "pack"
+    },
+    "files": [
+      "**/*",
+      "!.vscode",
+      "dist/"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "src/assets/BMW_icon.png"
+    },
+    "mac": {
+      "icon": "src/assets/BMW_icon.png"
+    },
+    "linux": {
+      "icon": "src/assets/BMW_icon.png"
+    }
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
