@@ -5,8 +5,11 @@
         <div class="mx-auto pa-4" style="max-width: 500px;min-width: 200px;" v-if="companion">
           <v-card-title>角色模型</v-card-title>
           <!-- <Live2dComponent :fromFiles="uploadedFiles" v-if="showModel"></Live2dComponent> --> <v-container>
-            <div v-for="(url, index) in imageUrls" :key="index">
-              <v-img :src="url" class="ma-2" aspect-ratio="1.5" />
+            <div style="max-height: 50vh;" class="overflow-y-auto">
+
+              <div v-for="(url, index) in imageUrls" :key="index">
+                <v-img :src="url" class="ma-2" aspect-ratio="1.5" />
+              </div>
             </div>
           </v-container>
           <v-sub-header class="d-flex align-center">僅接受
@@ -35,7 +38,7 @@
       </div>
       <div class="flex-grow-1 pt-4 pr-4">
         <v-card-title>角色設定</v-card-title>
-        <v-form ref="form" v-model="isValid" class="pa-4 pt-10">
+        <v-form ref="form" v-model="isValid" class="pa-4 pt-10 flex-gorw-1 overflow-y-auto " style="max-height: 60vh;">
           <v-textarea v-model="companion.profile.name" label="姓名" :rules="[rules.name]" rows="1" variant="filled"
             auto-grow></v-textarea>
           <v-textarea v-model="companion.profile.description" label="描述" :rules="[rules.description]" rows="1"

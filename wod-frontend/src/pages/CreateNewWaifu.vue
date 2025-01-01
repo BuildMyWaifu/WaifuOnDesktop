@@ -4,7 +4,6 @@
     <div style="height: 100vh;width: 100vw">
         <v-window v-model="currentStep">
             <v-window-item value="select">
-
                 <div class="d-flex">
                     <v-list lines="three" style="min-width: 256px;max-width: 256px; height: 100vh; max-height: 100vh;"
                         class="overflow-y-auto">
@@ -25,7 +24,7 @@
                                 <v-card-title>以此模板為基準</v-card-title>
                                 <v-btn variant="outlined" color="primary" @click="currentStep = 'edit'">使用此模板</v-btn>
                             </div>
-                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1"
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1" style="max-height: 80vh;"
                                 :key="baseCompanionIndex" v-if="showPreview">
                             </CompanionPreview>
                         </v-card>
@@ -36,15 +35,23 @@
             <v-window-item value="edit">
                 <v-card :key="baseCompanionIndex" class="d-flex flex-column" style="height: 100vh;width: 100vw">
                     <div>
-                        <v-btn @click="currentStep = 'select'" flat prepend-icon="mdi-back">選擇其他模板</v-btn>
+                        <v-btn @click="currentStep = 'select'" flat prepend-icon="mdi-keyboard-return">選擇其他模板</v-btn>
                     </div>
-                    <CompanionEdit v-if="companion != undefined" v-model="companion" flat
-                        @valid-change="childIsValid = $event">
-                    </CompanionEdit>
-                    <v-card-text v-else>
-                        不合法的選擇，請回上一步
-                        <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
-                    </v-card-text>
+                    <div class="flex-grow-1">
+
+                        <CompanionEdit v-if="companion != undefined" v-model="companion" flat>
+                        </CompanionEdit>
+                        <v-card-text v-else>
+                            不合法的選擇，請回上一步
+                            <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
+                        </v-card-text>
+                    </div>
+                    <div style="padding-left: 100px;padding-right: 100px;">
+                        <v-btn size="large" color="success" block variant="outlined">建立</v-btn>
+                    </div>
+                    <v-card-actions>
+
+                    </v-card-actions>
                 </v-card>
             </v-window-item>
         </v-window>
@@ -135,8 +142,7 @@
             },
         }
     ] as Companion[];
-    // 接收子層 CompanionEdit 的 isValid 狀態
-    const childIsValid = ref(false);
+
 
     const baseCompanionIndex = ref(0)
     function selectBase(index: number) {
