@@ -11,7 +11,7 @@ import {
 // let originalWidth;
 // let originalHeight;
 
-export async function init(elementId: string) {
+export async function init(elementId: string, fromFiles: File[] | undefined) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
     const canvas = document.getElementById(elementId) as HTMLCanvasElement;
@@ -39,16 +39,21 @@ export async function init(elementId: string) {
     console.log('live2d.js: PIXI application created.');
 
     // Load the initial Live2D model
-
-    const modelPath = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json'
-    console.log(`live2d.js: Loading model from ${modelPath}`);
+    // let modelSource = '../../src/assets/mao_model/runtime/mao_pro.model3.json' as string | File;
+    let modelSource = '../../src/assets/mao_test/mao_pro_test.model3.json' as string | File;
+    // let modelSource = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json' as string | File;
+    if (fromFiles != undefined) {
+      console.log(fromFiles)
+      modelSource = fromFiles[0]
+    }
+    console.log(`live2d.js: Loading model from ${modelSource}`);
     let model = undefined as Live2DModel | undefined;
     try {
       // if (model) {
       //   app.stage.removeChild(model); // Remove the previous model from the stage
       //   model.destroy(); // Clean up the previous model
       // }
-      model = await Live2DModel.from(modelPath, {
+      model = await Live2DModel.from(modelSource, {
         motionPreload: MotionPreloadStrategy.NONE,
         autoUpdate: false,
       });
