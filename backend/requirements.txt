@@ -21,3 +21,4 @@ psutil
 pydub
 ffmpeg-python
 gitpython
+openai
