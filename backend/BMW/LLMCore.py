@@ -4,8 +4,7 @@ import time
 import uuid
 import json
 
-
-from BMW.model import Companion
+from BMW.model import Companion, Message 
 
 openai.api_key = os.environ["OPENAI_KEY"]
 
@@ -185,7 +184,8 @@ def chat_with_ai(companion: Companion, user_input: str):
     # Parse the JSON from the AI
     motion_key = "idle"
     try:
-        ai_data = eval(ai_response)  # or json.loads if you expect perfect JSON
+        ai_data = json.loads(ai_response)  # <-- json.loads instead of eval
+
         motion_key = ai_data.get("pose_key", "idle")
 
         changed_traits = ai_data.get("changed_traits", {})
@@ -206,7 +206,7 @@ def chat_with_ai(companion: Companion, user_input: str):
 
             print("[DEBUG] 更新後的 companion_states:", companion_states[user_id])
 
-    except (SyntaxError, KeyError) as err:
+    except (json.JSONDecodeError, KeyError) as err: 
         print(f"[DEBUG] 回應解析時發生錯誤: {err}")
         motion_key = "idle"
 
