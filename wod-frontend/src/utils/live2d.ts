@@ -23,7 +23,7 @@ export async function init(elementId: string, fromFiles: File[] | undefined) {
     console.log('live2d.js: Canvas element found:', canvas);
 
     // Set an initial background image dynamically
-    setBackground(canvas, './src/assets/backgrounds/Living_room.jpg');
+    setBackground(canvas, '../../src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
     // if (app) {
@@ -128,6 +128,7 @@ export function setBackground(canvas: HTMLCanvasElement, imagePath: string) {
     container.style.backgroundRepeat = 'no-repeat';
     container.style.backgroundPosition = 'center';
     container.style.backgroundSize = 'cover';
+    container.style.zIndex = '1';
     console.log(`live2d.js: Background switched to ${imagePath}`);
   }
 }
