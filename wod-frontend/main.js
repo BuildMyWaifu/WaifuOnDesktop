@@ -44,7 +44,12 @@ ipcMain.handle('store:get', async (_event, key) => {
 });
 
 ipcMain.handle('store:set', async (_event, key, val) => {
-  store.set(key, val);
+  if (val == "") {
+    store.delete(key);
+  }
+  else { 
+    store.set(key, val);
+  }
 });
 
 
