@@ -17,6 +17,9 @@ class CompanionPrompt(BaseModel):
 class Companion(Editable):
     collection_name: str = "Companion"
 
+    live2dModelSettingPath: str | None = None
+    motionMap: dict[str, str] = {}
+    
     profile: CompanionProfile = CompanionProfile()
     prompt: CompanionPrompt = CompanionPrompt()
     userId: str

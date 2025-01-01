@@ -11,7 +11,7 @@ import {
 // let originalWidth;
 // let originalHeight;
 
-export async function init(elementId: string, fromFiles: File[] | undefined) {
+export async function init(elementId: string, fromUrl: string | undefined) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
     const canvas = document.getElementById(elementId) as HTMLCanvasElement;
@@ -42,9 +42,9 @@ export async function init(elementId: string, fromFiles: File[] | undefined) {
     // let modelSource = '../../src/assets/mao_model/runtime/mao_pro.model3.json' as string | File;
     let modelSource = '../../src/assets/mao_test/mao_pro_test.model3.json' as string | File;
     // let modelSource = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json' as string | File;
-    if (fromFiles != undefined) {
-      console.log(fromFiles)
-      modelSource = fromFiles[0]
+    if (fromUrl != undefined) {
+      console.log(fromUrl)
+      modelSource = fromUrl
     }
     console.log(`live2d.js: Loading model from ${modelSource}`);
     let model = undefined as Live2DModel | undefined;
@@ -128,7 +128,7 @@ export function setBackground(canvas: HTMLCanvasElement, imagePath: string) {
     container.style.backgroundRepeat = 'no-repeat';
     container.style.backgroundPosition = 'center';
     container.style.backgroundSize = 'cover';
-    container.style.zIndex = '1';
+    // container.style.zIndex = '1';
     console.log(`live2d.js: Background switched to ${imagePath}`);
   }
 }

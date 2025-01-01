@@ -19,9 +19,9 @@ export async function fetchApi (path: string = '') {
   }
 }
 
-export async function postApi (path: string = '', data: object) {
+export async function postApi(path: string = '', data: object) {
   try {
-    const token = await electronStoreGet("token"); 
+    const token = await electronStoreGet("token");
     const response = await fetch(`/api${path}`, {
       method: 'POST',
       headers: {
@@ -37,6 +37,27 @@ export async function postApi (path: string = '', data: object) {
     return new Promise(resolve => {
       resolve({ status: 'error', message: `在請求時發生錯誤${error}` })
     })
+  }
+}
+
+export async function rawPostApi(path: string = "", data: FormData) {
+  try {
+
+    const token = await electronStoreGet("token");
+    const response = await fetch(`/api${path}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // 使用 token
+      },
+      body: data,
+      credentials: "include",
+    });
+    return await response.json();
+  }
+  catch (error) {
+    return new Promise((resolve) => {
+      resolve({ status: "error", message: `在請求時發生錯誤${error}` });
+    });
   }
 }
 

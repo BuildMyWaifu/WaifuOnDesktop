@@ -2,10 +2,14 @@ import traceback
 from contextlib import asynccontextmanager
 from multiprocessing import Manager
 from typing import Annotated
-
+from pathlib import Path
+import zipfile
+import os
 import BMW.Manager
 import BMW.model
 import git
+import secrets
+
 from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
 BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
@@ -20,6 +24,7 @@ from BMW.utils import console
 from fastapi import (
     Cookie,
     Depends,
+    UploadFile,
     FastAPI,
     HTTPException,
     Request,
@@ -27,7 +32,7 @@ from fastapi import (
     WebSocket,
 )
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -253,7 +258,7 @@ async def patch_companion(
 
 class CompanionCreatePayload(BaseModel):
     name: str
-    avatar: str | None = None
+
     description: str | None = None
 
 
@@ -315,14 +320,80 @@ async def user_token_reset(user_id: str, user: User = Depends(get_current_user))
     raise HTTPException(403, "您沒有權限重設這個使用者的 token")
 
 
-# @app.post("/file")
-# async def create_upload_file(file: UploadFile, user: User = Depends(get_current_user)):
-#     # console.log(upload_file)
-#     if user.level < 0:
-#         raise HTTPException(403, "您沒有權限上傳檔案")
-#     file_document = await File.from_file(file)
-#     file_id = await file_document.create()
-#     return Payload.success("成功上傳檔案", file_id)
+"""
+/assets/live2dModel/public/mao
+                          /miku
+                          ...
+                   /<userId>
+                   
+
+
+
+"""
+
+
+@app.post("/assets/live2dModel/upload")
+async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current_user)):
+    # 定義解壓縮目標目錄
+    target_directory = Path(
+        f"./assets/live2dModel/{user.id}/{secrets.token_urlsafe(8)}"
+    )
+
+    # 確保目標目錄存在
+    target_directory.mkdir(parents=True, exist_ok=True)
+
+    # 確定檔案是否為 zip 檔
+    if not file.filename.endswith(".zip"):
+        return Payload.error("僅接受 .zip 格式的檔案")
+
+    # 儲存上傳的 zip 檔
+    zip_path = target_directory / file.filename
+    with open(zip_path, "wb") as f:
+        f.write(await file.read())
+
+    # 解壓縮 zip 檔
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(target_directory)
+        # 解壓縮成功後刪除原始 zip 檔案
+        zip_path.unlink()
+    except zipfile.BadZipFile:
+        return Payload.error("無法解壓縮，檔案可能已損壞")
+
+    # 尋找符合條件的檔案
+    model_json_path = None
+    for root, _, files in os.walk(target_directory):
+        for file_name in files:
+            if file_name.endswith(".model3.json"):
+                model_json_path = str(Path(root) / file_name)
+                break
+        if model_json_path:
+            break
+
+    if model_json_path:
+        return Payload.success("成功上傳並找到符合條件的文件", "/api/"+model_json_path)
+    else:
+        return Payload.error("未找到符合條件的 .model3.json 文件")
+
+
+@app.get("/assets/{file_path:path}")
+async def read_assets(file_path: str):
+    # 定義根目錄
+    console.log(file_path)
+    base_directory = Path("./assets")
+
+    # 確保路徑安全
+    full_path = (base_directory / file_path).resolve()
+    console.log(full_path)
+    if not str(full_path).startswith(str(base_directory.resolve())):
+        raise HTTPException(status_code=403, detail="禁止訪問的路徑")
+
+    # 檢查文件是否存在
+    if not full_path.exists() or not full_path.is_file():
+        raise HTTPException(status_code=404, detail="文件不存在")
+
+    # 返回文件回應
+    return FileResponse(full_path)
 
 
 # @app.get("/file/{file_id}")

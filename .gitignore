@@ -8,6 +8,7 @@ node_modules/
 # testing
 /coverage
 
+backend/assets
 # production
 /build
 
@@ -46,3 +47,31 @@ backend/coverage.xml
 .VSCodeCounter/2024-08-05_11-54-42/results.json
 .VSCodeCounter/2024-08-05_11-54-42/results.md
 .VSCodeCounter/2024-08-05_11-54-42/results.txt
+wod-frontend/src/assets/miku_model.zip
+wod-frontend/src/assets/mao_test/mao_pro_test.cdi3.json
+wod-frontend/src/assets/mao_test/mao_pro_test.cmo3
+wod-frontend/src/assets/mao_test/mao_pro_test.moc3
+wod-frontend/src/assets/mao_test/mao_pro_test.model3.json
+wod-frontend/src/assets/mao_test/mao_pro_test.physics3.json
+wod-frontend/src/assets/mao_test/mao_pro_test.pose3.json
+wod-frontend/src/assets/mao_test/wink.can3
+wod-frontend/src/assets/mao_test/expressions/angry.exp3.json
+wod-frontend/src/assets/mao_test/expressions/attract.exp3.json
+wod-frontend/src/assets/mao_test/expressions/blush.exp3.json
+wod-frontend/src/assets/mao_test/expressions/confident.exp3.json
+wod-frontend/src/assets/mao_test/expressions/confuse.exp3.json
+wod-frontend/src/assets/mao_test/expressions/idle.exp3.json
+wod-frontend/src/assets/mao_test/expressions/mischievous.exp3.json
+wod-frontend/src/assets/mao_test/expressions/sad.exp3.json
+wod-frontend/src/assets/mao_test/expressions/shock.exp3.json
+wod-frontend/src/assets/mao_test/expressions/smile.exp3.json
+wod-frontend/src/assets/mao_test/mao_pro.4096/texture_00.png
+wod-frontend/src/assets/mao_test/mao_pro_test.4096/texture_00.png
+wod-frontend/src/assets/mao_test/motions/heart_fail.motion3.json
+wod-frontend/src/assets/mao_test/motions/heart_success.motion3.json
+wod-frontend/src/assets/mao_test/motions/level_up.motion3.json
+wod-frontend/src/assets/mao_test/motions/look_away.motion3.json
+wod-frontend/src/assets/mao_test/motions/react_big.motion3.json
+wod-frontend/src/assets/mao_test/motions/react_small.motion3.json
+wod-frontend/src/assets/mao_test/motions/relax.motion3.json
+wod-frontend/src/assets/mao_test/motions/wink.motion3.json

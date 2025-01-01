@@ -8,7 +8,7 @@
     display: block;
     margin: 0 auto;
     position: relative;
-    z-index: 1;
+
     width: 100%;
     height: 100%;
     max-width: 100%;
@@ -18,19 +18,19 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, PropType } from 'vue';
+  import { onMounted } from 'vue';
   import { init } from '../utils/live2d'; // Import your Live2D setup logic
 
   const props = defineProps({
-    fromFiles: {
-      type: Object as PropType<File[]>
+    fromUrl: {
+      type: String
     }
   })
 
   onMounted(async () => {
     console.log('Live2DComponent: Mounted hook started...');
       try {
-        await init("live2dCanvas", props.fromFiles);
+        await init("live2dCanvas", props.fromUrl);
         // alert('live2d init')
         console.log('Live2DComponent: Live2D model initialized successfully.');
       } catch (error) {

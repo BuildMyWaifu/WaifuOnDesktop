@@ -2,9 +2,11 @@
   <v-card v-if="companion">
     <div class="d-flex">
       <div>
-        <div class="mx-auto pa-4" style="max-width: 500px;min-width: 200px;" v-if="companion">
+        <div class="mx-auto pa-4" style="max-width: 500px;min-width: 300px;" v-if="companion">
           <v-card-title>角色模型</v-card-title>
-          <!-- <Live2dComponent :fromFiles="uploadedFiles" v-if="showModel"></Live2dComponent> --> <v-container>
+          <Live2dComponent :fromUrl="modelUrl" :key="modelUrl" v-if="showModel"></Live2dComponent>
+          材質預覽
+          <v-container>
             <div style="max-height: 50vh;" class="overflow-y-auto">
 
               <div v-for="(url, index) in imageUrls" :key="index">
@@ -12,7 +14,7 @@
               </div>
             </div>
           </v-container>
-          <v-sub-header class="d-flex align-center">僅接受
+          <div class="d-flex align-center text-grey">僅接受
             <pre class="px-2">.zip</pre> 壓縮檔，關於格式
             <v-dialog width="500">
               <template v-slot:activator="{ props }">
@@ -31,9 +33,11 @@
                 </v-card-text>
               </v-card>
             </v-dialog>
-          </v-sub-header>
-          <v-file-input type="file" accept=".zip" label="上傳新模型" density="compact" @change="handleFileUpload" />
-
+          </div>
+          <div class="d-flex align-center mt-2">
+            <v-file-input type="file" accept=".zip" label="上傳新模型" density="compact" @change="handleFileUpload"
+              hide-details />
+          </div>
         </div>
       </div>
       <div class="flex-grow-1 pt-4 pr-4">
@@ -54,13 +58,15 @@
 </template>
 
 <script lang="ts" setup>
+  import Live2dComponent from "@/components/Live2dComponent.vue";
   import { Companion } from "@/utils/model";
   import { ref, watch, PropType, onMounted, nextTick } from "vue";
   import { copy } from "@/utils/utils";
+  import { rawPostApi } from "@/utils/api";
   import JSZip from "jszip";
 
   const isValid = ref(false);
-  const showModel = ref(false);
+  const showModel = ref(true);
   const imageUrls = ref<string[]>([]); // 用於存儲圖片的 URL
 
   const props = defineProps({
@@ -86,6 +92,7 @@
 
   onMounted(() => {
     loadProp();
+    reloadModel();
   });
   watch(() => JSON.stringify(props.modelValue), loadProp);
   watch(
@@ -108,7 +115,7 @@
     backStory: (value: string) => (value === "" ? "該欄位必須填寫" : true),
   };
   const uploadedFiles = ref<File | File[] | null>(null);
-
+  const modelUrl = ref<string | null>(null);
   // 上傳並處理壓縮檔
   async function handleFileUpload(event: Event) {
     let files = (event.target as HTMLInputElement).files;
@@ -119,8 +126,17 @@
     }
     if (!files) return;
     uploadedFiles.value = files;
-    console.log("Start to handle file upload");
-    console.log(files);
+    let formData = new FormData
+
+    formData.append('file', files)
+    const res = await rawPostApi('/assets/live2dModel/upload', formData)
+    if (res.status != 'success') {
+      alert(res.message)
+      return
+    }
+    modelUrl.value = res.data
+
+
 
     const zip = new JSZip();
     const content = await zip.loadAsync(files);
