@@ -1,39 +1,54 @@
 <!-- eslint-disable vue/valid-v-slot -->
 <template>
-    <v-stepper v-model="currentStep" :items="steps" editable elevation="0" class="h-100 w-100"
-        style="max-width: 100%;max-height: 100%;">
-        <template v-slot:item.1>
-            <div class="h-100 w-100" style="max-width: 100%;max-height: 100%;">
-                <v-btn to="/app">返回</v-btn>
-                <v-card-subtitle>從範本建立，或是從零開始打造</v-card-subtitle>
+
+    <div style="height: 100vh;width: 100vw">
+        <v-window v-model="currentStep">
+            <v-window-item value="select">
+
                 <div class="d-flex">
-                    <v-list lines="three" style="min-width: 256px;" class="overflow-y-auto">
+                    <v-list lines="three" style="min-width: 256px;max-width: 256px; height: 100vh; max-height: 100vh;"
+                        class="overflow-y-auto">
+                        <v-btn to="/app" prepend-icon="mdi-menu" flat>返回</v-btn>
+                        <v-card-title>伴侶建立頁面</v-card-title>
+                        <v-card-subtitle>從模板建立，或是從零開始打造</v-card-subtitle>
                         <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
                             :subtitle="companion.profile.description" @click="selectBase(i)"
                             :active="baseCompanionIndex == i">
                         </v-list-item>
                     </v-list>
                     <v-divider vertical></v-divider>
-                    <CompanionPreview readonly :companion="wives[baseCompanionIndex]" style="max-width: 600px;"
-                        :key="baseCompanionIndex * currentStep" v-if="showPreview">
-                    </CompanionPreview>
+                    <div class="d-flex flex-column overflow-y-auto flex-grow-1 pa-4 pr-8"
+                        style="height: 100vh; max-height: 100vh;">
+
+                        <v-card class="flex-grow-1 d-flex flex-column" variant="outlined">
+                            <div class="d-flex align-center">
+                                <v-card-title>以此模板為基準</v-card-title>
+                                <v-btn variant="outlined" color="primary" @click="currentStep = 'edit'">使用此模板</v-btn>
+                            </div>
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1"
+                                :key="baseCompanionIndex" v-if="showPreview">
+                            </CompanionPreview>
+                        </v-card>
+                    </div>
                 </div>
-            </div>
-        </template>
-        <template v-slot:item.2>
-            <div :key="baseCompanionIndex">
 
-                <CompanionEdit v-if="companion != undefined" v-model="companion" @valid-change="childIsValid = $event">
-                </CompanionEdit>
-                <v-card-text v-else>
-                    不合法的選擇，請回上一步
-                    <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
-                </v-card-text>
-            </div>
-        </template>
-    </v-stepper>
-
-
+            </v-window-item>
+            <v-window-item value="edit">
+                <v-card :key="baseCompanionIndex" class="d-flex flex-column" style="height: 100vh;width: 100vw">
+                    <div>
+                        <v-btn @click="currentStep = 'select'" flat prepend-icon="mdi-back">選擇其他模板</v-btn>
+                    </div>
+                    <CompanionEdit v-if="companion != undefined" v-model="companion" flat
+                        @valid-change="childIsValid = $event">
+                    </CompanionEdit>
+                    <v-card-text v-else>
+                        不合法的選擇，請回上一步
+                        <div class="text-caption text-grey">如果見到此訊息，請視作錯誤回報</div>
+                    </v-card-text>
+                </v-card>
+            </v-window-item>
+        </v-window>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -43,8 +58,8 @@
     import { copy } from '@/utils/utils'
     import { ref, watch, nextTick } from 'vue';
 
-    const steps = ['選擇老婆', '設定']
-    const currentStep = ref(1)
+    
+    const currentStep = ref<string>('select')
     const wives = [
         {
             _id: "咪醬",

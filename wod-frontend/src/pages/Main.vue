@@ -36,9 +36,10 @@
 
       <div class="px-4">
         <v-btn variant="outlined" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu">
-          新增老婆
+          新增伴侶
         </v-btn>
       </div>
+      <v-btn @click="store.generateMockCompanionList">test</v-btn>
 
       <template #append>
         <v-divider />
@@ -82,7 +83,8 @@
     </v-navigation-drawer>
 
     <v-main app>
-      <CompanionPreview v-if="currentCompanionId !== null" :companionId="currentCompanionId"></CompanionPreview>
+      <CompanionPreview style="height: 100vh; max-height: 100vh;" v-if="currentCompanionId !== null"
+        :companionId="currentCompanionId"></CompanionPreview>
     </v-main>
 
   </v-app>

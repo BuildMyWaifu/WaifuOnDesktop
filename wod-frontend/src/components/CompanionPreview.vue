@@ -1,10 +1,10 @@
 <template>
 
-  <div class="d-flex align-center h-100" v-if="localCompanion" style="max-width: 100%;max-height: 100vh;">
+  <div class="d-flex align-center" v-if="localCompanion" style="max-width: 100%;max-height: 100vh;">
     <div class="d-flex justify-center h-100 w-50 align-center overflow-hidden align-center justify-center">
         <Live2dComponent class="h-100 w-100" style="max-height: 100%;max-width: 100%;" :key="randomLive2dKey"></Live2dComponent>
     </div>
-    <div class="text-center pa-8 w-50 overflow-auto" style="max-height: 100%;">
+    <div class="text-center pa-8 w-50 overflow-y-auto" style="max-height: 100%;">
       <v-card-title class="text-h5">
         {{ localCompanion.profile.name }}
       </v-card-title>

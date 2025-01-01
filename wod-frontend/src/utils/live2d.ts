@@ -4,18 +4,18 @@ import {
   MotionPreloadStrategy,
 } from 'pixi-live2d-display';
 
-window.PIXI = PIXI; // Global Pixi
+// window.PIXI = PIXI; // Global Pixi
 
-let app;
-let model;
-let originalWidth;
-let originalHeight;
+// let app;
+// let model;
+// let originalWidth;
+// let originalHeight;
 
-export async function init(elementId) {
+export async function init(elementId: string) {
   console.log('live2d.js: Initializing Live2D model...');
   try {
-    const canvas = document.getElementById(elementId);
-    const container = canvas.parentElement;
+    const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+    const container = canvas.parentElement as HTMLElement;
     if (!canvas) {
       console.error('live2d.js: Canvas element not found!');
       return;
@@ -26,10 +26,10 @@ export async function init(elementId) {
     setBackground(canvas, './src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
-    if (app) {
-      app.destroy(); // Clean up the previous PIXI application
-    }
-    app = new PIXI.Application({
+    // if (app) {
+    //   app.destroy(); // Clean up the previous PIXI application
+    // }
+    const app = new PIXI.Application({
       view: canvas,
       transparent: true,
       autoDensity: true,
@@ -41,35 +41,52 @@ export async function init(elementId) {
     // Load the initial Live2D model
 
     const modelPath = '../../src/assets/miku_model/runtime/miku_sample_t04.model3.json'
+    console.log(`live2d.js: Loading model from ${modelPath}`);
+    let model = undefined as Live2DModel | undefined;
     try {
-      console.log(`live2d.js: Loading model from ${modelPath}`);
-      if (model) {
-        app.stage.removeChild(model); // Remove the previous model from the stage
-        model.destroy(); // Clean up the previous model
-      }
+      // if (model) {
+      //   app.stage.removeChild(model); // Remove the previous model from the stage
+      //   model.destroy(); // Clean up the previous model
+      // }
       model = await Live2DModel.from(modelPath, {
         motionPreload: MotionPreloadStrategy.NONE,
+        autoUpdate: false,
       });
 
       // Add the model to the PIXI stage
       app.stage.addChild(model);
 
       // Store the original dimensions of the model
-      originalWidth = model.width;
-      originalHeight = model.height;
 
-      fitModelToCanvas(canvas); // Set initial scale and position
 
       console.log('live2d.js: Model loaded and added to stage.');
     } catch (error) {
       console.error('live2d.js: Failed to load model:', error);
     }
+    
+    if (!model) {
+      alert("Live2d模型載入失敗")
+      return
+    }
+    let then = performance.now();
+    function tick(now: number) {
+      if (!model) return;
+      model.update(now - then);
+      then = now;
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+    const originalWidth = model.width;
+    const originalHeight = model.height;
+
+    fitModelToCanvas(model, canvas, originalWidth, originalHeight); // Set initial scale and position
 
     // Handle window resize events
     window.addEventListener('resize', () => {
       console.log('live2d.js: Window resized, adjusting model...');
       app.renderer.resize(container.clientWidth, container.clientHeight); // Resize PIXI renderer
-      fitModelToCanvas(canvas); // Adjust model size and position
+      fitModelToCanvas(model, canvas, originalWidth, originalHeight); // Adjust model size and position
     });
 
     console.log('live2d.js: Live2D model added to the stage.');
@@ -78,11 +95,10 @@ export async function init(elementId) {
   }
 }
 
-function fitModelToCanvas(canvas) {
+function fitModelToCanvas(model: Live2DModel, canvas: HTMLCanvasElement, originalWidth: number, originalHeight: number) {
   if (!model) return;
-
-  // 根據drawer調整大小
   const container = canvas.parentElement;
+  if (!container) return;
   const availableWidth = container.clientWidth;
   const availableHeight = container.clientHeight;
 
@@ -100,7 +116,7 @@ function fitModelToCanvas(canvas) {
 
 
 // Existing setBackground function remains the same
-export function setBackground(canvas, imagePath) {
+export function setBackground(canvas: HTMLCanvasElement, imagePath: string) {
   const container = canvas.parentElement;
   if (container) {
     container.style.backgroundImage = `url('${imagePath}')`;
