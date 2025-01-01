@@ -18,13 +18,19 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, PropType } from 'vue';
   import { init } from '../utils/live2d'; // Import your Live2D setup logic
+
+  const props = defineProps({
+    fromFiles: {
+      type: Object as PropType<File[]>
+    }
+  })
 
   onMounted(async () => {
     console.log('Live2DComponent: Mounted hook started...');
       try {
-        await init("live2dCanvas");
+        await init("live2dCanvas", props.fromFiles);
         // alert('live2d init')
         console.log('Live2DComponent: Live2D model initialized successfully.');
       } catch (error) {
