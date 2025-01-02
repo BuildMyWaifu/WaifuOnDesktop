@@ -1,5 +1,5 @@
 <template>
-    <v-card v-if="localCompanion" style="height: 100vh;width: 100vw" class="d-flex flex-column overflow-y-auto">
+    <v-card v-if="localCompanion" style="height: 100vh;width: 100vw" class="d-flex flex-column">
         <div class="pl-8 pt-4">
             你正在編輯伴侶
         </div>
@@ -11,7 +11,9 @@
             <v-btn size="large" color="success" block variant="tonal" :disabled="!isCompanionValid(localCompanion)"
                 @click="updateCompanion">儲存</v-btn>
         </div>
-        <CompanionEdit v-model="localCompanion" flat></CompanionEdit>
+        <div class="flex-grow-1 overflow-auto">
+            <CompanionEdit v-model="localCompanion" flat></CompanionEdit>
+        </div>
     </v-card>
 </template>
 <script lang="ts" setup>

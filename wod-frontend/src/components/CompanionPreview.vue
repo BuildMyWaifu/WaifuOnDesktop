@@ -1,6 +1,6 @@
 <template>
 
-  <div class="d-flex align-center" v-if="localCompanion" style="max-width: 100%;max-height: 100vh;">
+  <div class="d-flex align-center" v-if="localCompanion" style="max-width: 100%;max-height: 100vh;" >
     <div class="d-flex justify-center h-100 w-50 align-center overflow-hidden align-center justify-center ">
       <Live2dComponent v-if="localCompanion.live2dModelSettingPath" :fromUrl="localCompanion.live2dModelSettingPath"
         class="h-100 w-100" style="max-height: 100%;max-width: 100%;" :key="randomLive2dKey"></Live2dComponent>

@@ -3,7 +3,8 @@ import openai
 import time
 import uuid
 import json
-
+from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 from BMW.model import Companion, Message
 from BMW.utils import console
@@ -12,6 +13,23 @@ from BMW.utils import console
 # from BMW.model.Message import MessagePose
 
 openai.api_key = os.environ["OPENAI_KEY"]
+
+executor = ThreadPoolExecutor(max_workers=1000)
+
+
+async def run_in_threadpool(func, *args):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(executor, func, *args)
+
+
+def call_openai_api_sync(args, kwargs):
+    """同步方式調用 OpenAI API"""
+    return openai.ChatCompletion.create(*args, **kwargs)
+
+
+async def async_openai_chat_completion(*args, **kwargs):
+    """非阻塞方式調用 OpenAI API"""
+    return await run_in_threadpool(call_openai_api_sync, args, kwargs)
 
 
 async def setup_trait(companion: Companion):
@@ -28,7 +46,7 @@ async def setup_trait(companion: Companion):
 - Emotional response: ...
     """
 
-    response = openai.ChatCompletion.create(
+    response = await async_openai_chat_completion(
         model="gpt-4",
         messages=[{"role": "system", "content": trait_generation_prompt}],
         temperature=0.7,
@@ -55,7 +73,7 @@ def generate_system_prompt(companion: Companion) -> str:
     Removes explicit companion_id usage; we use companion.userId as the key instead.
     """
 
-    pose_key_instructions = "2. 「pose_key」：為下列之一，用於 Live2D 動作與表情，建議頻繁切換來達成生動的效果：\n"
+    pose_key_instructions = "2. 「pose_key」：為下列之一，用於表示動作與表情，建議頻繁切換來達成生動的效果，請務必多加使用！\n"
     for pk in companion.poseMap.keys():
         pose_key_instructions += f"- {pk}\n"
     if len(companion.poseMap.keys()) == 0:
@@ -89,12 +107,12 @@ emotional response: {companion.trait.emotional_response}
 - 使用者多次責罵或離開你 -> 你可能更焦慮或更悲傷。
 
 使用者會與你互動，而你需要以以下格式回應：
-1. text_response：符合你的角色與背景、與使用者對應的口語簡短回應，如同與使用者口語對話一般。
+1. text：符合你的角色與背景、與使用者對應的口語簡短回應，如同與使用者口語對話一般。
 {pose_key_instructions}
 
 嚴格遵守以下 JSON 格式回應：
 {{
-  "text_response": "...",
+  "text": "...",
   "pose_key": "...",
   "changed_traits": {{}}
 }}
@@ -128,7 +146,7 @@ async def get_messages(companion: Companion) -> list[Message]:
         companionId=companion.id, sort=[("createdAt", 1)], limit=30
     )
     message_list = [
-        {"role": message.role, "content": message.content}
+        {"role": message.role, "content": """\{"text": \"""" + message.content + """\"\}"""}
         for message in raw_message_list
     ]
 
@@ -137,7 +155,7 @@ async def get_messages(companion: Companion) -> list[Message]:
         {
             "role": "assistant",
             "content": """\{
-  "text_response": "範例文字回應",
+  "text": "範例文字回應",
   "pose_key": "nervous_smile",  // 回應時記得要確保使用合法的 pose_key
   "changed_traits": \{\}
 \}""",
@@ -160,7 +178,7 @@ async def generateResponseMessage(companion: Companion) -> Message:
     message_list = await get_messages(companion)
     console.log(message_list)
 
-    response = openai.ChatCompletion.create(
+    response = await async_openai_chat_completion(
         model="gpt-4",
         messages=message_list,
         temperature=0.8,
@@ -170,9 +188,10 @@ async def generateResponseMessage(companion: Companion) -> Message:
     ai_response = response["choices"][0]["message"]["content"]
     # Store the AI message in conversation history
     content = ai_response
+    pose_key = "idle"
     try:
         ai_data = json.loads(ai_response)
-        content = ai_data.get("text_response", ai_response)
+        content = ai_data.get("text", ai_response)
         pose_key = ai_data.get("pose_key", "idle")
         changed_traits = ai_data.get("changed_traits", {})
         if changed_traits:
@@ -194,7 +213,7 @@ async def generateResponseMessage(companion: Companion) -> Message:
 
     except (json.JSONDecodeError, KeyError) as err:
         print(f"[DEBUG] 回應解析時發生錯誤: {err}")
-        pose_key = "idle"
+        console.log(ai_response)
 
     print(f"選擇的動作鍵：{pose_key}")
 
