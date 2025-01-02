@@ -21,8 +21,8 @@
       <v-card-text style="white-space: pre-line;">
         {{ localCompanion.backstory.replace('\n', '\n\n') }}
       </v-card-text>
-      <v-card-actions v-if="!readonly" style="position: sticky; bottom: 0;background-color: #121212;">
-        <v-spacer></v-spacer>
+      <v-card-actions v-if="!readonly" style="position: sticky; bottom: 0;background-color: #121212;" class="d-flex flex-wrap justify-end">
+        
         <v-dialog width="500">
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" prepend-icon="mdi-delete" color="error" class="mr-4">刪除</v-btn>
