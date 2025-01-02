@@ -22,3 +22,4 @@ pydub
 ffmpeg-python
 gitpython
 openai
+edge-tts
