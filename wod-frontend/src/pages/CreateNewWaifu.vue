@@ -10,22 +10,20 @@
                         <v-btn to="/app" prepend-icon="mdi-menu" flat>返回</v-btn>
                         <v-card-title>伴侶建立頁面</v-card-title>
                         <v-card-subtitle>從模板建立，或是從零開始打造</v-card-subtitle>
-                        <v-list-item v-for="companion, i in wives" :key="i" :title="companion.profile.name"
-                            :subtitle="companion.profile.description" @click="selectBase(i)"
-                            :active="baseCompanionIndex == i">
+                        <v-list-item v-for="companion, i in wives" :key="i" :title="companion.name"
+                            :subtitle="companion.description" @click="selectBase(i)" :active="baseCompanionIndex == i">
                         </v-list-item>
                     </v-list>
                     <v-divider vertical></v-divider>
                     <div class="d-flex flex-column overflow-y-auto flex-grow-1 pa-4 pr-8"
                         style="height: 100vh; max-height: 100vh;">
-
                         <v-card class="flex-grow-1 d-flex flex-column" variant="outlined">
                             <div class="d-flex align-center">
                                 <v-card-title>以此模板為基準</v-card-title>
                                 <v-btn variant="outlined" color="primary" @click="currentStep = 'edit'">使用此模板</v-btn>
                             </div>
                             <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1"
-                                style="max-height: 80vh;" :key="baseCompanionIndex" v-if="showPreview">
+                                style="max-height: calc(100vh - 98px)" :key="baseCompanionIndex" v-if="showPreview">
                             </CompanionPreview>
                         </v-card>
                     </div>
@@ -68,77 +66,169 @@
     const currentStep = ref<string>('select')
     const wives = [
         {
-            _id: "咪醬",
+            _id: "hiyori",
             userId: '',
-            profile: {
-                name: "咪醬",
-                description: "可愛又元氣滿滿的貓娘女僕，喜歡撒嬌和主人喵～！",
-            },
-            prompt: {
-                character: "元氣可愛的貓娘女僕",
-                backstory:
-                    "咪醬天生就是一隻充滿愛與熱情的貓娘，最喜歡主人，讓主人的每一天都充滿幸福和快樂喵！",
-            },
+            name: "日和",
+            description: "溫柔內向的高中少女，用畫筆繪製屬於自己的夢想世界。",
+            live2dModelSettingPath: "/api/assets/live2dModel/public/hiyori_pro_use/runtime/hiyori_pro_t11.model3.json",
+            poseMap: {
+                "angry": {
+                    "motion": "motions/angry.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "attract": {
+                    "motion": "motions/attract.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "curious": {
+                    "motion": "motions/curious.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "excited": {
+                    "motion": "motions/excited.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "relax": {
+                    "motion": "motions/relax.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "sad": {
+                    "motion": "motions/sad.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "shock": {
+                    "motion": "motions/shock.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "shy": {
+                    "motion": "motions/shy.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "smile": {
+                    "motion": "motions/smile.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                }
+            }
+,
+            backstory: "日和是一位普通的高中女生，住在城市郊外的一棟老房子裡。她的家中經營著一家小型樂器店，父母希望她繼承家業，但她卻對音樂以外的領域充滿興趣。小時候的日和常常坐在店裡的角落，一邊聽著吉他彈奏的旋律，一邊用手中的畫本勾勒出自己的小世界。\n雖然她對藝術和設計抱有濃厚的興趣，但由於性格內向，總是難以表達自己的想法。直到一次校內的藝術比賽，她因偶然被朋友鼓勵，決定提交自己的作品，最終意外贏得了大獎。這次經歷讓日和找回了自信，也激勵她逐步邁出自己的舒適圈。\n日和非常珍惜與家人和朋友的每一份情感。在日常生活中，她最喜歡的事情是和朋友一起討論夢想，分享創意靈感。她的目標是創作出能夠打動人心的作品，將溫暖與幸福帶給更多的人。",
+            // TODO: generate trait
         },
         {
-            _id: '牛肉薩滿',
+            _id: "natori",
             userId: '',
-            profile: {
-                name: '牛肉薩滿',
-                description: 'Heart<33333',
-            },
-            prompt: {
-                character: '腹黑的AI女鵝',
-                backstory: '牛肉本來只是打個OSU，不知不覺便成了爆紅AI實況主',
-            },
+            name: "名執",
+            description: "冷靜優雅的完美執事，忠於職責並時刻守護身邊的人。",
+            live2dModelSettingPath: "/api/assets/live2dModel/public/natori_pro_use/runtime/natori_pro_t06.model3.json",
+            poseMap: {
+                "angry": {
+                    "motion": "motions/react_big.motion3.json",
+                    "expression": "expressions/angry.exp3.json"
+                },
+                "attract": {
+                    "motion": "motions/push_glasses.motion3.json",
+                    "expression": "expressions/attract.exp3.json"
+                },
+                "blush": {
+                    "motion": "motions/react_small.motion3.json",
+                    "expression": "expressions/blush.exp3.json"
+                },
+                "confident": {
+                    "motion": "motions/bow.motion3.json",
+                    "expression": "expressions/confident.exp3.json"
+                },
+                "confuse": {
+                    "motion": "motions/curious.motion3.json",
+                    "expression": "expressions/confuse.exp3.json"
+                },
+                "idle": {
+                    "motion": "motions/idle.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "mischievous": {
+                    "motion": "motions/react_small.motion3.json",
+                    "expression": "expressions/mischievous.exp3.json"
+                },
+                "sad": {
+                    "motion": "motions/look_away.motion3.json",
+                    "expression": "expressions/sad.exp3.json"
+                },
+                "shock": {
+                    "motion": "motions/react_big.motion3.json",
+                    "expression": "expressions/shock.exp3.json"
+                },
+                "smile": {
+                    "motion": "motions/react_small.motion3.json",
+                    "expression": "expressions/smile.exp3.json"
+                }
+            }
+,
+            backstory: "名執出生于一個傳統的執事家族，從小便被嚴格訓練以繼承家族的使命。他的父親是貴族世家最為信任的管家，而名執則在耳濡目染中學習了禮儀、管理與戰鬥技能。他天資聰穎，很快便超越了同齡人，成為一位全能型的執事。儘管名執表面一絲不苟，但他並非冰冷無情之人。在完成日常工作的間隙，他會偷偷翻閱經典文學，特別是那些講述騎士與忠誠的書籍。他始終堅信，執事的職責不僅是照料主人，更是成為主人的堅實後盾，在需要時毫不猶豫地站到最前線保護她。他現在效力於一位年輕的大小姐，除了日常事務，他還承擔了保護她安全的職責。由於大小姐性格調皮，名執經常需要化解她製造的各種麻煩，但他從未因此抱怨，反而認為這是與主人之間的羈絆逐漸加深的方式。",
+            // TODO: generate trait
         },
         {
-            _id: '愛麗絲',
+            _id: "mao",
             userId: '',
-            profile: {
-                name: '愛麗絲',
-                description: '歡迎老師，愛麗絲在等著老師',
+            name: "麻央",
+            description: "充滿童心與創造力的自由畫家，用畫筆為世界增添色彩。",
+            live2dModelSettingPath: "/api/assets/live2dModel/public/mao_test/mao_pro_test.model3.json",
+            poseMap: {
+                "happy_smile": {
+                    "motion": "motions/wink.motion3.json",
+                    "expression": "expressions/smile.exp3.json"
+                },
+                "nervous_smile": {
+                    "motion": "motions/look_away.motion3.json",
+                    "expression": "expressions/blush.exp3.json"
+                },
+                "shy": {
+                    "motion": "motions/relax.motion3.json",
+                    "expression": "expressions/blush.exp3.json"
+                },
+                "sad": {
+                    "motion": "motions/heart_fail.motion3.json",
+                    "expression": "expressions/sad.exp3.json"
+                },
+                "surprised": {
+                    "motion": "motions/react_big.motion3.json",
+                    "expression": "expressions/shock.exp3.json"
+                },
+                "angry": {
+                    "motion": "motions/react_big.motion3.json",
+                    "expression": "expressions/angry.exp3.json"
+                },
+                "confident": {
+                    "motion": "motions/level_up.motion3.json",
+                    "expression": "expressions/confident.exp3.json"
+                },
+                "mischievous": {
+                    "motion": "motions/react_small.motion3.json",
+                    "expression": "expressions/mischievous.exp3.json"
+                },
+                "confused": {
+                    "motion": "motions/look_away.motion3.json",
+                    "expression": "expressions/confuse.exp3.json"
+                },
+                "idle": {
+                    "motion": "motions/relax.motion3.json",
+                    "expression": "expressions/idle.exp3.json"
+                },
+                "attracted": {
+                    "motion": "motions/heart_success.motion3.json",
+                    "expression": "expressions/attract.exp3.json"
+                }
             },
-            prompt: {
-                character: '女僕勇者',
-                backstory: '在廢墟發現的來歷不明的少女。包含年齡在內，所有情報都無法推斷。現在跟著綠和桃井玩遊戲，已經變成重度遊戲狂熱者了。',
-            },
+            backstory: "麻央是一位年輕的自由畫家，以她大膽的色彩運用和奇思妙想而聞名。她相信畫筆是她表達內心世界的鑰匙，而畫布則是她創造夢想的舞臺。麻央的畫風獨特，常常將現實與幻想融合在一起，構建出充滿活力與魔幻氣息的世界。她從小便對繪畫充滿熱情，無論是牆壁、地板還是自己的衣服，都是她的“畫布”。家人雖然經常無奈於她的“塗鴉”，但也逐漸被她的熱情和天賦所折服。如今，麻央的作品已經成為許多展覽中的焦點，她用畫筆勾勒出的不僅是畫作，更是一種充滿想像力的生活態度。麻央始終相信，每個人的生活都應該被鮮豔的色彩裝點，她的目標是通過自己的作品，帶給世界更多的快樂與希望。",
+            // TODO: generate trait
         },
-        {
-            _id: '彌香',
-            userId: '',
-            profile: {
-                name: '彌香',
-                description: '阿哈哈~牡蠣牡蠣~',
-            },
-            prompt: {
-                character: '三一綜合學園的學生',
-                backstory: '三一綜合學園所屬，是擔任構成三一的學生聯盟「聖父派」前任領袖的少女。原本是茶會的一員，和主席渚是青梅竹馬。然而由於政治上屬於對立立場，她秉持著公私分明的態度。雖然她總是露出開心的笑容，展現天真無邪的樣子，但心裡似乎有著無法與他人訴說的煩惱。',
-            },
-        },
-        {
-            _id: '陽奈',
-            userId: '',
-            profile: {
-                name: '陽奈',
-                description: '雖然很麻煩，不過必須做該做的事，因為那就是我的義務',
-            },
-            prompt: {
-                character: '格黑娜學園的糾察部長',
-                backstory: '平常是覺得什麼都很麻煩的懶蟲少女，但是一旦在和校規有關的問題上，就會展現出嚴格的糾察部长的樣子。經常把「好麻煩」作為口頭禪，但在戰場上從不迷茫，快速判斷並行動。因此與格黑娜敵對的組織最害怕她出場戰鬥',
-            },
-        },
+      
         {
             _id: '',
             userId: '',
-            profile: {
-                name: '自定義',
-                description: '',
-            },
-            prompt: {
-                character: '尚未定義的靈魂',
-                backstory: '未被提及的篇章，等待有人開啟',
-            },
+            name: '自定義',
+            description: '自定義',
+            live2dModelSettingPath: '',
+            poseMap: {},
+            backstory: '',
         }
     ] as Companion[];
 
