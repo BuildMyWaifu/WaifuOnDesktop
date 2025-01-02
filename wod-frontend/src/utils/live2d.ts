@@ -4,12 +4,26 @@ import {
   MotionPreloadStrategy,
 } from 'pixi-live2d-display';
 
-// window.PIXI = PIXI; // Global Pixi
+declare global {
+  interface Window {
+    PIXI: typeof PIXI;
+  }
+}
+window.PIXI = PIXI; // Global Pixi
 
-// let app;
-// let model;
-// let originalWidth;
-// let originalHeight;
+let app = undefined as PIXI.Application | undefined;
+let model = undefined as Live2DModel | undefined;
+let originalWidth = 0;
+let originalHeight = 0;
+window.addEventListener('resize', () => {
+  console.log('live2d.js: Window resized, adjusting model...');
+  if (!model) return;
+  if (!app) return;
+  const canvas = app.view as HTMLCanvasElement;
+  const container = canvas.parentElement as HTMLElement;
+  app.renderer.resize(container.clientWidth, container.clientHeight); // Resize PIXI renderer
+  fitModelToCanvas(model, canvas, originalWidth, originalHeight); // Adjust model size and position
+});
 
 export async function init(elementId: string, fromUrl: string | undefined) {
   console.log('live2d.js: Initializing Live2D model...');
@@ -26,10 +40,10 @@ export async function init(elementId: string, fromUrl: string | undefined) {
     setBackground(canvas, '../../src/assets/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
-    // if (app) {
-    //   app.destroy(); // Clean up the previous PIXI application
-    // }
-    const app = new PIXI.Application({
+    if (app) {
+      app.destroy(); // Clean up the previous PIXI application
+    }
+    app = new PIXI.Application({
       view: canvas,
       transparent: true,
       autoDensity: true,
@@ -47,15 +61,13 @@ export async function init(elementId: string, fromUrl: string | undefined) {
       modelSource = fromUrl
     }
     console.log(`live2d.js: Loading model from ${modelSource}`);
-    let model = undefined as Live2DModel | undefined;
     try {
-      // if (model) {
-      //   app.stage.removeChild(model); // Remove the previous model from the stage
-      //   model.destroy(); // Clean up the previous model
-      // }
+      if (model) {
+        app.stage.removeChild(model); // Remove the previous model from the stage
+        model.destroy(); // Clean up the previous model
+      }
       model = await Live2DModel.from(modelSource, {
         motionPreload: MotionPreloadStrategy.NONE,
-        autoUpdate: false,
       });
 
       // Add the model to the PIXI stage
@@ -73,26 +85,22 @@ export async function init(elementId: string, fromUrl: string | undefined) {
       alert("Live2d模型載入失敗")
       return
     }
-    let then = performance.now();
-    function tick(now: number) {
-      if (!model) return;
-      model.update(now - then);
-      then = now;
-      requestAnimationFrame(tick);
-    }
+    // let then = performance.now();
+    // function tick(now: number) {
+    //   if (!model) return;
+    //   model.update(now - then);
+    //   then = now;
+    //   requestAnimationFrame(tick);
+    // }
 
-    requestAnimationFrame(tick);
-    const originalWidth = model.width;
-    const originalHeight = model.height;
+    // requestAnimationFrame(tick);
+    originalWidth = model.width;
+    originalHeight = model.height;
 
     fitModelToCanvas(model, canvas, originalWidth, originalHeight); // Set initial scale and position
 
     // Handle window resize events
-    window.addEventListener('resize', () => {
-      console.log('live2d.js: Window resized, adjusting model...');
-      app.renderer.resize(container.clientWidth, container.clientHeight); // Resize PIXI renderer
-      fitModelToCanvas(model, canvas, originalWidth, originalHeight); // Adjust model size and position
-    });
+    
 
     console.log('live2d.js: Live2D model added to the stage.');
   } catch (error) {

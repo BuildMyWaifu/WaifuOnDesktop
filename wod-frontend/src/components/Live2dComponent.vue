@@ -34,7 +34,7 @@
         // alert('live2d init')
         console.log('Live2DComponent: Live2D model initialized successfully.');
       } catch (error) {
-      alert('Live2DComponent: Failed to initialize Live2D model:', error);
+        alert(`Live2DComponent: Failed to initialize Live2D model: ${error}`);
       }
   });
 
