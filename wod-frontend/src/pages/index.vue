@@ -3,10 +3,10 @@
 <template>
   <v-container class="fill-height">
     <v-responsive class="align-center fill-height mx-auto" max-width="900">
-      <div class="text-center text-h1 pb-2">
-        <LogoText></LogoText>
+      <div class="text-center text-h1 pb-1">
+        <v-img height="240" src="@/assets/logo.png" />
       </div>
-      <div class="text-center text-h4">
+      <div class="text-center text-h5">
         一個屬於你的動態伴侶陪伴神器
       </div>
       <div class="py-4" />
