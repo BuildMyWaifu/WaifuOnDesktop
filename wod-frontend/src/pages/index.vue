@@ -3,12 +3,12 @@
 <template>
   <v-container class="fill-height">
     <v-responsive class="align-center fill-height mx-auto" max-width="900">
-      <div class="text-center">
-        <div class="text-h3 font-weight-light mb-n1">Build My</div>
-
-        <h1 class="text-h2 font-weight-bold text-primary">Waifu</h1>
+      <div class="text-center text-h1 pb-2">
+        <LogoText></LogoText>
       </div>
-
+      <div class="text-center text-h4">
+        一個屬於你的動態伴侶陪伴神器
+      </div>
       <div class="py-4" />
       <div v-if="auth" class="d-flex justify-center">
         <v-btn class="ma-3" to="/app" variant="outlined">進入</v-btn>
@@ -28,7 +28,6 @@
         <v-card-text>
           <!-- <v-btn variant="text" to="/abcd">進入錯誤頁面</v-btn> -->
           <v-btn variant="text" to="/test">測試頁面</v-btn>
-          <v-btn variant="text" @click="toggleAuthStat">切換登入狀態</v-btn>
 
         </v-card-text>
       </v-card>
@@ -39,6 +38,7 @@
 <script lang="ts" setup>
   import { useAppStore } from '@/stores/app'
   import { computed } from 'vue';
+  import LogoText from '@/components/LogoText.vue';
 
   const store = useAppStore()
   const auth = computed(() => {
@@ -47,14 +47,5 @@
     }
     return false
   })
-  async function toggleAuthStat () {
-    if (store.user !== undefined) {
-      store.logout()
-    } else {
-      await store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
-      store.generateMockCompanionList()
-      store.generateMockMessages();
 
-    }
-  }
 </script>

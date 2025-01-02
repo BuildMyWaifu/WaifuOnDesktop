@@ -4,29 +4,27 @@
     <v-card class="mb-4" :loading="loading" style="max-width: 100%;" width="500">
       <v-form v-model="valid" validate-on="input" @submit.prevent="submit">
         <v-card-title class="d-flex text-center justify-center">
-          <h1 class="knockout">
-            Build My Waifu
-          </h1>
+          <LogoText></LogoText>
         </v-card-title>
-        <v-card-text>
-          <v-text-field v-model="payload.email" density="compact" label="電子郵件" :rules="rules" variant="solo-filled" />
-          <v-text-field v-model="payload.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        <v-card-text class="pb-0">
+          <v-text-field flat v-model="payload.email" density="compact" label="電子郵件" :rules="rules" variant="solo-filled" />
+          <v-text-field flat v-model="payload.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             density="compact" label="密碼" :rules="rules" :type="showPassword ? 'text' : 'password'" variant="solo-filled"
             @click:append-inner="showPassword = !showPassword" />
 
           <v-divider />
-          <v-card-actions>
-            <div class="d-flex justify-center w-100">
-              <v-btn
-              color="black"
-              :disabled="!valid"
-              :loading="loading"
-              type="submit"
-              style="background-color: #f28ac0;"
-              >登入</v-btn>
-            </div>
-          </v-card-actions>
         </v-card-text>
+        <v-card-actions>
+          <div class="d-flex justify-center w-100">
+            <v-btn
+            block
+            color="primary"
+            :disabled="!valid"
+            :loading="loading"
+            type="submit"
+            >登入</v-btn>
+          </div>
+        </v-card-actions>
       </v-form>
 
     </v-card>
@@ -50,6 +48,7 @@
   import { hash } from '@/utils/utils'
   import { SubmitEventPromise } from 'vuetify'
   import { electronStoreSet } from '@/utils/electronAPI'
+  import LogoText from '@/components/LogoText.vue'
 
   const rules = [required]
   const loading = ref(false)
@@ -104,31 +103,3 @@
     loading.value = false
   }
 </script>
-
-<style scoped>
-.knockout {
-  text-align: center;
-  font-family: Comic Sans MS, Comic Sans, cursive;
-  font-size: 3rem;
-  background: linear-gradient(110deg, #efdc0a 33%, rgba(0, 0, 0, 0) 33%), linear-gradient(110deg, #ffffff 34%, #cf7ccd 34%);
-  background-size: 400%;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: Gradient 5s ease infinite;
-  -webkit-animation: Gradient 15s ease infinite;
-  -moz-animation: Gradient 5s ease infinite;
-}
-
-@keyframes Gradient {
-	0% {
-		background-position: 32% 50%
-	}
-	50% {
-		background-position: 25.5% 50%
-	}
-	100% {
-		background-position: 32% 50%
-	}
-}
-
-</style>
