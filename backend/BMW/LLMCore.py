@@ -133,7 +133,7 @@ async def setup_trait_and_send_systemPrompt(companion: Companion):
     # ).create()
 
     # await Message.empty(
-    #     role="system",  # TODO: 這裡原本是 user ，不過應該要是 system
+    #     role="system",  
     #     companionId=companion.id,
     #     content=f"這是你的背景故事：{background_story}",
     # ).create()

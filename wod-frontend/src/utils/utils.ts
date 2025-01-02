@@ -16,7 +16,6 @@ export function hash(input: string) {
   return crypto.SHA256(input).toString()
 }
 
-// TODO: 在這裡寫一個檢查 companion 是否合法的函數，並且在更新時檢查
 
 export function isCompanionValid(companion: Companion) {
   if (companion.name.length > 20 || companion.name.length < 1) {

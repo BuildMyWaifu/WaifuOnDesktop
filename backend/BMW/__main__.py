@@ -178,7 +178,6 @@ async def registration(payload: UserSignUpPayload, response: Response):
     user.profile.name = payload.name
     user.profile.email = payload.email
     await user.create()
-    # TODO: 建立預設伴侶
 
     await user.update_token()
     await user.set_password(payload.password)
@@ -381,6 +380,11 @@ async def user_token_reset(user_id: str, user: User = Depends(get_current_user))
 
 
 """
+
+@app.delete("/me")
+async def delete_user(user: User = Depends(get_current_user)):
+    await user.update(deleted=True)
+    return Payload.success("成功刪除帳號")
 
 @app.post("/assets/live2dModel/upload")
 async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current_user)):

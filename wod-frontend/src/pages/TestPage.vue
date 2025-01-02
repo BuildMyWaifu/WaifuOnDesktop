@@ -6,7 +6,7 @@
             :to="`/liveChat/${store.companionList[0]._id}`">liveChat</v-btn>
         <v-btn variant="text" @click="openNewWindow">開啟新視窗</v-btn>
         <v-btn variant="text" @click="updateSyncAndBroadcast">toggle test facetime window</v-btn>
-        <v-btn variant="text" @click="store.generateMockCompanionList">generateMockCompanionList</v-btn>
+        <!-- <v-btn variant="text" @click="store.generateMockCompanionList">generateMockCompanionList</v-btn> -->
         <v-card-text>
             <pre><code>{{ store.sync }}</code></pre>
         </v-card-text>
@@ -23,7 +23,7 @@
     import { broadcast, createWindow } from '@/utils/electronAPI'
     import CompanionEdit from '@/components/CompanionEdit.vue'
     import { ref, onMounted } from 'vue'
-    import { Companion } from '@/utils/models';
+    import { Companion } from '@/utils/model';
 
     const store = useAppStore()
 
@@ -34,8 +34,10 @@
     onMounted(async () => {
         await store.login({ _id: 'test', profile: { avatarId: 'test avatarId', name: 'test name', email: 'test' } })
 
-        store.generateMockCompanionList()
-        companion.value = store.companionList[0]
+        // store.generateMockCompanionList()
+        if (store.companionList) { 
+            companion.value = store.companionList[0]
+        }
     })
 
     function updateSyncAndBroadcast() {

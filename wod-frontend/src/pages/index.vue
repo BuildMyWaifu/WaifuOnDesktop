@@ -38,7 +38,6 @@
 <script lang="ts" setup>
   import { useAppStore } from '@/stores/app'
   import { computed } from 'vue';
-  import LogoText from '@/components/LogoText.vue';
 
   const store = useAppStore()
   const auth = computed(() => {

@@ -102,7 +102,7 @@ export async function init(elementId: string, fromUrl: string) {
     console.log('live2d.js: Canvas element found:', canvas);
 
     // Set an initial background image dynamically
-    setBackground(canvas, '../../src/assets/backgrounds/Living_room.jpg');
+    setBackground(canvas, '/backgrounds/Living_room.jpg');
 
     // Create PIXI application with improved resolution
     if (app) {
