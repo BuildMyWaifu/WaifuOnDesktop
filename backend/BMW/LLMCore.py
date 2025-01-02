@@ -133,18 +133,18 @@ async def get_messages(companion: Companion) -> list[Message]:
     ]
 
     message_list.insert(
-        0, {"role": "system", "content": generate_system_prompt(companion)}
-    )
-    message_list.insert(
         0,
         {
             "role": "assistant",
             "content": """\{
   "text_response": "範例文字回應",
-  "pose_key": "idle",
+  "pose_key": "nervous_smile",  // 回應時記得要確保使用合法的 pose_key
   "changed_traits": \{\}
 \}""",
         },
+    )
+    message_list.insert(
+        0, {"role": "system", "content": generate_system_prompt(companion)}
     )
 
     return message_list

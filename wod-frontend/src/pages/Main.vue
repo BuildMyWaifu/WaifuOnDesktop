@@ -21,10 +21,10 @@
           <v-list-item :value="companion._id" @click="updateCurrentCompanion(companion._id)">
             <v-list-item-title>{{ companion.name }}</v-list-item-title>
             <v-list-item-subtitle class="text-caption">{{ companion.description }}</v-list-item-subtitle>
-            <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
+            <!-- <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
               {{ lastMessage(companion._id)?.role == 'assistance' ? companion.name : '您' }}：{{
               lastMessage(companion._id)?.content }}
-            </div>
+            </div> -->
           </v-list-item>
         </template>
       </v-list>
@@ -104,10 +104,10 @@
 
   // 新增訊息內容的變數
 
-  const lastMessage = (Id: string) => {
-    const messages = store.messageMap.get(Id)
-    return messages ? messages[messages.length - 1] : undefined
-  }
+  // const lastMessage = (Id: string) => {
+  //   const messages = store.messageMap.get(Id)
+  //   return messages ? messages[messages.length - 1] : undefined
+  // }
   // updateCurrentCompanion 函數來更新 currentCompanion
   const updateCurrentCompanion = (Id: string) => {
     currentCompanionId.value = Id; // 切換到新的

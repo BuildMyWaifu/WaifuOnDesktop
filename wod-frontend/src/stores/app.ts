@@ -18,21 +18,31 @@ export const useAppStore = defineStore("app", {
     expressionQueue: [] as string[],
   }),
   actions: {
-    async loadMessageList(companionId: string, options: { before: number, after: number } = { before: 0, after: 0 }) { 
-      let affix = ''
-      if (options.before !== 0 ) {
-        affix = `?before=${options.before}`
-      }
-      if (options.after !== 0 ) {
-        affix = `?after=${options.after}`
-      }
-      const messageList = handleErrorAlert(
-        await fetchApi(`/message/${companionId}${affix}`),
-      ) as Message[] | undefined;
+    removeDuplicateMessage(companionId: string) {
+      const messageList = this.messageMap.get(companionId);
       if (!messageList) {
         return;
       }
-      this.messageMap.set(companionId, messageList);
+      const newMessageList = messageList.filter(
+        (message, index, self) =>
+          self.findIndex((m) => m._id === message._id) === index,
+      );
+      this.messageMap.set(companionId, newMessageList);
+    },
+    addMessageListToFront(companionId: string, messageList: Message[]) {
+      this.messageMap.set(companionId,
+
+        messageList.concat(this.messageMap.get(companionId) || [])
+
+      );
+      this.removeDuplicateMessage(companionId);
+    },
+    addMessageListToBack(companionId: string, messageList: Message[]) {
+      this.messageMap.set(companionId,
+        (this.messageMap.get(companionId) || []).concat(messageList)
+      );
+      this.removeDuplicateMessage(companionId);
+
     },
     async loadCompanionList() {
       const companionList = handleErrorAlert(await fetchApi("/companion")) as
@@ -60,13 +70,13 @@ export const useAppStore = defineStore("app", {
     },
     getCompanion(companionId: string): Companion | undefined {
       if (!this.companionList) {
-        return undefined ;
+        return undefined;
       }
       const companion = this.companionList.find(
         (companion) => companion._id === companionId,
       );
       if (!companion) {
-        return undefined; 
+        return undefined;
       }
       return companion;
     },

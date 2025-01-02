@@ -219,8 +219,18 @@ async def list_message(
     offset: int = 0,
     user: User = Depends(get_current_user),
 ):
+    console.log(companion_id)
+    createAtFilter = {"$exists": True}
+    if before != None:
+        createAtFilter = {"$lt": before}
+    if after != None:
+        createAtFilter = {"$gt": after}
     messages = await Message.find_any(
-        companionId=companion_id, limit=limit, offset=offset
+        createdAt=createAtFilter,
+        companionId=companion_id,
+        limit=limit,
+        skip=offset,
+        sort=[("createdAt", 1)],
     )
     return Payload.success(
         "成功獲取訊息列表", [await message.get_dict(user) for message in messages]
