@@ -4,7 +4,6 @@ import time
 import uuid
 import json
 
-import BMW.model
 
 from BMW.model import Companion, Message
 
@@ -19,7 +18,7 @@ async def setup_trait(companion: Companion):
     Calls OpenAI to generate personality, communication style, and emotional response.
     """
     trait_generation_prompt = f"""
-根據以下背景故事，生成角色的個性（Personality）、溝通風格（Communication style）以及情感回應（Emotional response）：
+根據以下背景故事，生成角色的個性（Personality）、溝通風格（Communication style）以及情感回應（Emotional response），每項不可超過兩百字，並盡可能簡潔不重複：
 背景故事: "{companion.backstory or '（沒有背景故事）'}"
 
 回應格式：
@@ -32,10 +31,13 @@ async def setup_trait(companion: Companion):
         model="gpt-4",
         messages=[{"role": "system", "content": trait_generation_prompt}],
         temperature=0.7,
-        max_tokens=200,
+        max_tokens=1000,
     )
     traits = response["choices"][0]["message"]["content"]
     lines = traits.splitlines()
+    from BMW.model.Companion import CompanionTrait
+
+    companion.trait = CompanionTrait()
     for line in lines:
         if line.lower().startswith("- personality:"):
             companion.trait.personality = line.split(":", 1)[1].strip()
@@ -101,15 +103,14 @@ emotional response: {companion.trait.emotional_response}
 
 
 async def setup_trait_and_send_systemPrompt(companion: Companion):
-    background_story = companion.backstory or "（沒有背景故事）"
-
     await setup_trait(companion)
 
-    dynamic_system_prompt = generate_system_prompt(companion)
+    # dynamic_system_prompt = generate_system_prompt(companion)
 
-    await Message.empty(
-        role="system", companionId=companion.id, content=dynamic_system_prompt
-    ).create()
+    # from BMW.model.Message import Message
+    # await Message.empty(
+    #     role="system", companionId=companion.id, content=dynamic_system_prompt
+    # ).create()
 
     # await Message.empty(
     #     role="system",  # TODO: 這裡原本是 user ，不過應該要是 system
@@ -119,18 +120,18 @@ async def setup_trait_and_send_systemPrompt(companion: Companion):
 
 
 async def getMessages(companion: Companion) -> list[Message]:
-    raw_message_list = await BMW.model.Message.find_any(
+    raw_message_list = await Message.find_any(
         companionId=companion.id, sort=[("createdAt", 1)], limit=30
     )
     message_list = [
         {"role": message.role, "content": message.content}
         for message in raw_message_list
     ]
-    if not any([message.role == "system" for message in message_list]):
-        message_list.insert(
-            0, {"role": "system", "content": generate_system_prompt(companion)}
-        )
-        # message_list.insert(1, {"role": "system", "content": f"這是你的背景故事：{companion.backstory or '（沒有背景故事）'}"})
+
+    message_list.insert(
+        0, {"role": "system", "content": generate_system_prompt(companion)}
+    )
+
     return message_list
 
 
@@ -189,7 +190,7 @@ async def generateResponseMessage(companion: Companion) -> Message:
         pose=pose_data,
     )
     await messge.create()
-    
+
     return messge
 
 

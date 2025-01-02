@@ -23,9 +23,9 @@
         <button @click="showHistoryDialog = true">
           <v-icon>mdi-text-long</v-icon>
         </button>
-        <textarea v-model="message" placeholder="請輸入想要傳送的訊息..." @keydown.enter="sendMessage"
+        <textarea v-model="message" placeholder="請輸入想要傳送的訊息..." @keydown.enter.prevent="handleEnter"
           class="chat-input"></textarea>
-        <v-btn @click="sendMessage" variant="outlined" icon flat color="primary"><v-icon>mdi-send</v-icon></v-btn>
+        <v-btn @click="sendMessage" variant="text" icon flat color="primary"><v-icon>mdi-send</v-icon></v-btn>
       </div>
     </div>
 
@@ -58,6 +58,13 @@
       <v-icon>mdi-redo</v-icon>
     </button>
   </div>
+  <v-dialog :model-value="loading" persistent width="350">
+    <v-card class="text-center" title="正在初始化角色" subtitle="正在使用LLM生成更詳細的對話設定，這個過程需要十秒左右...">
+      <v-card-text>
+        <v-progress-linear indeterminate color="primary"></v-progress-linear>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -65,13 +72,18 @@
   import HistoryDialogInterface from '@/components/HistoryDialogInterface.vue';
   import SpeechBubble from '../components/SpeechBubble.vue';
 
-  import { ref, onMounted, computed} from 'vue';
+  import { ref, onMounted, computed, nextTick } from 'vue';
   import { useRouter, useRoute } from 'vue-router'
 
   import { useAppStore } from '@/stores/app';
   import { Message } from '@/utils/model';
+  import { fetchApi } from '@/utils/api';
+
+  const loading = ref(false);
 
   const route = useRoute();
+  const router = useRouter();
+
   const store = useAppStore()
 
   const message = ref('');
@@ -83,11 +95,33 @@
     return store.getCompanion(companionId.value)
   })
 
-  const sendMessage = () => {
-    if (message.value.trim() !== '') {
-      console.log('Message sent:', message.value);
-      message.value = ''; // Clear the input after sending
+  async function sendMessage() {
+    if (loading.value) return
+    alert(`Message sent ${message.value.trim()}`);
+    message.value = ''; // Clear the input after sending
+  }
+  async function handleEnter(event: KeyboardEvent) {
+    if (event) { 
+      if (event.key === 'Enter') {
+        if (!event.shiftKey) {
+          await sendMessage()
+          event.preventDefault();
+        }
+        else {
+          const textarea = event.target;
+          if (!(textarea instanceof HTMLTextAreaElement)) return;
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+        
+        // 在光標位置插入換行
+        message.value = message.value.substring(0, start) + "\n" + message.value.substring(end);
+        nextTick(() => {
+          textarea.selectionStart = textarea.selectionEnd = start + 1;
+        });
+      }
     }
+  }
+    
   };
 
   function getMessageList(): Message[] {
@@ -97,28 +131,31 @@
     else return result
   }
 
-
-
   const companionMsgList = computed<Message[]>(() => {
     return getMessageList().filter((msg) => {
       return msg.role == 'bot'
     })
   })
 
-  const companionId = ref<string>() 
+  const companionId = ref<string>()
   // const companion = computed(() => {
   //   return store.getCompanion(companionId.value)
   // })
-const router = useRouter();
-  onMounted(() => {
-    
-    companionId.value = route.params.companionId
-    if (companionId.value == undefined) {
+  onMounted(async () => {
+    if ('companionId' in route.params && route.params.companionId) {
+      companionId.value = route.params.companionId as string
+    }
+    else {
       alert("沒有指定聊天的伴侶")
-      router.push("/main")
+      router.push("/app")
+    }
+    if (!companion.value?.trait) { 
+      loading.value = true
+      await fetchApi(`/companion/${companionId.value}/setup`)
+      loading.value = false
+      // alert("伴侶資料尚未載入")
     }
   })
-
 
 </script>
 <style scoped>

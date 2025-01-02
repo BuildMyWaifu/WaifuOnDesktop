@@ -21,6 +21,7 @@ from BMW.Process import BackgroundProcess
 from BMW.Thread import DeliveryThread
 from BMW.utils import console, checkIfPathSafe, getFullPath
 from BMW.LLMCore import generateResponseMessage
+from BMW.model.Companion import CompanionTrait
 from fastapi import (
     Cookie,
     Depends,
@@ -29,7 +30,6 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
-    WebSocket,
 )
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, FileResponse
@@ -290,6 +290,7 @@ class CompanionCreatePayload(BaseModel):
     live2dModelSettingPath: str 
     poseMap: dict[str, dict[str, str]] = {}
     backstory: str
+    trait: CompanionTrait | None = None
 
 @app.post("/companion")
 async def create_companion(
@@ -315,6 +316,16 @@ async def delete_companion(
     await companion.update(deleted=True)
     return Payload.success("成功刪除伴侶")
 
+
+@app.get("/companion/{companion_id}/setup")
+async def setup_companion(companion_id: str, user: User = Depends(get_current_user)):
+    companion = await Companion.find(_id=companion_id)
+    if not companion:
+        raise HTTPException(404, "找不到這個伴侶")
+    if companion.userId != user.id:
+        raise HTTPException(403, "您沒有權限設定這個伴侶")
+    await companion.setup()
+    return Payload.success("成功設定伴侶")
 
 @app.get("/user/{user_id}")
 async def get_user_by_id(user_id: str, user: User = Depends(get_current_user)):
