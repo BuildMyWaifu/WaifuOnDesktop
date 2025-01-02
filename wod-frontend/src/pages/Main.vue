@@ -3,7 +3,7 @@
   <v-app>
     <v-navigation-drawer app location="left" permanent>
 
-      <v-list lines="two" select-strategy="single-independent" width="256">
+      <v-list lines="two" select-strategy="single-independent" width="256" class="pb-0">
 
         <v-list-item v-show="store.companionList == undefined">
           <v-card-text class="d-flex text-center">
@@ -16,25 +16,26 @@
             伴侶列表為空
           </v-card-text>
         </v-list-item>
-        <template v-for="companion in store.companionList" :key="companion._id">
-
+        <template v-for="companion, index in store.companionList" :key="companion._id">
+          <v-divider v-if="index != 0" />
           <v-list-item :value="companion._id" @click="updateCurrentCompanion(companion._id)">
             <v-list-item-title>{{ companion.name }}</v-list-item-title>
             <v-list-item-subtitle class="text-caption">{{ companion.description }}</v-list-item-subtitle>
             <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
               {{ lastMessage(companion._id)?.role == 'assistance' ? companion.name : '您' }}：{{
-                lastMessage(companion._id)?.content }}
+              lastMessage(companion._id)?.content }}
             </div>
           </v-list-item>
-          <v-divider />
         </template>
-
       </v-list>
 
-      <div class="px-4">
-        <v-btn variant="outlined" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu">
-          新增伴侶
-        </v-btn>
+      <div >
+        <v-divider class="mb-2"></v-divider>
+        <div class="px-4">
+          <v-btn variant="outlined" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu" class=" mb-2">
+            新增伴侶
+          </v-btn>
+        </div>
       </div>
 
       <template #append>
@@ -80,7 +81,7 @@
 
     <v-main app>
       <CompanionPreview style="height: 100vh; max-height: 100vh;" v-if="currentCompanionId !== null"
-      :companionId="currentCompanionId" :key="currentCompanionId"></CompanionPreview>
+        :companionId="currentCompanionId" :key="currentCompanionId"></CompanionPreview>
 
     </v-main>
 
@@ -92,12 +93,12 @@
   import CompanionPreview from '@/components/CompanionPreview.vue'
   import UserSettingListItem from '@/components/UserSettingListItem.vue';
   import { useAppStore } from '@/stores/app';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { ref, onMounted } from 'vue';
 
   const store = useAppStore();
-  const router = useRouter();
   const route = useRoute()
+  const router = useRouter()
   const currentCompanionId = ref<string | null>(null);
 
 
@@ -111,18 +112,20 @@
   const updateCurrentCompanion = (Id: string) => {
     currentCompanionId.value = Id; // 切換到新的
   }
-  const logout = () => {
-    store.logout()
-    router.push('/')
+  const logout = async () => {
+    await store.logout()
+    await router.push("/")
   }
 
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
+
   onMounted(async () => {
     await store.loadCompanionList()
+
     if (store.companionList != undefined && store.companionList.length != 0) {
       currentCompanionId.value = store.companionList[0]._id
     }
-    if ('companionId' in route.params) {
+    if ('companionId' in route.params && route.params.companionId) {
       currentCompanionId.value = route.params.companionId as string
     }
 

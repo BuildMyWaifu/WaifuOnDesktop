@@ -42,15 +42,15 @@ export const useAppStore = defineStore("app", {
     reset() {
       this.$reset();
     },
-    getCompanion(companionId: string): Companion {
+    getCompanion(companionId: string): Companion | undefined {
       if (!this.companionList) {
-        throw new Error("Companion list not loaded");
+        return undefined ;
       }
       const companion = this.companionList.find(
         (companion) => companion._id === companionId,
       );
       if (!companion) {
-        throw new Error(`Companion ${companionId} not found`);
+        return undefined; 
       }
       return companion;
     },

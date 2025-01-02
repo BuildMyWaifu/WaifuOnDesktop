@@ -13,6 +13,8 @@ declare module 'vue' {
     CompanionPreview: typeof import('./components/CompanionPreview.vue')['default']
     HistoryDialogInterface: typeof import('./components/HistoryDialogInterface.vue')['default']
     Live2dComponent: typeof import('./components/Live2dComponent.vue')['default']
+    Logo: typeof import('./components/Logo.vue')['default']
+    LogoText: typeof import('./components/LogoText.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SpeechBubble: typeof import('./components/SpeechBubble.vue')['default']
