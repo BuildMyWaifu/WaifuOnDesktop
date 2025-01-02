@@ -21,6 +21,7 @@ export default createVuetify({
         colors: {
           primary: colors.pink.accent1, // #E53935
           secondary: colors.pink.accent2, // #FFCDD2
+          error: "#FF5252", // #FF5252
         },
       },
     },

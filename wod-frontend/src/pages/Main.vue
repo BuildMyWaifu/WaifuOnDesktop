@@ -94,7 +94,7 @@
   import UserSettingListItem from '@/components/UserSettingListItem.vue';
   import { useAppStore } from '@/stores/app';
   import { useRoute, useRouter } from 'vue-router';
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, watch } from 'vue';
 
   const store = useAppStore();
   const route = useRoute()
@@ -118,6 +118,16 @@
   }
 
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
+  watch(() => store.companionList, () => {
+    if (store.companionList != undefined && store.companionList.length != 0 && currentCompanionId.value) {
+      for (let i = 0; i < store.companionList.length; i++) {
+        if (store.companionList[i]._id == currentCompanionId.value) {
+          return
+        }
+      }
+      currentCompanionId.value = store.companionList[0]._id
+    }
+  })
 
   onMounted(async () => {
     await store.loadCompanionList()

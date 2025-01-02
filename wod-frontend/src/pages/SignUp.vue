@@ -17,7 +17,7 @@
           <v-divider />
         </v-card-text>
         <v-card-actions>
-          <div class="d-flex justify-center w-100">
+          <div class="d-flex justify-center w-100 px-2">
             <v-btn
               block
               color="primary"
