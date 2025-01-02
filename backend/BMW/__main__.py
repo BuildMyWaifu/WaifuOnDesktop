@@ -17,10 +17,10 @@ BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
 # from BMW.config import config
 from BMW.Manager import connection_manager, websocket_manager
 from BMW.model import ChatRoom, Document, File, Message, Payload, User, Companion
-from BMW.model.Message import MessageCreatePayload
 from BMW.Process import BackgroundProcess
 from BMW.Thread import DeliveryThread
 from BMW.utils import console
+from BMW.LLMCore import generateResponseMessage
 from fastapi import (
     Cookie,
     Depends,
@@ -185,13 +185,27 @@ async def registration(payload: UserSignUpPayload, response: Response):
     return Payload.success("註冊成功", user.token)
 
 
+class MessageCreatePayload(BaseModel):
+    companionId: str
+    content: str
+
+
 @app.post("/message")
 async def create_message(
     payload: MessageCreatePayload,
     user: User = Depends(get_current_user),
 ):
+    companion = await Companion.find(_id=payload.companionId)
+    if not companion:
+        raise HTTPException(404, "找不到這個伴侶")
+    if companion.userId != user.id:
+        raise HTTPException(403, "您沒有權限發送訊息")
+    
+    
     message = Message.empty(**payload.model_dump())
     await message.create()
+    user_input = message.content
+    await generateResponseMessage(companion, user_input)
     return Payload.success("成功發送訊息", await message.get_dict(user))
 
 
@@ -331,7 +345,6 @@ async def user_token_reset(user_id: str, user: User = Depends(get_current_user))
 
 """
 
-
 @app.post("/assets/live2dModel/upload")
 async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current_user)):
     # 定義解壓縮目標目錄
@@ -396,34 +409,6 @@ async def read_assets(file_path: str):
     return FileResponse(full_path)
 
 
-# @app.get("/file/{file_id}")
-# async def get_file_info_by_id(file_id: str, user: User = Depends(get_current_user)):
-#     if user.level < 0:
-#         raise HTTPException(403, "您沒有權限取得檔案資訊")
-#     file = await File.find(_id=file_id)
-#     return Payload.success("成功獲得檔案資訊", file.safe_dict())
-
-
-# @app.get("/file/{file_id}/download")
-# async def download_file_by_id(file_id: str, user: User = Depends(get_current_user)):
-#     if user.level < 0:
-#         raise HTTPException(403, "您沒有權限下載檔案")
-
-#     file = await File.find(_id=file_id)
-#     file_stream = io.BytesIO(file.data)
-
-#     response = StreamingResponse(file_stream)
-
-#     try:
-#         response.headers["Content-Disposition"] = (
-#             f"attachment; filename={file.filename}"
-#         )
-#     except UnicodeEncodeError:
-#         response.headers["Content-Disposition"] = (
-#             f"attachment; filename={file_id}.{file.filename.split('.')[-1]}"
-#         )
-
-#     return response
 
 
 @app.get("/version")

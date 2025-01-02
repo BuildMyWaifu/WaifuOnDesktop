@@ -1,28 +1,37 @@
 from pydantic import BaseModel
 
+from BMW.LLMCore import setup_trait_and_send_systemPrompt
+
 from .Editable import Editable
 from .User import User
 
 
-class CompanionProfile(BaseModel):
-    name: str | None = None
-    description: str | None = None
+class Pose(BaseModel):
+    motion: str
+    expression: str
 
 
-class CompanionPrompt(BaseModel):
-    character: str | None = None
-    backstory: str | None = None
+class CompanionTrait(BaseModel):
+    role: str = "companion"
+    personality: str = ""
+    communication_style: str = ""
+    emotional_response: str = ""
 
 
 class Companion(Editable):
     collection_name: str = "Companion"
 
-    live2dModelSettingPath: str | None = None
-    motionMap: dict[str, str] = {}
-    
-    profile: CompanionProfile = CompanionProfile()
-    prompt: CompanionPrompt = CompanionPrompt()
     userId: str
+
+    name: str | None = None
+    description: str | None = None
+
+    live2dModelSettingPath: str | None = None
+    poseMap: dict[str, Pose] = {}
+
+    backstory: str | None = None
+
+    trait: CompanionTrait | None = None
 
     @classmethod
     async def check_create_permission(cls, user: User) -> bool:
@@ -34,6 +43,9 @@ class Companion(Editable):
 
     async def check_permission(self, user: User) -> bool:
         return user.id == self.authorId
+
+    async def setup_chat_env(self):
+        await setup_trait_and_send_systemPrompt(self)
 
     @classmethod
     def empty(cls, *args, **kwargs):
