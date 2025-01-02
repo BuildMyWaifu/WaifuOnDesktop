@@ -42,21 +42,35 @@
                 @change="handleLive2dModelUpload" hide-details class="flex-grow-1" />
               <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好Live2D模型了，可以上傳新模型替代</div>
               <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定Live2D模型</div>
-              <div class="d-flex align-center">
+              <div class="d-flex align-center mt-2">
                 <v-file-input type="file" accept=".json" label="動作設定（.json）" density="compact" hide-details
-                  @change="handleUpdateMotionMap" class="flex-grow-1 mt-2"></v-file-input>
-                <v-btn @click="downloadPoseMap" v-if="companion.poseMap && isNotEmpty(companion.poseMap)" flat
-                  class="mt-2">下載動作設定</v-btn>
+                  @change="handleUpdateMotionMap" class="flex-grow-1 "></v-file-input>
+                <v-btn @click="downloadPoseMap" v-if="companion.poseMap && isNotEmpty(companion.poseMap)"
+                  flat>下載動作設定</v-btn>
+                <v-menu :close-on-content-click="false">
+                  <template v-slot:activator="{props}">
+                    <v-btn flat v-bind="props">預覽動作</v-btn>
+                  </template>
+                  <v-card>
+                    <v-list>
+                      <v-list-item v-for="pose, poseKey  in companion.poseMap" :key="poseKey"
+                        @click="store.doPose(pose)">
+                        <v-list-item-title>{{poseKey}}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-menu>
               </div>
               <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好動作設定了</div>
               <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定動作設定</div>
+
             </div>
           </v-card-text>
         </div>
       </div>
       <div class="flex-grow-1 pt-4 pr-4">
         <v-card-title>角色設定</v-card-title>
-        <v-form ref="form" v-model="isValid" class="ml-4 flex-gorw-1 " >
+        <v-form ref="form" v-model="isValid" class="ml-4 flex-gorw-1 ">
           <v-textarea v-model="companion.name" label="姓名" :rules="[rules.name]" rows="1" variant="filled"
             auto-grow></v-textarea>
           <v-textarea v-model="companion.description" label="描述" :rules="[rules.description]" rows="1" variant="filled"
@@ -76,8 +90,9 @@
   import { copy, isNotEmpty } from "@/utils/utils";
   import { rawPostApi } from "@/utils/api";
   import { saveAs } from 'file-saver';
+import { useAppStore } from "@/stores/app";
   // import JSZip from "jszip";
-
+  const store= useAppStore()
   const isValid = ref(false);
   const showModel = ref(true);
   // const imageUrls = ref<string[]>([]); // 用於存儲圖片的 URL

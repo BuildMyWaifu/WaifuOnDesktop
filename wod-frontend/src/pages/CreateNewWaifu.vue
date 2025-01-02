@@ -73,39 +73,39 @@
             live2dModelSettingPath: "/api/assets/live2dModel/public/hiyori_pro_use/runtime/hiyori_pro_t11.model3.json",
             poseMap: {
                 "angry": {
-                    "motion": "motions/angry.motion3.json",
+                    "motion": "motion/angry.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "attract": {
-                    "motion": "motions/attract.motion3.json",
+                    "motion": "motion/attract.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "curious": {
-                    "motion": "motions/curious.motion3.json",
+                    "motion": "motion/curious.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "excited": {
-                    "motion": "motions/excited.motion3.json",
+                    "motion": "motion/excited.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "relax": {
-                    "motion": "motions/relax.motion3.json",
+                    "motion": "motion/relax.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "sad": {
-                    "motion": "motions/sad.motion3.json",
+                    "motion": "motion/sad.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "shock": {
-                    "motion": "motions/shock.motion3.json",
+                    "motion": "motion/shock.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "shy": {
-                    "motion": "motions/shy.motion3.json",
+                    "motion": "motion/shy.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 },
                 "smile": {
-                    "motion": "motions/smile.motion3.json",
+                    "motion": "motion/smile.motion3.json",
                     "expression": "expressions/idle.exp3.json"
                 }
             }
@@ -122,43 +122,43 @@
             poseMap: {
                 "angry": {
                     "motion": "motions/react_big.motion3.json",
-                    "expression": "expressions/angry.exp3.json"
+                    "expression": "exp/angry.exp3.json"
                 },
                 "attract": {
                     "motion": "motions/push_glasses.motion3.json",
-                    "expression": "expressions/attract.exp3.json"
+                    "expression": "exp/attract.exp3.json"
                 },
                 "blush": {
                     "motion": "motions/react_small.motion3.json",
-                    "expression": "expressions/blush.exp3.json"
+                    "expression": "exp/blush.exp3.json"
                 },
                 "confident": {
                     "motion": "motions/bow.motion3.json",
-                    "expression": "expressions/confident.exp3.json"
+                    "expression": "exp/confident.exp3.json"
                 },
                 "confuse": {
                     "motion": "motions/curious.motion3.json",
-                    "expression": "expressions/confuse.exp3.json"
+                    "expression": "exp/confuse.exp3.json"
                 },
                 "idle": {
                     "motion": "motions/idle.motion3.json",
-                    "expression": "expressions/idle.exp3.json"
+                    "expression": "exp/idle.exp3.json"
                 },
                 "mischievous": {
                     "motion": "motions/react_small.motion3.json",
-                    "expression": "expressions/mischievous.exp3.json"
+                    "expression": "exp/mischievous.exp3.json"
                 },
                 "sad": {
                     "motion": "motions/look_away.motion3.json",
-                    "expression": "expressions/sad.exp3.json"
+                    "expression": "exp/sad.exp3.json"
                 },
                 "shock": {
                     "motion": "motions/react_big.motion3.json",
-                    "expression": "expressions/shock.exp3.json"
+                    "expression": "exp/shock.exp3.json"
                 },
                 "smile": {
                     "motion": "motions/react_small.motion3.json",
-                    "expression": "expressions/smile.exp3.json"
+                    "expression": "exp/smile.exp3.json"
                 }
             }
 ,

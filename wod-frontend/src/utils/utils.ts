@@ -1,4 +1,5 @@
 import crypto from 'crypto-js'
+import { Companion } from '../utils/model'
 export function copy(data: object) {
   return JSON.parse(JSON.stringify(data))
 }
@@ -13,4 +14,24 @@ export function isNotEmpty(data: object) {
 
 export function hash(input: string) {
   return crypto.SHA256(input).toString()
+}
+
+// TODO: 在這裡寫一個檢查 companion 是否合法的函數，並且在更新時檢查
+
+export function isCompanionValid(companion: Companion) {
+  if (companion.name.length > 20) {
+    return false
+  } else if (companion.description.length > 100) {
+    return false
+  } else if (companion.backstory.length > 500) {
+    return false
+  } else if (!isNotEmpty(companion.poseMap)) {
+    return false
+  } else if (companion.live2dModelSettingPath == '')   {
+    return false
+  }
+  else {
+    return true
+  }
+  
 }

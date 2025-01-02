@@ -23,7 +23,8 @@
 
   const props = defineProps({
     fromUrl: {
-      type: String
+      type: String,
+      required: true
     }
   })
 
