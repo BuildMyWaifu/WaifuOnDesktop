@@ -1,6 +1,6 @@
 // Utilities
 import { defineStore } from "pinia";
-import { Companion, Message, Sync, User } from "@/utils/model";
+import { Companion, Message, Sync, User, Pose } from "@/utils/model";
 import { fetchApi, handleErrorAlert } from "@/utils/api";
 import { electronStoreSet } from "@/utils/electronAPI";
 
@@ -14,6 +14,8 @@ export const useAppStore = defineStore("app", {
     companionList: undefined as Companion[] | undefined,
     messageMap: new Map() as Map<string, Message[]>,
     sync: defaultSync as Sync,
+    motionQueue: [] as string[],
+    expressionQueue: [] as string[],
   }),
   actions: {
     async login(user: User) {
@@ -49,70 +51,28 @@ export const useAppStore = defineStore("app", {
       }
       return companion;
     },
-    generateMockCompanionList() {
-      if (!this.user) {
-        return;
-      }
-      this.companionList = [
-        {
-          _id: "咪醬",
-          userId: this.user._id,
-          profile: {
-            name: "咪醬",
-            description: "可愛又元氣滿滿的貓娘女僕，喜歡撒嬌和主人喵～！",
-          },
-          prompt: {
-            character: "元氣可愛的貓娘女僕",
-            backstory:
-              "咪醬天生就是一隻充滿愛與熱情的貓娘，最喜歡主人，讓主人的每一天都充滿幸福和快樂喵！",
-          },
-        },
-        {
-          _id: "test 2",
-          userId: this.user._id,
-          profile: {
-            name: "test name 1",
-            description: "asdf",
-          },
-          prompt: {
-            character: "asf",
-            backstory: "asdf",
-          },
-        },
-        {
-          _id: "test 3",
-          userId: this.user._id,
-          profile: {
-            name: "test name 1",
-            description: "asdf",
-          },
-          prompt: {
-            character: "asf",
-            backstory: "asdf",
-          },
-        },
-      ];
-    },
-    generateMockMessages() {
-      if (!this.companionList) {
-        throw new Error("Companion list not loaded");
-      }
-      for (const companion of this.companionList) {
-        const messages: Message[] = [];
-        for (let i = 0; i < 10; i++) {
-          messages.push({
-            _id: `test message ${i}`,
-            role: i % 2 === 1 ? "bot" : "user",
-            companionId: companion._id,
-            content: `test message content ${i}`,
-            createdAt: new Date().getTime(),
-          });
-        }
-        this.messageMap.set(companion._id, messages);
-      }
-    },
     setSync(content: Sync) {
       this.sync = content;
     },
+    pushMotion(motion: string) {
+      this.motionQueue.push(motion);
+    },
+    pushExpression(expression: string) {
+      this.expressionQueue.push(expression);
+    },
+    popMotion(): string | undefined {
+      return this.motionQueue.shift();
+    },
+    popExpression(): string | undefined {
+      return this.expressionQueue.shift();
+    },
+    doPose(pose: Pose) {
+      if (pose.motion) {
+        this.pushMotion(pose.motion)
+      }
+      if (pose.expression) {
+        this.pushExpression(pose.expression)
+      }
+    }
   },
 });

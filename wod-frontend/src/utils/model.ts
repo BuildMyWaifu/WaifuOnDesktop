@@ -12,7 +12,7 @@ export interface Sync {
     companion: { [key: string]: SyncCompanionStat | undefined } // companion[companionId]: SyncCompanionStat
 }
 
-interface Pose { 
+export interface Pose { 
     motion: string,
     expression: string
 }

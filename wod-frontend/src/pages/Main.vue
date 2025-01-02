@@ -4,9 +4,6 @@
     <v-navigation-drawer app location="left" permanent>
 
       <v-list lines="two" select-strategy="single-independent" width="256">
-        <template #prepend>
-          <v-avatar /> <!-- avatar for Companion -->
-        </template>
 
         <v-list-item v-show="store.companionList == undefined">
           <v-card-text class="d-flex text-center">
@@ -22,10 +19,10 @@
         <template v-for="companion in store.companionList" :key="companion._id">
 
           <v-list-item :value="companion._id" @click="updateCurrentCompanion(companion._id)">
-            <v-list-item-title>{{ companion.profile.name }}</v-list-item-title>
-            <v-list-item-subtitle class="text-caption">{{ companion.profile.description }}</v-list-item-subtitle>
+            <v-list-item-title>{{ companion.name }}</v-list-item-title>
+            <v-list-item-subtitle class="text-caption">{{ companion.description }}</v-list-item-subtitle>
             <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
-              {{ lastMessage(companion._id)?.role == 'bot' ? companion.profile.name : '您' }}：{{
+              {{ lastMessage(companion._id)?.role == 'assistance' ? companion.name : '您' }}：{{
               lastMessage(companion._id)?.content }}
             </div>
           </v-list-item>
