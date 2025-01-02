@@ -19,7 +19,7 @@ from BMW.Manager import connection_manager, websocket_manager
 from BMW.model import ChatRoom, Document, File, Message, Payload, User, Companion
 from BMW.Process import BackgroundProcess
 from BMW.Thread import DeliveryThread
-from BMW.utils import console
+from BMW.utils import console, checkIfPathSafe, getFullPath
 from BMW.LLMCore import generateResponseMessage
 from fastapi import (
     Cookie,
@@ -200,12 +200,13 @@ async def create_message(
         raise HTTPException(404, "找不到這個伴侶")
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限發送訊息")
-    
-    
-    message = Message.empty(**payload.model_dump())
-    await message.create()
-    user_input = message.content
-    await generateResponseMessage(companion, user_input)
+
+    await Message.empty(
+        role='user',
+        companionId=payload.companionId,
+        content=payload.content,
+        ).create()
+    message = await generateResponseMessage(companion)
     return Payload.success("成功發送訊息", await message.get_dict(user))
 
 
@@ -251,8 +252,10 @@ async def get_companion(
 
 class CompanionEditPayload(BaseModel):
     name: str | None = None
-    avatar: str | None = None
     description: str | None = None
+    live2dModelSettingPath: str | None = None
+    poseMap: dict[str, dict[str, str]] | None = None
+    backstory: str | None = None
 
 
 @app.patch("/companion/{companion_id}")
@@ -266,25 +269,33 @@ async def patch_companion(
         raise HTTPException(404, "找不到這個伴侶")
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限編輯這個伴侶")
-    await companion.update(**payload.model_dump(exclude_unset=True))
+    
+    if payload.live2dModelSettingPath and not checkIfPathSafe(payload.live2dModelSettingPath):
+        raise HTTPException(500, "不合法的Live2dModel路徑")
+    update_payload = payload.model_dump(exclude_unset=True)
+    if payload.backstory:
+        update_payload['trait'] = None
+    await companion.update(**update_payload)
     return Payload.success("成功編輯伴侶", await companion.get_dict(user))
 
 
 class CompanionCreatePayload(BaseModel):
     name: str
-
-    description: str | None = None
-
+    description: str 
+    live2dModelSettingPath: str 
+    poseMap: dict[str, dict[str, str]] = {}
+    backstory: str
 
 @app.post("/companion")
 async def create_companion(
     payload: CompanionCreatePayload,
     user: User = Depends(get_current_user),
 ):
+    if not checkIfPathSafe(payload.live2dModelSettingPath):
+        raise HTTPException(500, "不合法的Live2dModel路徑")
     companion = Companion.empty(**payload.model_dump(), userId=user.id)
     await companion.create()
     return Payload.success("成功創建伴侶", await companion.get_dict(user))
-
 
 @app.delete("/companion/{companion_id}")
 async def delete_companion(
@@ -392,15 +403,11 @@ async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current
 @app.get("/assets/{file_path:path}")
 async def read_assets(file_path: str):
     # 定義根目錄
-    console.log(file_path)
-    base_directory = Path("./assets")
 
-    # 確保路徑安全
-    full_path = (base_directory / file_path).resolve()
-    console.log(full_path)
-    if not str(full_path).startswith(str(base_directory.resolve())):
-        raise HTTPException(status_code=403, detail="禁止訪問的路徑")
-
+    if not checkIfPathSafe(file_path):
+        raise HTTPException(403, "不合法的路徑")
+    
+    full_path = getFullPath(file_path)
     # 檢查文件是否存在
     if not full_path.exists() or not full_path.is_file():
         raise HTTPException(status_code=404, detail="文件不存在")
@@ -409,154 +416,10 @@ async def read_assets(file_path: str):
     return FileResponse(full_path)
 
 
-
-
 @app.get("/version")
 async def get_version():
     repo = git.Repo(search_parent_directories=True)
     return Payload.success("成功獲得後端版本", repo.git.describe())
-
-
-@app.websocket("/api/ws")
-async def websocket_endpoint(
-    websocket: WebSocket, user: User = Depends(get_current_user)
-):
-    # read message from connection_manager, and send to websocket
-    # read from websocket, send to connecion_manager
-
-    await websocket.accept()
-    await websocket.send_json(
-        {"type": "snackbar", "data": Payload.success("連線成功").model_dump()}
-    )
-
-    websocket_manager.regist(userId=user.id, websocket=websocket)
-    try:
-        while True:
-            await websocket.receive_json()
-            # should not recv anything from client
-
-    except WebSocketDisconnect:
-        websocket_manager.unregist(userId=user.id)
-
-
-# class SearchPayload(BaseModel):
-#     filter: dict = {}
-#     sort: dict = {}
-
-
-# @app.post("/{collection_name}/search")
-# async def search_document(
-#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-#     payload: SearchPayload,
-#     user: User = Depends(get_current_user),
-#     offset: int = 0,
-#     limit: int = 50,
-# ):
-#     Object = lower_collection_name2object[collection_name]
-#     if not await Object.check_search_permission(user):
-#         raise HTTPException(403, "無搜索此類別的權限")
-#     filter_payload, sort_payload = await Object.validate_search(
-#         user=user, sort=payload.sort, filter=payload.filter
-#     )
-#     console.log(filter_payload)
-#     console.log(sort_payload)
-
-#     return Payload.success(
-#         "成功加載資料",
-#         [
-#             await document.get_dict(user)
-#             for document in await Object.find_any(
-#                 skip=offset,
-#                 limit=limit,
-#                 sort=list(sort_payload.items()),
-#                 **filter_payload,
-#             )
-#         ],
-#     )
-
-
-# @app.get("/{collection_name}/{document_id}")
-# async def get_document(
-#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-#     document_id: str,
-#     user: User = Depends(get_current_user),
-# ):
-#     Object = lower_collection_name2object[collection_name]
-#     document = await Object.find(_id=document_id)
-#     if not document:
-#         raise HTTPException(404, "找不到此文件")
-
-#     output_dict = await document.get_dict(user)
-#     if output_dict:
-#         return Payload.success("成功存取資料", output_dict)
-#     else:
-#         raise HTTPException(403, "無存取此文件的權限")
-
-
-# @app.post("/{collection_name}")
-# async def create_document(
-#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-#     dict_payload: dict,
-#     user: User = Depends(get_current_user),
-# ):
-#     console.log(dict_payload)
-#     Object = lower_collection_name2object[collection_name]
-#     if not issubclass(Object, Editable):
-#         raise HTTPException(500, "該類型不支援創建")
-#     if not await Object.check_create_permission(user):
-#         raise HTTPException(403, "無建立此類型文件的權限")
-
-#     create_payload = await Object.validate_create(user=user, create=dict_payload)
-
-#     document = Object.empty(**create_payload)
-#     await document.create()
-#     return Payload.success("成功創建文件", await document.get_dict(user))
-
-
-# # @app.patch("/{collection_name}/{document_id}")
-# # async def update_document(
-# #     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-# #     document_id: str,
-# #     dict_payload: dict,
-# #     user: User = Depends(get_current_user),
-# # ):
-# #     Object = lower_collection_name2object[collection_name]
-# #     document = await Object.find(_id=document_id)
-
-# #     if not document:
-# #         raise HTTPException(404, "找不到此文件")
-
-# #     if not isinstance(document, Editable):
-# #         raise HTTPException(500, "該類型不支援編輯")
-
-# #     if not await document.check_permission(user):
-# #         raise HTTPException(403, "無存取此文件的權限")
-
-# #     update_payload = await document.validate_update(user=user, update=dict_payload)
-
-# #     await document.update(**update_payload, )
-# #     return Payload.success("成功更新文件", await document.get_dict(user))
-
-
-# @app.delete("/{collection_name}/{document_id}")
-# async def delete_document(
-#     collection_name: POSSIBLE_COLLECTION_NAME_LOWERCASE,
-#     document_id: str,
-#     user: User = Depends(get_current_user),
-# ):
-#     Object = lower_collection_name2object[collection_name]
-#     document = await Object.find(_id=document_id)
-
-#     if not document:
-#         raise HTTPException(404, "找不到此文件")
-
-#     if not isinstance(document, Editable):
-#         raise HTTPException(500, "該類型不支援刪除")
-
-#     await document.validate_delete(user)
-
-#     await document.update(deleted=True)
-#     return Payload.success("成功刪除文件")
 
 
 @app.api_route("/{full_path:path}")

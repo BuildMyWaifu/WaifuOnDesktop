@@ -12,17 +12,30 @@ export interface Sync {
     companion: { [key: string]: SyncCompanionStat | undefined } // companion[companionId]: SyncCompanionStat
 }
 
+interface Pose { 
+    motion: string,
+    expression: string
+}
+
 export interface Companion extends Document {
-    profile: {
-        name: string
-        description: string // 給使用者看的敘述
-    }
-    // avatarId: string // 現階段先不做這部分
-    prompt: {
-        character: string,
-        backstory: string
-    }
+    
     userId: string // 擁有者的ID
+
+    name: string
+    description: string // 給使用者看的敘述
+
+    live2dModelSettingPath: string
+    poseMap: {
+        [key: string]: Pose } // poseMap[poseName]: pose
+    
+    backstory: string // 角色背景故事
+    trait?: {
+        role: string,
+        personality: string,
+        communication_style: string,
+        emotional_response: string,
+    }
+
 }
 
 export interface User extends Document {
@@ -37,4 +50,5 @@ export interface Message extends Document {
     companionId: string,
     content: string,
     createdAt: number, // unix timestamp ms
+    pose?: Pose
 }

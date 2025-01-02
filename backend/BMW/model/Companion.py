@@ -44,9 +44,13 @@ class Companion(Editable):
     async def check_permission(self, user: User) -> bool:
         return user.id == self.authorId
 
-    async def setup_chat_env(self):
-        await setup_trait_and_send_systemPrompt(self)
-
     @classmethod
     def empty(cls, *args, **kwargs):
         return cls(*args, **kwargs)
+
+    async def setup(self):
+        await setup_trait_and_send_systemPrompt(self)
+
+    async def create(self):
+        await super().create()
+        return self

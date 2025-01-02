@@ -1,4 +1,5 @@
 from time import time
+from pathlib import Path
 
 from rich.console import Console
 from datetime import datetime
@@ -56,3 +57,18 @@ def get_human_duration_simple(duration: int) -> str:
         return second_string
 
     return ""
+
+
+base_directory = Path("./assets")
+
+
+def getFullPath(file_path: str):
+    return (base_directory / file_path).resolve()
+
+
+def checkIfPathSafe(file_path: str):
+    # 確保路徑安全
+    full_path = getFullPath(file_path)
+    if not str(full_path).startswith(str(base_directory.resolve())):
+        return False
+    return True
