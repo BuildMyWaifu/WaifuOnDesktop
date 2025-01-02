@@ -46,6 +46,12 @@ const routes = [
     component: () => import("@/pages/CreateNewWaifu.vue"),
   },
   {
+    path: "/companionEdit/:companionId",
+    name: "CompanionEdit",
+    meta: { requiresAuth: true },
+    component: () => import("@/pages/EditCurrentCompanion.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "Error",
     meta: { requiresAuth: false },

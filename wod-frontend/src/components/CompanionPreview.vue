@@ -25,25 +25,7 @@
         <v-spacer></v-spacer>
         <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" prepend-icon="mdi-chat" class="ml-4"
           color="primary">開始聊天</v-btn>
-        <v-dialog max-width="500">
-          <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" variant="text" class="mx-4" prepend-icon="mdi-pencil">編輯</v-btn>
-          </template>
-
-          <template v-slot:default="{ isActive }">
-            <v-card title="編輯角色">
-              <v-card-text>
-                這是一個dialog
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <v-btn text="關閉" @click="isActive.value = false"></v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
-        </v-dialog>
+        <v-btn v-if="!readonly" :to="`/companionEdit/${companionId}`" variant="text" class="mx-4" prepend-icon="mdi-pencil">編輯</v-btn>
       </v-card-actions>
     </div>
   </div>
@@ -51,7 +33,6 @@
 <script lang="ts" setup>
   import { useAppStore } from '@/stores/app';
   import Live2dComponent from './Live2dComponent.vue';
-
   import { computed, PropType, ref } from 'vue';
   import { Companion } from '@/utils/model';
 

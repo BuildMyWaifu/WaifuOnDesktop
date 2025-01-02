@@ -1,5 +1,5 @@
 export function required (v: string) {
-  return !!v || '此欄位不得留空'
+  return !!v || '該欄位必須填寫'
 }
 
 export function name (v: string) {

@@ -43,7 +43,7 @@
               <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好Live2D模型了，可以上傳新模型替代</div>
               <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定Live2D模型</div>
               <div class="d-flex align-center mt-2">
-                <v-file-input type="file" accept=".json" label="動作設定（.json）" density="compact" hide-details
+                <v-file-input type="file" accept=".json" label="動作設定（.json）" density="compact" hide-details style="min-width: 230px;"
                   @change="handleUpdateMotionMap" class="flex-grow-1 "></v-file-input>
                 <v-btn @click="downloadPoseMap" v-if="companion.poseMap && isNotEmpty(companion.poseMap)"
                   flat>下載動作設定</v-btn>
@@ -71,11 +71,11 @@
       <div class="flex-grow-1 pt-4 pr-4">
         <v-card-title>角色設定</v-card-title>
         <v-form ref="form" v-model="isValid" class="ml-4 flex-gorw-1 ">
-          <v-textarea v-model="companion.name" label="姓名" :rules="[rules.name]" rows="1" variant="filled"
+          <v-textarea counter v-model="companion.name" label="姓名" :rules="rules.name" rows="1" variant="filled"
             auto-grow></v-textarea>
-          <v-textarea v-model="companion.description" label="描述" :rules="[rules.description]" rows="1" variant="filled"
+          <v-textarea counter v-model="companion.description" label="描述" :rules="rules.description" rows="1" variant="filled"
             auto-grow></v-textarea>
-          <v-textarea v-model="companion.backstory" label="背景故事" :rules="[rules.backStory]" rows="1" variant="filled"
+          <v-textarea counter v-model="companion.backstory" label="背景故事" :rules="rules.backStory" rows="1" variant="filled"
             auto-grow></v-textarea>
         </v-form>
       </div>
@@ -91,6 +91,7 @@
   import { rawPostApi } from "@/utils/api";
   import { saveAs } from 'file-saver';
   import { useAppStore } from "@/stores/app";
+import { required } from "@/utils/form";
   // import JSZip from "jszip";
   const store = useAppStore()
   const isValid = ref(false);
@@ -136,11 +137,11 @@
     emits("valid-change", val);
   });
 
+  
   const rules = {
-    name: (value: string) => (value === "" ? "該欄位必須填寫" : true),
-    description: (value: string) => (value === "" ? "該欄位必須填寫" : true),
-    character: (value: string) => (value === "" ? "該欄位必須填寫" : true),
-    backStory: (value: string) => (value === "" ? "該欄位必須填寫" : true),
+    name: [required, (v: string) => v.length <= 20 || "名字長度不能超過 20 個字"],
+    description: [required, (v: string) => v.length <= 100 || "描述長度不能超過 100 個字"],
+    backStory: [required, (v: string) => v.length <= 500 || "角色長度不能超過 500 個字"],
   };
   // 上傳並處理壓縮檔
   async function handleUpdateMotionMap(event: Event) {

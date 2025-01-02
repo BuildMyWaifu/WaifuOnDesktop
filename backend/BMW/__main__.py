@@ -272,7 +272,12 @@ async def patch_companion(
     
     if payload.live2dModelSettingPath and not checkIfPathSafe(payload.live2dModelSettingPath):
         raise HTTPException(500, "不合法的Live2dModel路徑")
-    update_payload = payload.model_dump(exclude_unset=True)
+    raw_update_payload = payload.model_dump(exclude_unset=True)
+    update_payload = {}
+    for key, value in raw_update_payload.items():
+        if value is not None and value != getattr(companion, key):
+            update_payload[key] = value
+    
     if payload.backstory:
         update_payload['trait'] = None
     await companion.update(**update_payload)
