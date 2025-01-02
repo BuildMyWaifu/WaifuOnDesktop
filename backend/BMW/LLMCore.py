@@ -146,7 +146,7 @@ async def get_messages(companion: Companion) -> list[Message]:
         companionId=companion.id, sort=[("createdAt", 1)], limit=30
     )
     message_list = [
-        {"role": message.role, "content": """\{"text": \"""" + message.content + """\"\}"""}
+        {"role": message.role, "content": """{"text": \"""" + message.content + """\"}"""}
         for message in raw_message_list
     ]
 
@@ -154,11 +154,11 @@ async def get_messages(companion: Companion) -> list[Message]:
         0,
         {
             "role": "assistant",
-            "content": """\{
+            "content": """{
   "text": "範例文字回應",
   "pose_key": "nervous_smile",  // 回應時記得要確保使用合法的 pose_key
-  "changed_traits": \{\}
-\}""",
+  "changed_traits": { }
+}""",
         },
     )
     message_list.insert(
