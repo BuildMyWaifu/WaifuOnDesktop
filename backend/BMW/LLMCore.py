@@ -181,6 +181,9 @@ def chat_with_ai(companion: Companion, user_input: str):
     # Store the AI message in conversation history
     user_conversations[user_id].append({"role": "assistant", "content": ai_response})
 
+    if len(user_conversations[user_id]) > 30:
+        user_conversations[user_id].pop(0)  # remove the oldest message
+        
     # Parse the JSON from the AI
     motion_key = "idle"
     try:
