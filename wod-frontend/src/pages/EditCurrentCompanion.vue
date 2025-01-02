@@ -8,7 +8,7 @@
         </div>
 
         <div style="padding-left: 100px;padding-right: 100px;">
-            <v-btn size="large" color="success" block variant="outlined" :disabled="!isCompanionValid(localCompanion)"
+            <v-btn size="large" color="success" block variant="tonal" :disabled="!isCompanionValid(localCompanion)"
                 @click="updateCompanion">儲存</v-btn>
         </div>
         <CompanionEdit v-model="localCompanion" flat></CompanionEdit>

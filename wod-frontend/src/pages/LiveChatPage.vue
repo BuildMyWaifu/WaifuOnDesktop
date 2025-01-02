@@ -13,14 +13,16 @@
     </div>
 
     <Live2DComponent :fromUrl="companion.live2dModelSettingPath" />
-    
+
     <v-overlay v-model="showHistoryDialog" style="z-index: 201;">
-      <HistoryDialogInterface  v-if="companionId" :companionId="companionId" @close="showHistoryDialog = false"/>
+      <HistoryDialogInterface v-if="companionId" :companionId="companionId" @close="showHistoryDialog = false" />
     </v-overlay>
 
     <div>
       <div class="floating-chat">
-
+        <button @click="showHistoryDialog = true">
+          <v-icon>mdi-text-long</v-icon>
+        </button>
         <textarea v-model="message" placeholder="請輸入想要傳送的訊息..." @keydown.enter="sendMessage"
           class="chat-input"></textarea>
         <v-btn @click="sendMessage" variant="outlined" icon flat color="primary"><v-icon>mdi-send</v-icon></v-btn>
@@ -33,11 +35,9 @@
      left: 10px;
      z-index: 200;
    ">
-      <v-btn :to="`/app/${companionId}`" prepend-icon="mdi-menu">返回選單</v-btn>
+      <v-btn :to="`/app/${companionId}`" prepend-icon="mdi-menu" variant="text">返回選單</v-btn>
       <!-- History Dialog Button -->
-      <button @click="showHistoryDialog = true">
-        <v-icon>mdi-text-long</v-icon>
-      </button>
+
     </div>
 
     <!-- Close History Dialog Button -->

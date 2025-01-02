@@ -32,7 +32,7 @@
       <div >
         <v-divider class="mb-2"></v-divider>
         <div class="px-4">
-          <v-btn variant="outlined" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu" class=" mb-2">
+          <v-btn variant="tonal" block color="primary" prepend-icon="mdi-plus" to="/createNewWaifu" class=" mb-2">
             新增伴侶
           </v-btn>
         </div>

@@ -23,9 +23,11 @@
       </v-card-text>
       <v-card-actions v-if="!readonly" style="position: sticky; bottom: 0;background-color: #121212;">
         <v-spacer></v-spacer>
-        <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" prepend-icon="mdi-chat" class="ml-4"
+        <v-btn prepend-icon="mdi-delete" color="error" class="mr-4">刪除</v-btn>
+        <v-divider vertical></v-divider>
+        <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" prepend-icon="mdi-chat" class="ml-4"  variant="tonal"
           color="primary">開始聊天</v-btn>
-        <v-btn v-if="!readonly" :to="`/companionEdit/${companionId}`" variant="text" class="mx-4" prepend-icon="mdi-pencil">編輯</v-btn>
+        <v-btn v-if="!readonly" :to="`/companionEdit/${companionId}`" variant="tonal" class="mx-4"  prepend-icon="mdi-pencil">編輯</v-btn>
       </v-card-actions>
     </div>
   </div>
