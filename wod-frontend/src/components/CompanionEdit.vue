@@ -1,12 +1,16 @@
 <template>
   <v-card v-if="companion">
-    <div class="d-flex">
+    <div class="d-flex px-4 pb-4">
       <div>
-        <div class="mx-auto pa-4" style="max-width: 500px;min-width: 300px;" v-if="companion">
+        <div class="mx-auto py-4" style="max-width: 500px;min-width: 300px;" v-if="companion">
           <v-card-title>角色模型</v-card-title>
-          <Live2dComponent :fromUrl="modelUrl" :key="modelUrl" v-if="showModel"></Live2dComponent>
-          <!-- 材質預覽 -->
-          <!-- <v-container>
+          <v-card-text>
+
+
+            <Live2dComponent :fromUrl="companion.live2dModelSettingPath" :key="companion.live2dModelSettingPath"
+              v-if="showModel && companion.live2dModelSettingPath"></Live2dComponent>
+            <!-- 材質預覽 -->
+            <!-- <v-container>
             <div style="max-height: 50vh;" class="overflow-y-auto">
 
               <div v-for="(url, index) in imageUrls" :key="index">
@@ -14,45 +18,51 @@
               </div>
             </div>
           </v-container> -->
-          <div class="d-flex align-center text-grey mt-2">關於格式
-            <v-dialog width="500">
-              <template v-slot:activator="{ props }">
-                <v-icon v-bind="props">mdi-information</v-icon>
-              </template>
-              <v-card>
-                <v-card-text>
-                  <v-card-title>模型格式</v-card-title>
+            <div class="d-flex align-center text-grey mt-2">關於格式
+              <v-dialog width="500">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props">mdi-information</v-icon>
+                </template>
+                <v-card>
                   <v-card-text>
-                    <p>模型檔案必須為壓縮檔，且內含以下檔案：</p>
-                    <ul>
-                      <li>model.json</li>
-                      <li>textures</li>
-                    </ul>
+                    <v-card-title>模型格式</v-card-title>
+                    <v-card-text>
+                      <p>模型檔案必須為壓縮檔，且內含以下檔案：</p>
+                      <ul>
+                        <li>model.json</li>
+                        <li>textures</li>
+                      </ul>
+                    </v-card-text>
                   </v-card-text>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-          </div>
-          <div class="mt-2">
-            <v-file-input type="file" accept=".zip" label="上傳新模型（.zip）" density="compact" @change="handleFileUpload"
-              hide-details class="flex-grow-1" />
-            <v-file-input type="file" accept=".json" label="動作設定（.json）" density="compact" hide-details @change="handleUpdateMotionMap"
-              class="flex-grow-1 mt-2"></v-file-input>
-          </div>
-
+                </v-card>
+              </v-dialog>
+            </div>
+            <div class="mt-2">
+              <v-file-input type="file" accept=".zip" label="上傳新的模型（.zip）" density="compact"
+                @change="handleLive2dModelUpload" hide-details class="flex-grow-1" />
+              <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好Live2D模型了，可以上傳新模型替代</div>
+              <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定Live2D模型</div>
+              <div class="d-flex align-center">
+                <v-file-input type="file" accept=".json" label="動作設定（.json）" density="compact" hide-details
+                  @change="handleUpdateMotionMap" class="flex-grow-1 mt-2"></v-file-input>
+                <v-btn @click="downloadPoseMap" v-if="companion.poseMap && isNotEmpty(companion.poseMap)" flat
+                  class="mt-2">下載動作設定</v-btn>
+              </div>
+              <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好動作設定了</div>
+              <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定動作設定</div>
+            </div>
+          </v-card-text>
         </div>
       </div>
       <div class="flex-grow-1 pt-4 pr-4">
         <v-card-title>角色設定</v-card-title>
-        <v-form ref="form" v-model="isValid" class="pa-4 pt-10 flex-gorw-1 overflow-y-auto " style="max-height: 60vh;">
-          <v-textarea v-model="companion.profile.name" label="姓名" :rules="[rules.name]" rows="1" variant="filled"
+        <v-form ref="form" v-model="isValid" class="ml-4 flex-gorw-1 " >
+          <v-textarea v-model="companion.name" label="姓名" :rules="[rules.name]" rows="1" variant="filled"
             auto-grow></v-textarea>
-          <v-textarea v-model="companion.profile.description" label="描述" :rules="[rules.description]" rows="1"
-            variant="filled" auto-grow></v-textarea>
-          <v-textarea v-model="companion.prompt.character" label="角色" :rules="[rules.character]" rows="1"
-            variant="filled" auto-grow></v-textarea>
-          <v-textarea v-model="companion.prompt.backstory" label="背景故事" :rules="[rules.backStory]" rows="1"
-            variant="filled" auto-grow></v-textarea>
+          <v-textarea v-model="companion.description" label="描述" :rules="[rules.description]" rows="1" variant="filled"
+            auto-grow></v-textarea>
+          <v-textarea v-model="companion.backstory" label="背景故事" :rules="[rules.backStory]" rows="1" variant="filled"
+            auto-grow></v-textarea>
         </v-form>
       </div>
     </div>
@@ -63,8 +73,9 @@
   import Live2dComponent from "@/components/Live2dComponent.vue";
   import { Companion } from "@/utils/model";
   import { ref, watch, PropType, onMounted, nextTick } from "vue";
-  import { copy } from "@/utils/utils";
+  import { copy, isNotEmpty } from "@/utils/utils";
   import { rawPostApi } from "@/utils/api";
+  import { saveAs } from 'file-saver';
   // import JSZip from "jszip";
 
   const isValid = ref(false);
@@ -116,20 +127,21 @@
     character: (value: string) => (value === "" ? "該欄位必須填寫" : true),
     backStory: (value: string) => (value === "" ? "該欄位必須填寫" : true),
   };
-  const modelUrl = ref<string | null>(null);
   // 上傳並處理壓縮檔
-
-  const motionMap = ref<{ [key: string]: string}>()
-
   async function handleUpdateMotionMap(event: Event) {
     let files = (event.target as HTMLInputElement).files;
+    console.log(files)
 
-    if (files && !(files instanceof File)) {
-      files = files[0];
-    }
     if (!files) return;
 
-    const file = files;
+    let file = undefined as File | undefined;
+    if (!(files instanceof File)) {
+      file = files[0];
+    }
+    else { 
+      file = files;
+    }
+
 
     if (file.type !== "application/json") {
       alert("請上傳有效的 JSON 檔案");
@@ -149,7 +161,8 @@
       }
 
       // 更新 motionMap.value
-      motionMap.value = { ...parsedContent };
+      if (!companion.value) return
+      companion.value.poseMap = { ...parsedContent };
 
     } catch (error) {
       console.error("讀取或解析 JSON 檔案時發生錯誤:", error);
@@ -158,23 +171,28 @@
   }
 
 
-  async function handleFileUpload(event: Event) {
+  async function handleLive2dModelUpload(event: Event) {
     let files = (event.target as HTMLInputElement).files;
-
-
-    if (files && !(files instanceof File)) {
-      files = files[0];
-    }
     if (!files) return;
+
+
+    let file = undefined as File | undefined;
+    if (!(files instanceof File)) {
+      file = files[0];
+    }
+    else {
+      file = files;
+    }
     let formData = new FormData
 
-    formData.append('file', files)
+    formData.append('file', file)
     const res = await rawPostApi('/assets/live2dModel/upload', formData)
     if (res.status != 'success') {
       alert(res.message)
       return
     }
-    modelUrl.value = res.data
+    if (!companion.value) return
+    companion.value.live2dModelSettingPath = res.data
     // const zip = new JSZip();
     // const content = await zip.loadAsync(files);
     // imageUrls.value = []; // 清空已有的圖片
@@ -189,5 +207,23 @@
     // }
 
     reloadModel();
+  }
+  
+
+  // 其他現有程式碼...
+
+  function downloadPoseMap() {
+    if (!companion.value?.poseMap) {
+      alert("poseMap is not available or is empty.");
+      return;
+    }
+
+    try {
+      const blob = new Blob([JSON.stringify(companion.value.poseMap, null, 2)], { type: 'application/json' });
+      saveAs(blob, 'poseMap.json');
+    } catch (error) {
+      console.error("Error downloading poseMap:", error);
+      alert("An error occurred while trying to download the poseMap.");
+    }
   }
 </script>
