@@ -48,20 +48,20 @@
                 <v-btn @click="downloadPoseMap" v-if="companion.poseMap && isNotEmpty(companion.poseMap)"
                   flat>下載動作設定</v-btn>
                 <v-menu :close-on-content-click="false">
-                  <template v-slot:activator="{props}">
+                  <template v-slot:activator="{ props }">
                     <v-btn flat v-bind="props">預覽動作</v-btn>
                   </template>
                   <v-card>
                     <v-list>
-                      <v-list-item v-for="pose, poseKey  in companion.poseMap" :key="poseKey"
+                      <v-list-item v-for="pose, poseKey in companion.poseMap" :key="poseKey"
                         @click="store.doPose(pose)">
-                        <v-list-item-title>{{poseKey}}</v-list-item-title>
+                        <v-list-item-title>{{ poseKey }}</v-list-item-title>
                       </v-list-item>
                     </v-list>
                   </v-card>
                 </v-menu>
               </div>
-              <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好動作設定了</div>
+              <div class="pl-10 text-body-2 pt-1" v-if="isNotEmpty(companion.poseMap)">已經設定好動作設定了</div>
               <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定動作設定</div>
 
             </div>
@@ -90,9 +90,9 @@
   import { copy, isNotEmpty } from "@/utils/utils";
   import { rawPostApi } from "@/utils/api";
   import { saveAs } from 'file-saver';
-import { useAppStore } from "@/stores/app";
+  import { useAppStore } from "@/stores/app";
   // import JSZip from "jszip";
-  const store= useAppStore()
+  const store = useAppStore()
   const isValid = ref(false);
   const showModel = ref(true);
   // const imageUrls = ref<string[]>([]); // 用於存儲圖片的 URL
@@ -153,7 +153,7 @@ import { useAppStore } from "@/stores/app";
     if (!(files instanceof File)) {
       file = files[0];
     }
-    else { 
+    else {
       file = files;
     }
 
@@ -223,7 +223,7 @@ import { useAppStore } from "@/stores/app";
 
     reloadModel();
   }
-  
+
 
   // 其他現有程式碼...
 
