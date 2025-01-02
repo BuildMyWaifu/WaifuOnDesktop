@@ -1,23 +1,26 @@
 <template>
-  <div style="
-  height: 100vh;
-  width: 99vw;
-  background: linear-gradient(to bottom, rgba(234, 165, 250, 0.7), rgba(234, 211, 240, 0.7));
-  overflow-y: scroll;
-  scrollbar-width: thin;
+  <v-dialog width="600" height="1067" opacity="0">
+    <template v-slot:activator="{props}">
+      <v-btn v-bind="props" icon variant="text">
+        <v-icon>mdi-history</v-icon>
+      </v-btn>
+    </template>
+    <v-card style="
+    background: linear-gradient(to bottom, rgba(234, 165, 250, 0.7), rgba(234, 211, 240, 0.7));
+    scrollbar-width: thin;
   scrollbar-color: #e0e0e0 rgba(0, 0, 0, 0);
-  ">
-    <v-infinite-scroll @load="load">
-      <template class="pa-2">
-        <div v-for="(message, index) in items" :key="index"
-            :class="['message-box', message.role]">
-          <div class="message-content">
-            {{ message.content }}
+    ">
+      <v-infinite-scroll @load="load">
+        <template class="pa-2">
+          <div v-for="(message, index) in items" :key="index" :class="['message-box', message.role]">
+            <div class="message-content">
+              {{ message.content }}
+            </div>
           </div>
-        </div>
-      </template>
-    </v-infinite-scroll>
-  </div>
+        </template>
+      </v-infinite-scroll>
+    </v-card>
+  </v-dialog>
 </template>
   
 <script setup lang="ts">
@@ -70,7 +73,7 @@
       border-bottom-right-radius: 0;
     }
   
-    .message-box.bot .message-content {
+    .message-box.assistant .message-content {
       background-color: #e0e0e0;
       /* 灰色，類似圖中對方訊息的顏色 */
       border-bottom-left-radius: 0;

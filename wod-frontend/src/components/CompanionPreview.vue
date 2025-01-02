@@ -13,24 +13,25 @@
 
       </v-card-title>
       <v-card-text style="white-space: pre-line;">
-        {{ localCompanion.description.replace('\n', '\n\n') }}
+        {{ localCompanion.description}}
       </v-card-text>
       <v-card-title>
         背景故事
       </v-card-title>
       <v-card-text style="white-space: pre-line;">
-        {{ localCompanion.backstory.replace('\n', '\n\n') }}
+        {{ localCompanion.backstory }}
       </v-card-text>
-      <v-card-actions v-if="!readonly" style="position: sticky; bottom: 0;background-color: #121212;" class="d-flex flex-wrap justify-end">
-        
+      <v-card-actions v-if="!readonly" style="position: sticky; bottom: 0;background-color: #121212;"
+        class="d-flex flex-wrap justify-end">
+
         <v-dialog width="500">
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" prepend-icon="mdi-delete" color="error" class="mr-4">刪除</v-btn>
+            <v-btn  v-bind="props" variant="text" color="error" class="mr-1" icon><v-icon>mdi-delete</v-icon></v-btn>
           </template>
           <template v-slot:default="{ isActive }">
 
             <v-card :title="`你確定要刪除「${localCompanion.name}」嗎？`" :subtitle="localCompanion.description">
-              
+
               <v-alert variant="outlined" type="error" icon="mdi-alert" class="mx-4">
                 刪除後將無法復原
               </v-alert>
@@ -42,10 +43,10 @@
           </template>
         </v-dialog>
         <v-divider vertical></v-divider>
-        <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" prepend-icon="mdi-chat" class="ml-4" variant="tonal"
+        <v-btn v-if="!readonly" :to="`/companionEdit/${companionId}`" variant="text" class="ml-1" icon
+          prepend-icon="mdi-pencil"><v-icon>mdi-pencil</v-icon></v-btn>
+        <v-btn v-if="!readonly" :to="`/liveChat/${companionId}`" prepend-icon="mdi-chat" class="ml-1 mr-2" variant="tonal"
           color="primary">開始聊天</v-btn>
-        <v-btn v-if="!readonly" :to="`/companionEdit/${companionId}`" variant="tonal" class="mx-4"
-          prepend-icon="mdi-pencil">編輯</v-btn>
       </v-card-actions>
     </div>
   </div>

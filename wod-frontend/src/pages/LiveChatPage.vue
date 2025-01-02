@@ -1,31 +1,29 @@
 <template>
   <div style="
-      width: 100%;
-      height: 100%;
-      position: relative;
+  height: 100vh;
+      width: 100vw;
       overflow: hidden;
     " v-if="companion">
     <div style="position: fixed; top: 0; left: 0;z-index: 100" class="w-100 h-100 d-flex justify-center">
       <v-container style="margin-top: 8vh; max-width: 800px; max-height: 80%;"
         class="d-flex flex-column align-start fade-container">
-        <SpeechBubble :message="message.content" class="mt-4" v-for="message in companionMsgList" :key="message._id" />
+        <SpeechBubble :message="message.content" class="mt-4" style="max-width: 300px;"
+          v-for="message in recvMessageList" :key="message._id" />
       </v-container>
     </div>
 
     <Live2DComponent :fromUrl="companion.live2dModelSettingPath" />
 
     <v-overlay v-model="showHistoryDialog" style="z-index: 201;">
-      <HistoryDialogInterface v-if="companionId" :companionId="companionId" @close="showHistoryDialog = false" />
     </v-overlay>
 
     <div>
       <div class="floating-chat">
-        <button @click="showHistoryDialog = true">
-          <v-icon>mdi-text-long</v-icon>
-        </button>
-        <textarea v-model="message" placeholder="請輸入想要傳送的訊息..." @keydown.enter.prevent="handleEnter"
-          class="chat-input"></textarea>
-        <v-btn @click="sendMessage" variant="text" icon flat color="primary"><v-icon>mdi-send</v-icon></v-btn>
+        <HistoryDialogInterface v-if="companionId" :companionId="companionId" />
+          <textarea :disabled="messageLoading" v-model="message" placeholder="請輸入想要傳送的訊息..."
+            @keypress.enter.exact.prevent="handleEnter" class="chat-input"></textarea>
+        <v-btn :loading="messageLoading" @click="sendMessage" variant="text" icon flat
+          color="primary"><v-icon>mdi-send</v-icon></v-btn>
       </div>
     </div>
 
@@ -58,8 +56,9 @@
       <v-icon>mdi-redo</v-icon>
     </button>
   </div>
-  <v-dialog :model-value="loading" persistent width="350">
-    <v-card class="text-center" title="正在初始化角色" subtitle="正在使用LLM生成更詳細的對話設定，這個過程需要十秒左右...">
+  <v-dialog :model-value="setupLoading " persistent width="350">
+    <v-card class="text-center" title="正在初始化角色">
+      <v-card-subtitle class="text-wrap">正在使用LLM生成更詳細的對話設定<br>這個過程需要十秒左右...</v-card-subtitle>
       <v-card-text>
         <v-progress-linear indeterminate color="primary"></v-progress-linear>
       </v-card-text>
@@ -77,9 +76,10 @@
 
   import { useAppStore } from '@/stores/app';
   import { Message } from '@/utils/model';
-  import { fetchApi } from '@/utils/api';
+  import { fetchApi, handleErrorAlert, postApi } from '@/utils/api';
 
-  const loading = ref(false);
+  const recvMessageList = ref<Message[]>([])
+  const setupLoading = ref(false);
 
   const route = useRoute();
   const router = useRouter();
@@ -94,14 +94,34 @@
     if (companionId.value == undefined) return undefined
     return store.getCompanion(companionId.value)
   })
+  const messageLoading = ref(false)
 
   async function sendMessage() {
-    if (loading.value) return
-    alert(`Message sent ${message.value.trim()}`);
+
+
+    if (setupLoading.value) return
+    if (messageLoading.value) return
+    messageLoading.value = true
+
+    const recvMessge = handleErrorAlert(await postApi(`/message`, {
+      companionId: companionId.value,
+      content: message.value
+    })) as Message
+    // insert at 0
+    if (recvMessge.pose) { 
+      if (recvMessge.pose.expression) {
+        store.pushExpression(recvMessge.pose.expression)
+      }
+      if (recvMessge.pose.motion) {
+        store.pushMotion(recvMessge.pose.motion)
+      }
+    }
+    recvMessageList.value = [recvMessge, ...recvMessageList.value]
     message.value = ''; // Clear the input after sending
+    messageLoading.value = false
   }
   async function handleEnter(event: KeyboardEvent) {
-    if (event) { 
+    if (event) {
       if (event.key === 'Enter') {
         if (!event.shiftKey) {
           await sendMessage()
@@ -112,30 +132,18 @@
           if (!(textarea instanceof HTMLTextAreaElement)) return;
           const start = textarea.selectionStart;
           const end = textarea.selectionEnd;
-        
-        // 在光標位置插入換行
-        message.value = message.value.substring(0, start) + "\n" + message.value.substring(end);
-        nextTick(() => {
-          textarea.selectionStart = textarea.selectionEnd = start + 1;
-        });
+
+          // 在光標位置插入換行
+          message.value = message.value.substring(0, start) + "\n" + message.value.substring(end);
+          nextTick(() => {
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+          });
+        }
       }
     }
-  }
-    
+
   };
 
-  function getMessageList(): Message[] {
-    if (companionId.value == undefined) return []
-    const result = store.messageMap.get(companionId.value)
-    if (!result) return []
-    else return result
-  }
-
-  const companionMsgList = computed<Message[]>(() => {
-    return getMessageList().filter((msg) => {
-      return msg.role == 'bot'
-    })
-  })
 
   const companionId = ref<string>()
   // const companion = computed(() => {
@@ -146,22 +154,23 @@
       companionId.value = route.params.companionId as string
     }
     else {
-      alert("沒有指定聊天的伴侶")
+      alert("沒有指定聊天的伴侶，這不應該發生")
       router.push("/app")
+      return
     }
-    if (!companion.value?.trait) { 
-      loading.value = true
+    if (!companion.value?.trait) {
+      setupLoading.value = true
       await fetchApi(`/companion/${companionId.value}/setup`)
-      loading.value = false
-      // alert("伴侶資料尚未載入")
+      await store.loadCompanionList()
+      setupLoading.value = false
     }
   })
 
 </script>
 <style scoped>
   .fade-container {
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 70%, rgba(0, 0, 0, 0) 100%);
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 70%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 60%);
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 60%);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: 100% 100%;
@@ -221,5 +230,19 @@
 
   .send-button:hover {
     background-color: #2980b9;
+  }
+
+  .fade-out-animation {
+    animation: fadeOut 20s ease-out forwards;
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
   }
 </style>

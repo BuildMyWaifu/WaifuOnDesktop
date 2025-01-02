@@ -18,6 +18,22 @@ export const useAppStore = defineStore("app", {
     expressionQueue: [] as string[],
   }),
   actions: {
+    async loadMessageList(companionId: string, options: { before: number, after: number } = { before: 0, after: 0 }) { 
+      let affix = ''
+      if (options.before !== 0 ) {
+        affix = `?before=${options.before}`
+      }
+      if (options.after !== 0 ) {
+        affix = `?after=${options.after}`
+      }
+      const messageList = handleErrorAlert(
+        await fetchApi(`/message/${companionId}${affix}`),
+      ) as Message[] | undefined;
+      if (!messageList) {
+        return;
+      }
+      this.messageMap.set(companionId, messageList);
+    },
     async loadCompanionList() {
       const companionList = handleErrorAlert(await fetchApi("/companion")) as
         | Companion[]

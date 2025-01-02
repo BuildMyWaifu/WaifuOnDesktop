@@ -6,6 +6,7 @@ import json
 
 
 from BMW.model import Companion, Message
+from BMW.utils import console
 
 # from BMW.model.Companion import CompanionTrait
 # from BMW.model.Message import MessagePose
@@ -18,7 +19,7 @@ async def setup_trait(companion: Companion):
     Calls OpenAI to generate personality, communication style, and emotional response.
     """
     trait_generation_prompt = f"""
-根據以下背景故事，生成角色的個性（Personality）、溝通風格（Communication style）以及情感回應（Emotional response），每項不可超過兩百字，並盡可能簡潔不重複：
+根據以下背景故事，生成角色的個性（Personality）、溝通風格（Communication style）以及情感回應（Emotional response），每項不可超過一百字，並盡可能簡潔不重複：
 背景故事: "{companion.backstory or '（沒有背景故事）'}"
 
 回應格式：
@@ -54,7 +55,7 @@ def generate_system_prompt(companion: Companion) -> str:
     Removes explicit companion_id usage; we use companion.userId as the key instead.
     """
 
-    pose_key_instructions = "2. 「pose_key」：為下列之一，用於 Live2D 動作與表情：\n"
+    pose_key_instructions = "2. 「pose_key」：為下列之一，用於 Live2D 動作與表情，建議頻繁切換來達成生動的效果：\n"
     for pk in companion.poseMap.keys():
         pose_key_instructions += f"- {pk}\n"
     if len(companion.poseMap.keys()) == 0:
@@ -65,6 +66,7 @@ def generate_system_prompt(companion: Companion) -> str:
 - 你不是一般的「助理」，請避免客服式或正式的回答，例如「How can I assist you?」。
 - 請維持角色設定：不要透露自己是 AI，也避免使用「如何幫你」之類的字句。
 - 請勿使用「How may I help you?」或「How can I assist you today?」等句子。
+- 你的最高目標是完美的扮演對應角色，而不是服務別人。
 
 目前的角色屬性（之後可能會在對話中演變）：
 role: {companion.trait.role}
@@ -87,7 +89,7 @@ emotional response: {companion.trait.emotional_response}
 - 使用者多次責罵或離開你 -> 你可能更焦慮或更悲傷。
 
 使用者會與你互動，而你需要以以下格式回應：
-1. text_response：符合你的角色與背景、與使用者對應的自然對話
+1. text_response：符合你的角色與背景、與使用者對應的口語簡短回應，如同與使用者口語對話一般。
 {pose_key_instructions}
 
 嚴格遵守以下 JSON 格式回應：
@@ -119,7 +121,9 @@ async def setup_trait_and_send_systemPrompt(companion: Companion):
     # ).create()
 
 
-async def getMessages(companion: Companion) -> list[Message]:
+async def get_messages(companion: Companion) -> list[Message]:
+    from BMW.model.Message import Message
+
     raw_message_list = await Message.find_any(
         companionId=companion.id, sort=[("createdAt", 1)], limit=30
     )
@@ -130,6 +134,17 @@ async def getMessages(companion: Companion) -> list[Message]:
 
     message_list.insert(
         0, {"role": "system", "content": generate_system_prompt(companion)}
+    )
+    message_list.insert(
+        0,
+        {
+            "role": "assistant",
+            "content": """\{
+  "text_response": "範例文字回應",
+  "pose_key": "idle",
+  "changed_traits": \{\}
+\}""",
+        },
     )
 
     return message_list
@@ -142,19 +157,22 @@ async def generateResponseMessage(companion: Companion) -> Message:
 
     # Add user's message
     # user_conversations[user_id].append({"role": "user", "content": user_input})
+    message_list = await get_messages(companion)
+    console.log(message_list)
 
-    response = await openai.ChatCompletion.create(  # TODO: 不確定這邊能不能真的用 await
+    response = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=await getMessages(companion),
+        messages=message_list,
         temperature=0.8,
         max_tokens=300,
     )
 
     ai_response = response["choices"][0]["message"]["content"]
     # Store the AI message in conversation history
-
+    content = ai_response
     try:
         ai_data = json.loads(ai_response)
+        content = ai_data.get("text_response", ai_response)
         pose_key = ai_data.get("pose_key", "idle")
         changed_traits = ai_data.get("changed_traits", {})
         if changed_traits:
@@ -182,11 +200,12 @@ async def generateResponseMessage(companion: Companion) -> Message:
 
     # Lookup the motion and expression from our external JSON file
     pose_data = companion.poseMap.get(pose_key)
+    from BMW.model.Message import Message
 
     messge = Message.empty(
         role="assistant",
         companionId=companion.id,
-        content=ai_response,
+        content=content,
         pose=pose_data,
     )
     await messge.create()
