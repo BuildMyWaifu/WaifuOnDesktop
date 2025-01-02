@@ -42,7 +42,7 @@ class Companion(Editable):
         return True
 
     async def check_permission(self, user: User) -> bool:
-        return user.id == self.authorId
+        return user.id == self.userId
 
     @classmethod
     def empty(cls, *args, **kwargs):

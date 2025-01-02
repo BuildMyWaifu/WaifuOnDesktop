@@ -169,7 +169,6 @@ class UserSignUpPayload(BaseModel):
     email: str
     password: str
 
-
 @app.post("/signup")
 async def registration(payload: UserSignUpPayload, response: Response):
     if await User.find(**{"profile.email": payload.email}):
@@ -179,6 +178,7 @@ async def registration(payload: UserSignUpPayload, response: Response):
     user.profile.name = payload.name
     user.profile.email = payload.email
     await user.create()
+    # TODO: 建立預設伴侶
 
     await user.update_token()
     await user.set_password(payload.password)

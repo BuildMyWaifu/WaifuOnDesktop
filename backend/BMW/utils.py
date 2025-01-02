@@ -68,7 +68,10 @@ def getFullPath(file_path: str):
 
 def checkIfPathSafe(file_path: str):
     # 確保路徑安全
+    file_path = file_path.replace("/api/assets", ".")
     full_path = getFullPath(file_path)
+    console.log(full_path)
+    console.log(base_directory.resolve())
     if not str(full_path).startswith(str(base_directory.resolve())):
         return False
     return True

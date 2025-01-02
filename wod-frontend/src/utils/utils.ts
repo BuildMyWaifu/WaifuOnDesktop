@@ -19,11 +19,11 @@ export function hash(input: string) {
 // TODO: 在這裡寫一個檢查 companion 是否合法的函數，並且在更新時檢查
 
 export function isCompanionValid(companion: Companion) {
-  if (companion.name.length > 20) {
+  if (companion.name.length > 20 || companion.name.length < 1) {
     return false
-  } else if (companion.description.length > 100) {
+  } else if (companion.description.length > 100 || companion.description.length < 1) {
     return false
-  } else if (companion.backstory.length > 500) {
+  } else if (companion.backstory.length > 500 || companion.backstory.length < 1) {
     return false
   } else if (!isNotEmpty(companion.poseMap)) {
     return false

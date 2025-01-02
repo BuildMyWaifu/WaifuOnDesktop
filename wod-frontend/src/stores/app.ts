@@ -18,11 +18,7 @@ export const useAppStore = defineStore("app", {
     expressionQueue: [] as string[],
   }),
   actions: {
-    async login(user: User) {
-      // 當你登入後，將登入取得的使用者資訊傳入此函式
-      this.user = user;
-
-      // load companionList
+    async loadCompanionList() {
       const companionList = handleErrorAlert(await fetchApi("/companion")) as
         | Companion[]
         | undefined;
@@ -30,6 +26,13 @@ export const useAppStore = defineStore("app", {
         return;
       }
       this.companionList = companionList;
+    },
+    async login(user: User) {
+      // 當你登入後，將登入取得的使用者資訊傳入此函式
+      this.user = user;
+
+      // load companionList
+      await this.loadCompanionList();
     },
     async logout() {
       this.user = undefined;

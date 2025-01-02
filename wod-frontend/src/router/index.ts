@@ -16,7 +16,7 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: "/app",
+    path: "/app/:companionId?",
     name: "Home",
     component: () => import("@/pages/Main.vue"),
     meta: { requiresAuth: true },

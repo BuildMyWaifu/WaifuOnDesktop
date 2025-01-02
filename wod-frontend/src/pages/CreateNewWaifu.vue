@@ -22,7 +22,7 @@
                                 <v-card-title>以此模板為基準</v-card-title>
                                 <v-btn variant="outlined" color="primary" @click="currentStep = 'edit'">使用此模板</v-btn>
                             </div>
-                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1"
+                            <CompanionPreview readonly :companion="wives[baseCompanionIndex]" class="flex-grow-1 ml-4"
                                 style="max-height: calc(100vh - 98px)" :key="baseCompanionIndex" v-if="showPreview">
                             </CompanionPreview>
                         </v-card>
@@ -37,7 +37,7 @@
                         <v-btn @click="currentStep = 'select'" flat prepend-icon="mdi-keyboard-return">選擇其他模板</v-btn>
                     </div>
                     <div style="padding-left: 100px;padding-right: 100px;">
-                        <v-btn size="large" color="success" block variant="outlined">建立</v-btn>
+                        <v-btn size="large" color="success" block variant="outlined" :disabled="!isCompanionValid(companion)" @click="createCompanoin">建立</v-btn>
                     </div>
                     <div class="flex-grow-1 overflow-auto">
 
@@ -58,9 +58,12 @@
 <script lang="ts" setup>
     import CompanionEdit from '@/components/CompanionEdit.vue';
     import CompanionPreview from '@/components/CompanionPreview.vue'
-    import { Companion } from '@/utils/model';
-    import { copy } from '@/utils/utils'
+
     import { ref, watch, nextTick } from 'vue';
+    import { Companion } from '@/utils/model';
+    import { copy, isCompanionValid } from '@/utils/utils'
+    import { useRouter } from 'vue-router';
+import { postApi } from '@/utils/api';
 
     
     const currentStep = ref<string>('select')
@@ -251,4 +254,21 @@
 
     const companion = ref<Companion>(wives[0]);
 
+    const router = useRouter()
+
+    async function createCompanoin() {
+        const res = await postApi(`/api/companion`, {
+            name: companion.value.name,
+            description: companion.value.description,
+            live2dModelSettingPath: companion.value.live2dModelSettingPath,
+            poseMap: companion.value.poseMap,
+            backstory: companion.value.backstory
+        })
+        if (res.status == 'success') {
+            router.push("/app/" + res.data._id)
+        } else {
+            alert(res.message)
+        }
+
+    }
 </script>

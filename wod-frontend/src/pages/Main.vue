@@ -23,7 +23,7 @@
             <v-list-item-subtitle class="text-caption">{{ companion.description }}</v-list-item-subtitle>
             <div class="text-body-2" v-if="store.messageMap.get(companion._id) && lastMessage(companion._id)">
               {{ lastMessage(companion._id)?.role == 'assistance' ? companion.name : '您' }}：{{
-              lastMessage(companion._id)?.content }}
+                lastMessage(companion._id)?.content }}
             </div>
           </v-list-item>
           <v-divider />
@@ -36,7 +36,6 @@
           新增伴侶
         </v-btn>
       </div>
-      <v-btn @click="store.generateMockCompanionList">test</v-btn>
 
       <template #append>
         <v-divider />
@@ -81,7 +80,8 @@
 
     <v-main app>
       <CompanionPreview style="height: 100vh; max-height: 100vh;" v-if="currentCompanionId !== null"
-        :companionId="currentCompanionId"></CompanionPreview>
+      :companionId="currentCompanionId" :key="currentCompanionId"></CompanionPreview>
+
     </v-main>
 
   </v-app>
@@ -92,12 +92,12 @@
   import CompanionPreview from '@/components/CompanionPreview.vue'
   import UserSettingListItem from '@/components/UserSettingListItem.vue';
   import { useAppStore } from '@/stores/app';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import { ref, onMounted } from 'vue';
 
   const store = useAppStore();
   const router = useRouter();
-
+  const route = useRoute()
   const currentCompanionId = ref<string | null>(null);
 
 
@@ -117,9 +117,13 @@
   }
 
   // 監聽 window 的 resize 事件，並在 window 尺寸改變時調整 drawer 的狀態
-  onMounted(() => {
+  onMounted(async () => {
+    await store.loadCompanionList()
     if (store.companionList != undefined && store.companionList.length != 0) {
       currentCompanionId.value = store.companionList[0]._id
+    }
+    if ('companionId' in route.params) {
+      currentCompanionId.value = route.params.companionId as string
     }
 
   })

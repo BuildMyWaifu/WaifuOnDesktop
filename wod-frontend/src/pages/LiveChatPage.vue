@@ -4,7 +4,7 @@
       height: 100%;
       position: relative;
       overflow: hidden;
-    ">
+    " v-if="companion">
     <div style="position: fixed; top: 0; left: 0;z-index: 100" class="w-100 h-100 d-flex justify-center">
       <v-container style="margin-top: 8vh; max-width: 800px; max-height: 80%;"
         class="d-flex flex-column align-start fade-container">
@@ -12,10 +12,10 @@
       </v-container>
     </div>
 
-    <Live2DComponent />
+    <Live2DComponent :fromUrl="companion.live2dModelSettingPath" />
     
     <v-overlay v-model="showHistoryDialog" style="z-index: 201;">
-      <HistoryDialogInterface :companionId="companionId" @close="showHistoryDialog = false"/>
+      <HistoryDialogInterface  v-if="companionId" :companionId="companionId" @close="showHistoryDialog = false"/>
     </v-overlay>
 
     <div>
@@ -33,7 +33,7 @@
      left: 10px;
      z-index: 200;
    ">
-      <v-btn to="/app" prepend-icon="mdi-menu">返回選單</v-btn>
+      <v-btn :to="`/app/${companionId}`" prepend-icon="mdi-menu">返回選單</v-btn>
       <!-- History Dialog Button -->
       <button @click="showHistoryDialog = true">
         <v-icon>mdi-text-long</v-icon>
@@ -77,6 +77,11 @@
   const message = ref('');
 
   const showHistoryDialog = ref(false);
+
+  const companion = computed(() => {
+    if (companionId.value == undefined) return undefined
+    return store.getCompanion(companionId.value)
+  })
 
   const sendMessage = () => {
     if (message.value.trim() !== '') {
