@@ -65,7 +65,7 @@ const createWindow = url => {
     },
   })
   win.removeMenu()
-  let baseUrl = 'http://localhost:3000'
+  let baseUrl = 'https://bmw.kulimi.tw'
   if (url) {
     baseUrl = baseUrl + url
   }
