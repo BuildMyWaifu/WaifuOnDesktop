@@ -12,16 +12,13 @@
       </v-container>
     </div>
 
-    <Live2DComponent :fromUrl="companion.live2dModelSettingPath" />
-
-    <v-overlay v-model="showHistoryDialog" style="z-index: 201;">
-    </v-overlay>
+    <Live2DComponent :fromUrl="companion.live2dModelSettingPath"  style="z-index: 1;"/>
 
     <div>
       <div class="floating-chat">
         <HistoryDialogInterface v-if="companionId" :companionId="companionId" />
-          <textarea :disabled="messageLoading" v-model="message" placeholder="請輸入想要傳送的訊息..."
-            @keypress.enter.exact.prevent="handleEnter" class="chat-input"></textarea>
+        <textarea :disabled="messageLoading" v-model="message" placeholder="請輸入想要傳送的訊息..."
+          @keypress.enter.exact.prevent="handleEnter" class="chat-input"></textarea>
         <v-btn :loading="messageLoading" @click="sendMessage" variant="text" icon flat
           color="primary"><v-icon>mdi-send</v-icon></v-btn>
       </div>
@@ -56,7 +53,7 @@
       <v-icon>mdi-redo</v-icon>
     </button>
   </div>
-  <v-dialog :model-value="setupLoading " persistent width="350">
+  <v-dialog :model-value="setupLoading" persistent width="350">
     <v-card class="text-center" title="正在初始化角色">
       <v-card-subtitle class="text-wrap">正在使用LLM生成更詳細的對話設定<br>這個過程需要十秒左右...</v-card-subtitle>
       <v-card-text>
@@ -108,7 +105,7 @@
       content: message.value
     })) as Message
     // insert at 0
-    if (recvMessge.pose) { 
+    if (recvMessge.pose) {
       if (recvMessge.pose.expression) {
         store.pushExpression(recvMessge.pose.expression)
       }
