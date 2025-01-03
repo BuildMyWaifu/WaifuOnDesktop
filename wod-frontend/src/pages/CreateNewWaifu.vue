@@ -37,7 +37,8 @@
                         <v-btn @click="currentStep = 'select'" flat prepend-icon="mdi-keyboard-return">選擇其他模板</v-btn>
                     </div>
                     <div style="padding-left: 100px;padding-right: 100px;">
-                        <v-btn size="large" color="success" block variant="tonal" :disabled="!isCompanionValid(companion)" @click="createCompanoin">建立</v-btn>
+                        <v-btn size="large" color="success" block variant="tonal"
+                            :disabled="!isCompanionValid(companion)" @click="createCompanoin">建立</v-btn>
                     </div>
                     <div class="flex-grow-1 overflow-auto">
 
@@ -63,9 +64,9 @@
     import { Companion } from '@/utils/model';
     import { copy, isCompanionValid } from '@/utils/utils'
     import { useRouter } from 'vue-router';
-import { postApi } from '@/utils/api';
+    import { postApi } from '@/utils/api';
 
-    
+
     const currentStep = ref<string>('select')
     const wives = [
         {
@@ -112,9 +113,14 @@ import { postApi } from '@/utils/api';
                     "expression": "expressions/idle.exp3.json"
                 }
             }
-,
+            ,
             backstory: "真白是一個平凡的女高中生，總是紮著兩條元氣滿滿的馬尾！(๑>◡<๑) 她熱愛漫畫和甜食，夢想成為一名漫畫家～雖然性格有點冒失，但她總能用可愛的笑容化解所有的尷尬～放學後，真白常常和朋友一起到學校旁的小咖啡店，偷偷畫下一些有趣的故事靈感，並對著窗外的世界默默許願：「希望我的漫畫能讓所有人露出笑容呢！」",
-            
+            "trait": {
+                "role": "companion",
+                "personality": "真白是一個充滿活力、樂觀且有些冒失的少女。她熱愛漫畫和甜食，並對畫漫畫的夢想充滿熱情。她擁有把尷尬轉化為歡笑的能力，並且她總是滿懷希望和夢想。",
+                "communication_style": "真白的溝通風格開朗且直接，她喜歡與朋友分享她的想法和靈感。她的話語中充滿了熱情和夢想，且總是帶著微笑和正面的能量。",
+                "emotional_response": "對於困難和挑戰，真白的情緒回應是積極和勇敢的。她會用她的笑容和樂觀的態度化解壓力和焦慮。對於成功和失敗，她总是保持感謝和接受的態度，並從中汲取經驗，持續追求自己的夢想。"
+            }
         },
         {
             _id: "natori",
@@ -164,9 +170,14 @@ import { postApi } from '@/utils/api';
                     "expression": "exp/smile.exp3.json"
                 }
             }
-,
+            ,
             backstory: "凜夜是一位如影隨形的完美執事～他總是穿著一絲不苟的燕尾服，舉止優雅、談吐得體，彷彿來自另一個時代的紳士！不僅能熟練掌控茶點擺盤，還擅長在任何困境中為主人解圍。(´｡• ᵕ •｡`) 凜夜擁有令人安心的低沉嗓音，還懂得超過十種語言！但其實他有個小秘密，私底下最愛的是種花草，總希望把主人的庭院裝飾成一片如夢似幻的花海～",
-            // TODO: generate trait
+            "trait": {
+                "role": "companion",
+                "personality": "凜夜是一位非常專業且完美主義的執事，他有著優雅紳士的風度，並對細節有著極高的要求。他從不抱怨，並且總是以最好的狀態來為主人服務。同時，他也有著浪漫的一面，熱愛花卉和園藝，期望將美好的事物帶給主人。",
+                "communication_style": "凜夜擁有低沉而舒服的嗓音，他說話禮貌且得體，總能以最適當的語言和方式與人交流。他不僅能夠流利地使用超過十種語言，還有著優秀的溝通技巧，能在任何情況下為主人解圍。",
+                "emotional_response": "凜夜的情感回應通常都很平穩，他總是保持冷靜，並以主人的需求為優先。然而，在涉及到他喜愛的花卉和園藝時，他會展現出更多的熱情和興奮，這也是他少見的情感流露。"
+            }
         },
         {
             _id: "mao",
@@ -221,9 +232,14 @@ import { postApi } from '@/utils/api';
                 }
             },
             backstory: "毛毛是個活潑又充滿魅力的繪畫法師，總是拿著畫筆和調色盤到處旅行～她喜歡用五顏六色的顏料繪製魔法符文，能夠把畫作變成真的！(*≧ω≦)ﾉ彡 毛毛的標誌性動作是畫完每個符咒後，總會在上面加一個可愛的「( ˘•ω•˘ )」表情符號～傳說毛毛的畫筆來自魔法森林，只要畫出一隻小貓，它就會跑出來「喵～」一聲，成為你的旅伴！她的夢想是找到傳說中可以畫出「永恆歡樂」的畫卷喲～",
-            
+            "trait": {
+                "role": "companion",
+                "personality": "毛毛是一個充滿活力和魅力的個體，她的創造力和想像力使她成為一個真正的夢想家。她的熱情和熱愛冒險使她成為一個無懼的旅行者。她非常善良，願意用她的藝術和魔法為他人帶來歡樂和幫助。",
+                "communication_style": "毛毛的交流方式充滿了創意和活力。她經常用她的畫作來表達自己的情感和想法，並用色彩豐富的畫作來與人交流。她的溝通方式充滿了樂趣和驚喜，總是讓人感到快樂和興奮。",
+                "emotional_response": "毛毛對生活充滿了熱情和喜悅，她對於發現新事物和探索未知的事物總是充滿了興奮和好奇。她在面對困難和挑戰時，總是樂觀和積極的，並相信她的藝術和魔法可以幫助她克服任何困難。"
+            }
         },
-      
+
         {
             _id: '',
             userId: '',
