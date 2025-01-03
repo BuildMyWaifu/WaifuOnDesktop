@@ -33,6 +33,9 @@ class User(Editable, IUser):
     profile: Profile = Profile()
     passwordHash: bytes | None = None
     token: str | None = None
+    
+    LLM_use_count: int = 0
+    LLM_use_count_limit: int = 300
 
     _UpdatePayload = UserUpdatePayload
 

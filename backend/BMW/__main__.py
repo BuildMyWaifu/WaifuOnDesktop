@@ -193,6 +193,8 @@ async def create_message(
     payload: MessageCreatePayload,
     user: User = Depends(get_current_user),
 ):
+    if user.LLM_use_count >= user.LLM_use_count_limit:
+        raise HTTPException(403, "您的 LLM 使用次數已達上限，請聯絡管理員")
     companion = await Companion.find(_id=payload.companionId)
     if not companion:
         raise HTTPException(404, "找不到這個伴侶")
@@ -205,6 +207,7 @@ async def create_message(
         content=payload.content,
         ).create()
     message = await generateResponseMessage(companion)
+    await user.update(LLM_use_count=user.LLM_use_count+1)
     return Payload.success("成功發送訊息", await message.get_dict(user))
 
 
@@ -327,12 +330,15 @@ async def delete_companion(
 
 @app.get("/companion/{companion_id}/setup")
 async def setup_companion(companion_id: str, user: User = Depends(get_current_user)):
+    if user.LLM_use_count >= user.LLM_use_count_limit:
+        raise HTTPException(403, "您的 LLM 使用次數已達上限，請聯絡管理員")
     companion = await Companion.find(_id=companion_id)
     if not companion:
         raise HTTPException(404, "找不到這個伴侶")
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限設定這個伴侶")
     await companion.setup()
+    await user.update(LLM_use_count=user.LLM_use_count+1)
     return Payload.success("成功設定伴侶")
 
 class UserEditPayload(BaseModel):
