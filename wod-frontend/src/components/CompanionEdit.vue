@@ -38,7 +38,7 @@
               </v-dialog>
             </div>
             <div class="mt-2">
-              <v-file-input :loading="live2dUploadLoading" type="file" accept=".zip" label="上傳新的模型（.zip）" density="compact"
+              <v-file-input :disabled="live2dUploadLoading" :loading="live2dUploadLoading" type="file" accept=".zip" label="上傳新的模型（.zip）" density="compact"
                 @change="handleLive2dModelUpload" hide-details class="flex-grow-1" />
               <div class="pl-10 text-body-2 pt-1" v-if="companion.live2dModelSettingPath">已經設定好Live2D模型了，可以上傳新模型替代</div>
               <div class="pl-10 text-body-2 pt-1 text-error" v-else>尚未設定Live2D模型</div>
