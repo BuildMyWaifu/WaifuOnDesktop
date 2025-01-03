@@ -149,10 +149,10 @@
                     "motion": "motions/curious.motion3.json",
                     "expression": "exp/confuse.exp3.json"
                 },
-                "idle": {
-                    "motion": "motions/idle.motion3.json",
-                    "expression": "exp/idle.exp3.json"
-                },
+                // "idle": {
+                //     "motion": "motions/idle.motion3.json",
+                //     "expression": "exp/idle.exp3.json"
+                // },
                 "mischievous": {
                     "motion": "motions/react_small.motion3.json",
                     "expression": "exp/mischievous.exp3.json"
@@ -222,10 +222,10 @@
                     "motion": "motions/look_away.motion3.json",
                     "expression": "expressions/confuse.exp3.json"
                 },
-                "idle": {
-                    "motion": "motions/relax.motion3.json",
-                    "expression": "expressions/idle.exp3.json"
-                },
+                // "idle": {
+                //     "motion": "motions/relax.motion3.json",
+                //     "expression": "expressions/idle.exp3.json"
+                // },
                 "attracted": {
                     "motion": "motions/heart_success.motion3.json",
                     "expression": "expressions/attract.exp3.json"
