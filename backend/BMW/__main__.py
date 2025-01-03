@@ -15,7 +15,7 @@ from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
 BMW.Manager.connection_manager = BMW.Manager.ConnectionManager(Manager().dict())
 
-# from BMW.config import config
+from BMW.config import load_config, save_config
 from BMW.Manager import connection_manager, websocket_manager
 from BMW.model import ChatRoom, Document, File, Message, Payload, User, Companion
 from BMW.Process import BackgroundProcess
@@ -199,6 +199,9 @@ async def create_message(
     payload: MessageCreatePayload,
     user: User = Depends(get_current_user),
 ):
+    config = load_config()
+    if config.GLOBAL_FREE_COUNT <= 0 and user.profile.email != SUPER_ACCOUNT_EMAIL:
+        raise HTTPException(403, "全局免費 LLM 額度已經使用完畢")
     if user.LLM_use_count >= user.LLM_use_count_limit:
         raise HTTPException(403, "您的 LLM 使用次數已達上限，請聯絡管理員")
     companion = await Companion.find(_id=payload.companionId)
@@ -214,6 +217,8 @@ async def create_message(
     ).create()
     message = await generateResponseMessage(companion)
     await user.update(LLM_use_count=user.LLM_use_count + 1)
+    config.GLOBAL_FREE_COUNT -= 1
+    save_config(config)
     return Payload.success("成功發送訊息", await message.get_dict(user))
 
 
@@ -337,9 +342,13 @@ async def delete_companion(
     await companion.update(deleted=True)
     return Payload.success("成功刪除伴侶")
 
-
+SUPER_ACCOUNT_EMAIL = os.getenv("SUPER_ACCOUNT_EMAIL")
 @app.get("/companion/{companion_id}/setup")
 async def setup_companion(companion_id: str, user: User = Depends(get_current_user)):
+    config = load_config()
+    
+    if config.GLOBAL_FREE_COUNT <= 0 and user.profile.email != SUPER_ACCOUNT_EMAIL:
+        raise HTTPException(403, "全局免費 LLM 額度已經使用完畢")
     if user.LLM_use_count >= user.LLM_use_count_limit:
         raise HTTPException(403, "您的 LLM 使用次數已達上限，請聯絡管理員")
     companion = await Companion.find(_id=companion_id)
@@ -351,6 +360,9 @@ async def setup_companion(companion_id: str, user: User = Depends(get_current_us
         await m.update(deleted=True)
     await companion.setup()
     await user.update(LLM_use_count=user.LLM_use_count + 1)
+    config.GLOBAL_FREE_COUNT -= 1
+    save_config(config)
+                
     return Payload.success("成功設定伴侶")
 
 
