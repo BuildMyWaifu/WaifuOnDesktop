@@ -2,7 +2,7 @@
   <v-layout style="width: 100%;
     height: 100%;
     max-width: 100%;
-    max-height: 100%;" class="overflow-hidden">
+    max-height: 100%;" class="overflow-hidden live-background">
 
 
 
@@ -58,3 +58,9 @@
   //   return true;
   // })
 </script>
+<style>
+  .live-background {
+    background: rgb(255, 242, 114);
+    background: linear-gradient(38deg, rgba(255, 242, 114, 1) 0%, rgba(207, 124, 205, 1) 100%);
+  }
+</style>

@@ -12,11 +12,10 @@
       </v-container>
     </div>
 
-    <Live2DComponent :fromUrl="companion.live2dModelSettingPath"  style="z-index: 1;"/>
+    <Live2DComponent :fromUrl="companion.live2dModelSettingPath" style="z-index: 1;" id="live2dComponent" />
 
     <div>
       <div class="floating-chat">
-        <HistoryDialogInterface v-if="companionId" :companionId="companionId" />
         <textarea :disabled="messageLoading" v-model="message" placeholder="請輸入想要傳送的訊息..."
           @keypress.enter.exact.prevent="handleEnter" class="chat-input"></textarea>
         <v-btn :loading="messageLoading" @click="sendMessage" variant="text" icon flat
@@ -31,27 +30,33 @@
      z-index: 200;
    ">
       <v-btn :to="`/app/${companionId}`" prepend-icon="mdi-menu" variant="text">返回選單</v-btn>
+      <HistoryDialogInterface v-if="companionId" :companionId="companionId" />
+      <v-menu :close-on-content-click="false">
+        <template v-slot:activator="{props}">
+          <v-btn v-bind="props" icon variant="text"><v-icon>mdi-wallpaper</v-icon></v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="setBackground()">清除背景</v-list-item>
+          <v-list-item @click="setBackground('/backgrounds/Living_room.jpg')">和風室內</v-list-item>
+          <v-list-item @click="setBackground('/backgrounds/street.jpg')">房屋前</v-list-item>
+          <v-list-item @click="setBackground('/backgrounds/street2.jpg')">馬路上</v-list-item>
+          <v-divider></v-divider>
+          <v-dialog width="500">
+            <template v-slot:activator="{props}">
+              <v-list-item v-bind="props">自定義</v-list-item>
+            </template>
+            <!-- <v-list-item @click="setBackground('/backgrounds/forest.jpg')">自定義</v-list-item> -->
+             <v-card>
+              <v-card-text>
+                <v-file-input :disabled="setupLoading" :loading="setupLoading" type="file" accept="image/*" label="上傳自定義背景" @change="handleSetBackground" hide-details></v-file-input>
+              </v-card-text>
+             </v-card>
+          </v-dialog>
+        </v-list>
+      </v-menu>
       <!-- History Dialog Button -->
 
     </div>
-
-    <!-- Close History Dialog Button -->
-    <button v-if="showHistoryDialog" @click="showHistoryDialog = false" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 202;
-    background-color: rgb(237, 172, 231);
-    color: rgb(255, 255, 255);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    box-shadow: rgba(71, 17, 77, 0.82);
-    ">
-      <v-icon>mdi-redo</v-icon>
-    </button>
   </div>
   <v-dialog :model-value="setupLoading" persistent width="350">
     <v-card class="text-center" title="正在初始化角色">
@@ -84,8 +89,6 @@
   const store = useAppStore()
 
   const message = ref('');
-
-  const showHistoryDialog = ref(false);
 
   const companion = computed(() => {
     if (companionId.value == undefined) return undefined
@@ -140,7 +143,23 @@
     }
 
   };
-
+  // Existing setBackground function remains the same
+  function setBackground( imagePath?: string) {
+    const container = document.getElementById('live2dComponent');
+    if (container) {
+      if (!imagePath) {
+        container.style.backgroundImage = '';
+       
+        return;
+      }
+      container.style.backgroundImage = `url('${imagePath}')`;
+      container.style.backgroundRepeat = 'no-repeat';
+      container.style.backgroundPosition = 'center';
+      container.style.backgroundSize = 'cover';
+      // container.style.zIndex = '1';
+      console.log(`live2d.js: Background switched to ${imagePath}`);
+    }
+  }
 
   const companionId = ref<string>()
   // const companion = computed(() => {
@@ -162,6 +181,27 @@
       setupLoading.value = false
     }
   })
+
+  async function handleSetBackground(event: Event) {
+    let files = (event.target as HTMLInputElement).files;
+    if (!files) return;
+    let file = undefined as File | undefined;
+    if (!(files instanceof File)) {
+      file = files[0];
+    }
+    else {
+      file = files;
+    }
+    if (file.type.indexOf("image") == -1) {
+      alert("請上傳有效的圖片檔案");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      setBackground(e.target?.result as string);
+    }
+    reader.readAsDataURL(file);
+  }
 
 </script>
 <style scoped>

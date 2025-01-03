@@ -10,8 +10,11 @@
     scrollbar-width: thin;
   scrollbar-color: #e0e0e0 rgba(0, 0, 0, 0);
     ">
+      <v-card-text v-if="messageList.length == 0" class="text-center h-100 w-100 flex-grow-1">
+          目前沒有任何訊息
+      </v-card-text>
       <v-card-text class="pr-0 h-100 w-100">
-        <v-infinite-scroll @load="load" side="both" empty-text=""  class="pr-4 h-100 w-100">
+        <v-infinite-scroll @load="load" side="both" empty-text="" class="pr-4 h-100 w-100">
           <template v-for="message in messageList" :key="message._id">
             <div :class="['message-box', message.role]">
               <div class="message-content">
@@ -20,9 +23,7 @@
             </div>
           </template>
         </v-infinite-scroll>
-        <div v-if="messageList.length == 0" class="text-center">
-          目前沒有任何訊息
-        </div>
+
       </v-card-text>
     </v-card>
   </v-dialog>
