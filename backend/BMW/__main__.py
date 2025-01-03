@@ -9,6 +9,7 @@ import BMW.Manager
 import BMW.model
 import git
 import secrets
+import asyncio
 
 from BMW import POSSIBLE_COLLECTION_NAME_LOWERCASE
 
@@ -37,6 +38,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.websockets import WebSocketDisconnect
+import shutil
 
 # from starlette.requests import Request
 
@@ -86,6 +88,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(RewritePathMiddleware)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 @app.exception_handler(RequestValidationError)
 async def not_found_exception_handler(request, exc: RequestValidationError):
     console.log(exc.errors())
@@ -128,12 +131,14 @@ async def general_exception_handler(request, exc):
     )
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme),) -> User:
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+) -> User:
     if token:
         user = await User.find(token=token)
         if user:
             return user
-        
+
     raise HTTPException(status_code=401, detail="登入失敗")
 
 
@@ -167,6 +172,7 @@ class UserSignUpPayload(BaseModel):
     name: str
     email: str
     password: str
+
 
 @app.post("/signup")
 async def registration(payload: UserSignUpPayload, response: Response):
@@ -202,12 +208,12 @@ async def create_message(
         raise HTTPException(403, "您沒有權限發送訊息")
 
     await Message.empty(
-        role='user',
+        role="user",
         companionId=payload.companionId,
         content=payload.content,
-        ).create()
+    ).create()
     message = await generateResponseMessage(companion)
-    await user.update(LLM_use_count=user.LLM_use_count+1)
+    await user.update(LLM_use_count=user.LLM_use_count + 1)
     return Payload.success("成功發送訊息", await message.get_dict(user))
 
 
@@ -280,28 +286,31 @@ async def patch_companion(
         raise HTTPException(404, "找不到這個伴侶")
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限編輯這個伴侶")
-    
-    if payload.live2dModelSettingPath and not checkIfPathSafe(payload.live2dModelSettingPath):
+
+    if payload.live2dModelSettingPath and not checkIfPathSafe(
+        payload.live2dModelSettingPath
+    ):
         raise HTTPException(500, "不合法的Live2dModel路徑")
     raw_update_payload = payload.model_dump(exclude_unset=True)
     update_payload = {}
     for key, value in raw_update_payload.items():
         if value is not None and value != getattr(companion, key):
             update_payload[key] = value
-    
+
     if payload.backstory:
-        update_payload['trait'] = None
+        update_payload["trait"] = None
     await companion.update(**update_payload)
     return Payload.success("成功編輯伴侶", await companion.get_dict(user))
 
 
 class CompanionCreatePayload(BaseModel):
     name: str
-    description: str 
-    live2dModelSettingPath: str 
+    description: str
+    live2dModelSettingPath: str
     poseMap: dict[str, dict[str, str]] = {}
     backstory: str
     trait: CompanionTrait | None = None
+
 
 @app.post("/companion")
 async def create_companion(
@@ -313,6 +322,7 @@ async def create_companion(
     companion = Companion.empty(**payload.model_dump(), userId=user.id)
     await companion.create()
     return Payload.success("成功創建伴侶", await companion.get_dict(user))
+
 
 @app.delete("/companion/{companion_id}")
 async def delete_companion(
@@ -338,12 +348,14 @@ async def setup_companion(companion_id: str, user: User = Depends(get_current_us
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限設定這個伴侶")
     await companion.setup()
-    await user.update(LLM_use_count=user.LLM_use_count+1)
+    await user.update(LLM_use_count=user.LLM_use_count + 1)
     return Payload.success("成功設定伴侶")
+
 
 class UserEditPayload(BaseModel):
     name: str | None = None
     email: str | None = None
+
 
 @app.patch("/me")
 async def patch_user(
@@ -353,16 +365,16 @@ async def patch_user(
     raw_update_payload = payload.model_dump(exclude_unset=True)
     profile_dict = user.profile.model_dump()
     profile_dict.update(raw_update_payload)
-    
-    new_email = profile_dict.get('email')
+
+    new_email = profile_dict.get("email")
     if new_email and new_email != user.profile.email:
         if await User.find(**{"profile.email": new_email}):
             raise HTTPException(500, "這個信箱已被使用")
-    
+
     await user.update(profile=profile_dict)
-    
+
     return Payload.success("成功編輯帳戶", await user.get_dict(user))
-    
+
 
 @app.get("/user/{user_id}")
 async def get_user_by_id(user_id: str, user: User = Depends(get_current_user)):
@@ -409,10 +421,41 @@ async def user_token_reset(user_id: str, user: User = Depends(get_current_user))
 
 """
 
+
 @app.delete("/me")
 async def delete_user(user: User = Depends(get_current_user)):
     await user.update(deleted=True)
     return Payload.success("成功刪除帳號")
+
+
+async def user_assets_cleanup(user_id: str, preserve_path: str):
+    # remove all unused assets except the preserve_path
+    console.log(f"persist path: {preserve_path}")
+    user_directory = Path(f"./assets/live2dModel/{user_id}")
+    used_assets_path_list = [
+        c.live2dModelSettingPath.replace("/api/", "")
+        for c in await Companion.find_any(userId=user_id)
+    ]
+    console.log(f"[red] used_assets_path_list: {used_assets_path_list}")
+    for p in user_directory.iterdir():
+        console.log(str(p))
+        if (
+            not any(
+                [
+                    str(used_path).startswith(str(p))
+                    for used_path in used_assets_path_list
+                ]
+            )
+        ) and p != preserve_path:
+            console.log(f"preserved path: {preserve_path}")
+            console.log(f"[red]  removed: {p}")
+            console.log(p == preserve_path)
+
+            if p.is_dir():
+                shutil.rmtree(p)
+        else:
+            console.log(f"[yellow]  this is used: {p}")
+
 
 @app.post("/assets/live2dModel/upload")
 async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current_user)):
@@ -452,8 +495,12 @@ async def upload_live2d_model(file: UploadFile, user: User = Depends(get_current
         if model_json_path:
             break
 
+    asyncio.create_task(user_assets_cleanup(user.id, target_directory))
+
     if model_json_path:
-        return Payload.success("成功上傳並找到符合條件的文件", "/api/"+model_json_path)
+        return Payload.success(
+            "成功上傳並找到符合條件的文件", "/api/" + model_json_path
+        )
     else:
         return Payload.error("未找到符合條件的 .model3.json 文件")
 
@@ -464,7 +511,7 @@ async def read_assets(file_path: str):
 
     if not checkIfPathSafe(file_path):
         raise HTTPException(403, "不合法的路徑")
-    
+
     full_path = getFullPath(file_path)
     # 檢查文件是否存在
     if not full_path.exists() or not full_path.is_file():
