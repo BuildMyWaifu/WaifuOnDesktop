@@ -347,6 +347,8 @@ async def setup_companion(companion_id: str, user: User = Depends(get_current_us
         raise HTTPException(404, "找不到這個伴侶")
     if companion.userId != user.id:
         raise HTTPException(403, "您沒有權限設定這個伴侶")
+    for m in await Message.find_any(companionId=companion_id):
+        await m.update(deleted=True)
     await companion.setup()
     await user.update(LLM_use_count=user.LLM_use_count + 1)
     return Payload.success("成功設定伴侶")
