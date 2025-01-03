@@ -133,9 +133,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme),) -> User:
         user = await User.find(token=token)
         if user:
             return user
-        else:
-            raise HTTPException(status_code=401, detail="登入已過期，請重新登入")
-    raise HTTPException(status_code=401, detail="授權失效，請重新登入")
+        
+    raise HTTPException(status_code=401, detail="登入失敗")
 
 
 @app.get("/test")
@@ -336,6 +335,29 @@ async def setup_companion(companion_id: str, user: User = Depends(get_current_us
     await companion.setup()
     return Payload.success("成功設定伴侶")
 
+class UserEditPayload(BaseModel):
+    name: str | None = None
+    email: str | None = None
+
+@app.patch("/me")
+async def patch_user(
+    payload: UserEditPayload,
+    user: User = Depends(get_current_user),
+):
+    raw_update_payload = payload.model_dump(exclude_unset=True)
+    profile_dict = user.profile.model_dump()
+    profile_dict.update(raw_update_payload)
+    
+    new_email = profile_dict.get('email')
+    if new_email and new_email != user.profile.email:
+        if await User.find(**{"profile.email": new_email}):
+            raise HTTPException(500, "這個信箱已被使用")
+    
+    await user.update(profile=profile_dict)
+    
+    return Payload.success("成功編輯帳戶", await user.get_dict(user))
+    
+
 @app.get("/user/{user_id}")
 async def get_user_by_id(user_id: str, user: User = Depends(get_current_user)):
     target_user = await User.find(_id=user_id)
@@ -357,8 +379,8 @@ async def user_password_set(
     if await target_user.check_permission(user):
         await target_user.set_password(data.password)
         await target_user.update_token()
-        return Payload.success("成功編輯使用者密碼")
-    raise HTTPException(403, "您沒有權限重設這個使用者的密碼")
+        return Payload.success("成功編輯密碼")
+    raise HTTPException(403, "您沒有權限重設該密碼")
 
 
 @app.get("/user/{user_id}/token/reset")

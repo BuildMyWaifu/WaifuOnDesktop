@@ -15,13 +15,6 @@ T = TypeVar("T", bound="Editable")
 
 def basic_permission_check(func):
     async def wrapper(cls, user: IUser, *args, **kwargs):
-        if user.type != "carer" and not user.enable:
-            return False
-        if user.type == "staff":
-            if user.level < config.NONE_PERMISSION_LEVEL:
-                return False
-            if user.level > config.ALL_PERMISSION_LEVEL:
-                return True
         return await func(cls, user, *args, **kwargs)
 
     return wrapper
