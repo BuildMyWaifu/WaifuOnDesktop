@@ -8,7 +8,7 @@
         <v-card-text class="pb-0">
           <v-text-field flat  v-model="payload.email" density="compact" label="電子郵件" :rules="[email, required]"
             variant="solo-filled" />
-          <v-text-field flat  v-model="payload.name" density="compact" label="帳號" :rules="[name, required]"
+          <v-text-field flat  v-model="payload.name" density="compact" label="帳號名稱" :rules="[name, required]"
             variant="solo-filled" />
           <v-text-field  flat v-model="payload.password" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             density="compact" label="密碼" :rules="[password, required]" :type="showPassword ? 'text' : 'password'"
