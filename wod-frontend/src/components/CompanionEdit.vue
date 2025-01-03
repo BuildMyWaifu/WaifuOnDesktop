@@ -199,8 +199,8 @@ import { required } from "@/utils/form";
     else {
       file = files;
     }
+    if (!file) return
     let formData = new FormData
-
     formData.append('file', file)
     live2dUploadLoading.value = true;
     const res = await rawPostApi('/assets/live2dModel/upload', formData)
