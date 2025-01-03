@@ -29,8 +29,7 @@
                     <v-card-text>
                       <p>模型檔案必須為壓縮檔，且內含以下檔案：</p>
                       <ul>
-                        <li>model.json</li>
-                        <li>textures</li>
+                        <li>.model3.json</li>
                       </ul>
                     </v-card-text>
                   </v-card-text>
