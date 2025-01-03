@@ -24,13 +24,6 @@
         </v-alert>
 
       </div>
-      <v-card style="position: fixed; right: 8px; bottom: 8px">
-        <v-card-text>
-          <!-- <v-btn variant="text" to="/abcd">進入錯誤頁面</v-btn> -->
-          <v-btn variant="text" to="/test">測試頁面</v-btn>
-
-        </v-card-text>
-      </v-card>
     </v-responsive>
   </v-container>
 </template>
