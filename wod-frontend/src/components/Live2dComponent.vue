@@ -1,12 +1,12 @@
 <template>
-  <v-layout>
-
-    <div style="width: 100%;
+  <v-layout style="width: 100%;
     height: 100%;
     max-width: 100%;
     max-height: 100%;" class="overflow-hidden">
 
-      <canvas id="live2dCanvas" style="
+
+
+    <canvas id="live2dCanvas" style="
     display: block;
     margin: 0 auto;
     position: relative;
@@ -16,10 +16,10 @@
     max-width: 100%;
     max-height: 100%;
     "></canvas>
-      <v-overlay v-model="loading" class="align-center justify-center" contained persistent>
-        <v-progress-circular v-show="loading" indeterminate></v-progress-circular>
-      </v-overlay>
-    </div>
+    <v-overlay v-model="loading" class="align-center justify-center" contained persistent>
+      <v-progress-circular v-show="loading" indeterminate></v-progress-circular>
+    </v-overlay>
+
   </v-layout>
 </template>
 
