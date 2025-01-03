@@ -147,11 +147,11 @@ async def get_messages(companion: Companion) -> list[Message]:
     )
     message_list = []
     for message in raw_message_list:
-        content = message.content
+        content = """{"text": \"""" + message.content + """\"}"""
         if message.rawContent:
             content = message.rawContent
         message_list.append(
-            {"role": message.role, "content": """{"text": \"""" + content + """\"}"""}
+            {"role": message.role, "content": content}
         )
 
     message_list.insert(
