@@ -52,6 +52,7 @@ class Message(Editable):
     role: str
     companionId: str
     content: str
+    rawContent: str | None = None
     createdAt: int  # unix timestamp ms int
     pose: Pose | None = None
 

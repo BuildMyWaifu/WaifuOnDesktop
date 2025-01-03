@@ -133,7 +133,7 @@ async def setup_trait_and_send_systemPrompt(companion: Companion):
     # ).create()
 
     # await Message.empty(
-    #     role="system",  
+    #     role="system",
     #     companionId=companion.id,
     #     content=f"這是你的背景故事：{background_story}",
     # ).create()
@@ -145,10 +145,14 @@ async def get_messages(companion: Companion) -> list[Message]:
     raw_message_list = await Message.find_any(
         companionId=companion.id, sort=[("createdAt", 1)], limit=30
     )
-    message_list = [
-        {"role": message.role, "content": """{"text": \"""" + message.content + """\"}"""}
-        for message in raw_message_list
-    ]
+    message_list = []
+    for message in raw_message_list:
+        content = message.content
+        if message.rawContent:
+            content = message.rawContent
+        message_list.append(
+            {"role": message.role, "content": """{"text": \"""" + content + """\"}"""}
+        )
 
     message_list.insert(
         0,
@@ -225,6 +229,7 @@ async def generateResponseMessage(companion: Companion) -> Message:
         role="assistant",
         companionId=companion.id,
         content=content,
+        rawContent=ai_response,
         pose=pose_data,
     )
     await messge.create()
